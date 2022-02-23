@@ -1,0 +1,17 @@
+[package]
+name = "activex-rs"
+description = "Rust bindings for ActiveX and commonly-used plugins"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+com = "0.6.0"
+
+[dependencies.windows]
+version = "0.32.0"
+features = [
+    "alloc",
+    "Win32_Foundation"
+]

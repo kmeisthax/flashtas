@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "flashtas",
+    "comexport-rs",
+    "activex-rs",
+]
