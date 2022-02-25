@@ -69,13 +69,13 @@ fn main() {
         println!();
 
         for i in 0..fp_lib.GetTypeInfoCount() {
-            type_export::print_type_lib_type_as_rust(&fp_lib, i, false).unwrap();
+            type_export::print_type_lib_class_as_rust(&fp_lib, i).unwrap();
         }
 
         println!("com::interfaces! {{");
 
         for i in 0..fp_lib.GetTypeInfoCount() {
-            type_export::print_type_lib_type_as_rust(&fp_lib, i, true).unwrap();
+            type_export::print_type_lib_interface_as_rust(&fp_lib, i).unwrap();
         }
 
         println!("}}");
