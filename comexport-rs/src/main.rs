@@ -16,8 +16,8 @@ use windows::Win32::System::Ole::{
     VT_VOID,
 };
 
-/// Export a type library to Rust source code.
-fn print_type_lib_as_rust(lib: &ITypeLib) -> Result<(), WinError> {
+/// Export a type library's metadata as a module doccomment.
+fn print_type_lib_doccomment(lib: &ITypeLib) -> Result<(), WinError> {
     let libattr_raw = unsafe { lib.GetLibAttr()? };
     if libattr_raw.is_null() {
         return Err(WinError::new(HRESULT(-1), HSTRING::new()));
@@ -133,6 +133,8 @@ fn bridge_elem_to_rust_type(typeinfo: &ITypeInfo, tdesc: &TYPEDESC) -> Result<St
     })
 }
 
+/// Print valid Rust source code that matches the type signature of a COM
+/// method.
 fn rust_fn_for_com_method(
     type_nfo: &ITypeInfo,
     funcdesc: &FUNCDESC,
@@ -335,7 +337,7 @@ fn main() {
     unsafe {
         eprintln!("{} has {} entries", path, fp_lib.GetTypeInfoCount());
 
-        print_type_lib_as_rust(&fp_lib).unwrap();
+        print_type_lib_doccomment(&fp_lib).unwrap();
 
         println!("#![allow(clippy::too_many_arguments)]");
         println!("#![allow(clippy::upper_case_acronyms)]");
