@@ -43,6 +43,59 @@ fn print_type_lib_as_rust(lib: &ITypeLib) -> Result<(), WinError> {
     Ok(())
 }
 
+/// Given a type and a referred type ID, print the type it would be if defined
+/// in Rust.
+///
+/// This is sometimes referred to as `HREFTYPE` in Microsoft documentation.
+///
+/// NOTE: User-defined types are used verbatim. There is currently no machinery
+/// to look up or add use statements for user-defined types.
+fn bridge_usertype_to_rust_type(typeinfo: &ITypeInfo, href: u32) -> Result<String, WinError> {
+    let mut strname = BSTR::new();
+
+    unsafe {
+        let target_type = typeinfo.GetRefTypeInfo(href);
+        if target_type.is_err() {
+            return Ok(format!(
+                "/* unknown user-defined type 0x{:X} (error on reftypeinfo) */",
+                href
+            ));
+        }
+
+        let target_type = target_type.unwrap();
+        let mut target_lib = None;
+        let mut target_index = 0;
+        if target_type
+            .GetContainingTypeLib(&mut target_lib, &mut target_index)
+            .is_err()
+        {
+            return Ok(format!(
+                "/* unknown user-defined type 0x{:X} (error on getcontainingtypelib) */",
+                href
+            ));
+        }
+
+        let target_lib = target_lib.unwrap();
+        if target_lib
+            .GetDocumentation(
+                target_index as i32,
+                &mut strname,
+                null_mut(),
+                null_mut(),
+                null_mut(),
+            )
+            .is_err()
+        {
+            return Ok(format!(
+                "/* unknown user-defined type 0x{:X} (error on getdocs) */",
+                href
+            ));
+        }
+    }
+
+    Ok(format!("{}", strname))
+}
+
 /// Given a type description and the type it came from, print the type it would
 /// be if defined in Rust.
 ///
@@ -74,49 +127,7 @@ fn bridge_elem_to_rust_type(typeinfo: &ITypeInfo, tdesc: &TYPEDESC) -> Result<St
         }
         VT_USERDEFINED | VT_VARIANT => {
             let href_type = unsafe { tdesc.Anonymous.hreftype };
-            let mut strname = BSTR::new();
-
-            unsafe {
-                let target_type = typeinfo.GetRefTypeInfo(href_type);
-                if target_type.is_err() {
-                    return Ok(format!(
-                        "/* unknown user-defined type 0x{:X} (error on reftypeinfo) */",
-                        href_type
-                    ));
-                }
-
-                let target_type = target_type.unwrap();
-                let mut target_lib = None;
-                let mut target_index = 0;
-                if target_type
-                    .GetContainingTypeLib(&mut target_lib, &mut target_index)
-                    .is_err()
-                {
-                    return Ok(format!(
-                        "/* unknown user-defined type 0x{:X} (error on getcontainingtypelib) */",
-                        href_type
-                    ));
-                }
-
-                let target_lib = target_lib.unwrap();
-                if target_lib
-                    .GetDocumentation(
-                        target_index as i32,
-                        &mut strname,
-                        null_mut(),
-                        null_mut(),
-                        null_mut(),
-                    )
-                    .is_err()
-                {
-                    return Ok(format!(
-                        "/* unknown user-defined type 0x{:X} (error on getdocs) */",
-                        href_type
-                    ));
-                }
-            }
-
-            format!("{}", strname)
+            bridge_usertype_to_rust_type(typeinfo, href_type)?
         }
         _ => format!("/* unknown type 0x{:X} */", tdesc.vt),
     })
@@ -252,9 +263,18 @@ fn print_type_lib_type_as_rust(
                 println!("    /// {}", strdocstring);
             }
 
+            let mut superinterfaces = vec![];
+            for i in 0..typeattr.cImplTypes {
+                let href = unsafe { type_nfo.GetRefTypeOfImplType(i as u32)? };
+                superinterfaces.push(bridge_usertype_to_rust_type(&type_nfo, href)?);
+            }
+
             println!("    #[uuid(\"{:?}\")]", typeattr.guid);
-            //TODO: Get superinterfaces if possible
-            println!("    pub unsafe interface {}: IUnknown {{", strname);
+            println!(
+                "    pub unsafe interface {}: {} {{",
+                strname,
+                superinterfaces.join(", ")
+            );
 
             for i in 0..typeattr.cFuncs {
                 print_type_function_as_rust(&type_nfo, i as u32)?;

@@ -9,6 +9,7 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::upper_case_acronyms)]
 
+use crate::IDispatch;
 use com::interfaces::IUnknown;
 use com::sys::GUID;
 use windows::core::HRESULT;
@@ -49,7 +50,7 @@ pub const FLASH_OBJECT_CLSID: GUID = GUID {
 com::interfaces! {
     /// Shockwave Flash
     #[uuid("D27CDB6C-AE6D-11CF-96B8-444553540000")]
-    pub unsafe interface IShockwaveFlash: IUnknown {
+    pub unsafe interface IShockwaveFlash: IDispatch {
         // TODO: dispatch
         // fn QueryInterface(&self, param0: *mut GUID, param1: *mut *mut c_void);
 
@@ -246,7 +247,7 @@ com::interfaces! {
 
     /// Event interface for Shockwave Flash
     #[uuid("D27CDB6D-AE6D-11CF-96B8-444553540000")]
-    pub unsafe interface _IShockwaveFlashEvents: IUnknown {
+    pub unsafe interface _IShockwaveFlashEvents: IDispatch {
         // TODO: dispatch
         // fn OnReadyStateChange(&self, param0: i32);
 
@@ -268,11 +269,11 @@ com::interfaces! {
 
     /// IFlashObjectInterface Interface
     #[uuid("D27CDB72-AE6D-11CF-96B8-444553540000")]
-    pub unsafe interface IFlashObjectInterface: IUnknown {
+    pub unsafe interface IFlashObjectInterface: IDispatchEx {
     }
 
     #[uuid("A6EF9860-C720-11D0-9337-00A0C90DCAA9")]
-    pub unsafe interface IDispatchEx: IUnknown {
+    pub unsafe interface IDispatchEx: IDispatch {
         fn GetDispID(&self, param0: BSTR, param1: u32, param2: *mut i32) -> HRESULT;
         fn RemoteInvokeEx(&self, param0: i32, param1: u32, param2: u32, param3: *mut DISPPARAMS, param4: *mut IShockwaveFlash, param5: *mut EXCEPINFO, param6: *mut IServiceProvider, param7: usize, param8: *mut usize, param9: *mut IShockwaveFlash) -> HRESULT;
         fn DeleteMemberByName(&self, param0: BSTR, param1: u32) -> HRESULT;
@@ -290,7 +291,7 @@ com::interfaces! {
 
     /// IFlashObject Interface
     #[uuid("86230738-D762-4C50-A2DE-A753E5B1686F")]
-    pub unsafe interface IFlashObject: IUnknown {
+    pub unsafe interface IFlashObject: IDispatch {
         // TODO: dispatch
         // fn QueryInterface(&self, param0: *mut GUID, param1: *mut *mut c_void);
 
