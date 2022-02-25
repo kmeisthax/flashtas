@@ -2,13 +2,19 @@ use com::runtime::init_runtime;
 use convert_case::{Case, Casing};
 use std::env::args;
 use std::ffi::OsStr;
+use std::ptr::null_mut;
 use windows::core::{Error as WinError, HRESULT, HSTRING};
 use windows::Win32::Foundation::BSTR;
 use windows::Win32::System::Com::{
-    ITypeInfo, ITypeLib, FUNCDESC, TKIND_COCLASS, TKIND_DISPATCH, TKIND_INTERFACE, TLIBATTR,
-    TYPEATTR,
+    ITypeInfo, ITypeLib, ELEMDESC, FUNCDESC, FUNC_DISPATCH, FUNC_PUREVIRTUAL, FUNC_VIRTUAL,
+    INVOKE_FUNC, TKIND_COCLASS, TKIND_DISPATCH, TKIND_INTERFACE, TLIBATTR, TYPEATTR, TYPEDESC,
 };
 use windows::Win32::System::Ole::LoadTypeLib;
+use windows::Win32::System::Ole::{
+    VARENUM, VT_BOOL, VT_BSTR, VT_DISPATCH, VT_HRESULT, VT_I1, VT_I2, VT_I4, VT_I8, VT_INT, VT_PTR,
+    VT_R4, VT_R8, VT_UI1, VT_UI2, VT_UI4, VT_UI8, VT_UINT, VT_UNKNOWN, VT_USERDEFINED, VT_VARIANT,
+    VT_VOID,
+};
 
 /// Export a type library to Rust source code.
 fn print_type_lib_as_rust(lib: &ITypeLib) -> Result<(), WinError> {
@@ -37,6 +43,118 @@ fn print_type_lib_as_rust(lib: &ITypeLib) -> Result<(), WinError> {
     Ok(())
 }
 
+/// Given a type description and the type it came from, print the type it would
+/// be if defined in Rust.
+///
+/// NOTE: User-defined types are used verbatim. There is currently no machinery
+/// to look up or add use statements for user-defined types.
+fn bridge_elem_to_rust_type(typeinfo: &ITypeInfo, tdesc: &TYPEDESC) -> Result<String, WinError> {
+    Ok(match VARENUM(tdesc.vt as i32) {
+        VT_I2 => "i16".to_string(),
+        VT_I4 => "i32".to_string(),
+        VT_R4 => "f32".to_string(),
+        VT_R8 => "f64".to_string(),
+        VT_BSTR => "BSTR".to_string(),
+        VT_DISPATCH => "IDispatch".to_string(),
+        VT_BOOL => "BOOL".to_string(),
+        VT_I1 => "i8".to_string(),
+        VT_UI1 => "u8".to_string(),
+        VT_UI2 => "u16".to_string(),
+        VT_UI4 => "u32".to_string(),
+        VT_I8 => "i64".to_string(),
+        VT_UI8 => "u64".to_string(),
+        VT_INT => "isize".to_string(),
+        VT_UINT => "usize".to_string(),
+        VT_VOID => "c_void".to_string(),
+        VT_HRESULT => "HRESULT".to_string(),
+        VT_UNKNOWN => "IUnknown".to_string(),
+        VT_PTR => {
+            let target_type: &TYPEDESC = unsafe { &*tdesc.Anonymous.lptdesc };
+            format!("*mut {}", bridge_elem_to_rust_type(typeinfo, target_type)?)
+        }
+        VT_USERDEFINED | VT_VARIANT => {
+            let href_type = unsafe { tdesc.Anonymous.hreftype };
+            let mut strname = BSTR::new();
+
+            unsafe {
+                let target_type = typeinfo.GetRefTypeInfo(href_type);
+                if target_type.is_err() {
+                    return Ok(format!(
+                        "/* unknown user-defined type 0x{:X} (error on reftypeinfo) */",
+                        href_type
+                    ));
+                }
+
+                let target_type = target_type.unwrap();
+                let mut target_lib = None;
+                let mut target_index = 0;
+                if target_type
+                    .GetContainingTypeLib(&mut target_lib, &mut target_index)
+                    .is_err()
+                {
+                    return Ok(format!(
+                        "/* unknown user-defined type 0x{:X} (error on getcontainingtypelib) */",
+                        href_type
+                    ));
+                }
+
+                let target_lib = target_lib.unwrap();
+                if target_lib
+                    .GetDocumentation(
+                        target_index as i32,
+                        &mut strname,
+                        null_mut(),
+                        null_mut(),
+                        null_mut(),
+                    )
+                    .is_err()
+                {
+                    return Ok(format!(
+                        "/* unknown user-defined type 0x{:X} (error on getdocs) */",
+                        href_type
+                    ));
+                }
+            }
+
+            format!("{}", strname)
+        }
+        _ => format!("/* unknown type 0x{:X} */", tdesc.vt),
+    })
+}
+
+fn rust_fn_for_com_method(
+    type_nfo: &ITypeInfo,
+    funcdesc: &FUNCDESC,
+    fn_name: BSTR,
+) -> Result<String, WinError> {
+    let mut param_types = vec!["&self".to_string()];
+    for i in 0..funcdesc.cParams {
+        let elemdesc: &mut ELEMDESC =
+            unsafe { &mut *funcdesc.lprgelemdescParam.offset(i as isize) };
+        param_types.push(format!(
+            "param{}: {}",
+            i,
+            bridge_elem_to_rust_type(type_nfo, &elemdesc.tdesc)?
+        ));
+    }
+
+    let return_type = if VARENUM(funcdesc.elemdescFunc.tdesc.vt as i32) == VT_VOID {
+        "".to_string()
+    } else {
+        format!(
+            " -> {}",
+            bridge_elem_to_rust_type(type_nfo, &funcdesc.elemdescFunc.tdesc)?
+        )
+    };
+
+    Ok(format!(
+        "fn {}({}){};",
+        fn_name,
+        param_types.join(", "),
+        return_type
+    ))
+}
+
 /// Export a single function from a type info structure to Rust source code.
 fn print_type_function_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Result<(), WinError> {
     let funcdesc_raw = unsafe { type_nfo.GetFuncDesc(fn_index)? };
@@ -62,7 +180,31 @@ fn print_type_function_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Result<()
         )?
     };
 
-    println!("        //TODO: {}", strname);
+    //TODO: CALLCONV?
+    match funcdesc.funckind {
+        FUNC_VIRTUAL | FUNC_PUREVIRTUAL if funcdesc.invkind == INVOKE_FUNC => {
+            println!(
+                "        {}",
+                rust_fn_for_com_method(type_nfo, funcdesc, strname)?
+            );
+        }
+        //TODO: Dispatch methods don't live in the interface vtable and should
+        //be implemented in another block
+        FUNC_DISPATCH if funcdesc.invkind == INVOKE_FUNC => {
+            println!("        // TODO: dispatch");
+            println!(
+                "        // {}",
+                rust_fn_for_com_method(type_nfo, funcdesc, strname)?
+            );
+            println!();
+        }
+        _ => {
+            println!(
+                "        //TODO: {} (funckind {:?}, invkind {:?})",
+                strname, funcdesc.funckind, funcdesc.invkind
+            );
+        }
+    }
 
     unsafe { type_nfo.ReleaseFuncDesc(funcdesc) };
 
@@ -175,8 +317,17 @@ fn main() {
 
         print_type_lib_as_rust(&fp_lib).unwrap();
 
+        println!("#![allow(clippy::too_many_arguments)]");
+        println!("#![allow(clippy::upper_case_acronyms)]");
+        println!();
         println!("use com::interfaces::IUnknown;");
+
+        //TODO: automatic bridging from user-defined types to `windows`/`com` types
         println!("use com::sys::GUID;");
+        println!("use windows::core::HRESULT;");
+        println!("use windows::Win32::System::Com::{{DISPPARAMS, EXCEPINFO}};");
+        println!();
+        println!("type BSTR = *const u16;");
         println!();
 
         for i in 0..fp_lib.GetTypeInfoCount() {
