@@ -1,4 +1,4 @@
-use activex_rs::flash::{IShockwaveFlash, SHOCKWAVE_FLASH_CLSID};
+use activex_rs::bindings::flash::{IShockwaveFlash, SHOCKWAVE_FLASH_CLSID};
 use activex_rs::get_class_object_by_dll;
 use com::interfaces::IClassFactory;
 use com::runtime::init_runtime;

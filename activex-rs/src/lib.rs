@@ -1,8 +1,7 @@
 //! ActiveX bindings for Rust
 
-pub mod flash;
+pub mod bindings;
 mod rrf_com;
-mod stdole;
 
+pub use bindings::stdole::IDispatch;
 pub use rrf_com::get_class_object_by_dll;
-pub use stdole::IDispatch;
