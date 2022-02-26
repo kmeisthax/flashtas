@@ -94,11 +94,12 @@ pub fn bridge_elem_to_rust_type(
         VT_VOID => "c_void".to_string(),
         VT_HRESULT => "HRESULT".to_string(),
         VT_UNKNOWN => "IUnknown".to_string(),
+        VT_VARIANT => "VARIANT".to_string(),
         VT_PTR => {
             let target_type: &TYPEDESC = unsafe { &*tdesc.Anonymous.lptdesc };
             format!("*mut {}", bridge_elem_to_rust_type(typeinfo, target_type)?)
         }
-        VT_USERDEFINED | VT_VARIANT => {
+        VT_USERDEFINED => {
             let href_type = unsafe { tdesc.Anonymous.hreftype };
             bridge_usertype_to_rust_type(typeinfo, href_type)?
         }

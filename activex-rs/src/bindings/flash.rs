@@ -80,7 +80,7 @@ com::interfaces! {
     #[uuid("A6EF9860-C720-11D0-9337-00A0C90DCAA9")]
     pub unsafe interface IDispatchEx: IDispatch {
         pub unsafe fn GetDispID(&self, param0: BSTR, param1: u32, param2: *mut i32) -> HRESULT;
-        pub unsafe fn RemoteInvokeEx(&self, param0: i32, param1: u32, param2: u32, param3: *mut DISPPARAMS, param4: *mut IShockwaveFlash, param5: *mut EXCEPINFO, param6: *mut IServiceProvider, param7: u32, param8: *mut u32, param9: *mut IShockwaveFlash) -> HRESULT;
+        pub unsafe fn RemoteInvokeEx(&self, param0: i32, param1: u32, param2: u32, param3: *mut DISPPARAMS, param4: *mut VARIANT, param5: *mut EXCEPINFO, param6: *mut IServiceProvider, param7: u32, param8: *mut u32, param9: *mut VARIANT) -> HRESULT;
         pub unsafe fn DeleteMemberByName(&self, param0: BSTR, param1: u32) -> HRESULT;
         pub unsafe fn DeleteMemberByDispID(&self, param0: i32) -> HRESULT;
         pub unsafe fn GetMemberProperties(&self, param0: i32, param1: u32, param2: *mut u32) -> HRESULT;
@@ -339,7 +339,7 @@ impl IShockwaveFlash {
         param2: u32,
         param3: u16,
         param4: *mut DISPPARAMS,
-        param5: *mut IShockwaveFlash,
+        param5: *mut VARIANT,
         param6: *mut EXCEPINFO,
         param7: *mut u32,
     ) {
@@ -2271,7 +2271,7 @@ impl IFlashObject {
         param2: u32,
         param3: u16,
         param4: *mut DISPPARAMS,
-        param5: *mut IShockwaveFlash,
+        param5: *mut VARIANT,
         param6: *mut EXCEPINFO,
         param7: *mut u32,
     ) {
@@ -2385,12 +2385,12 @@ impl IFlashObject {
         param1: u32,
         param2: u32,
         param3: *mut DISPPARAMS,
-        param4: *mut IShockwaveFlash,
+        param4: *mut VARIANT,
         param5: *mut EXCEPINFO,
         param6: *mut IServiceProvider,
         param7: u32,
         param8: *mut u32,
-        param9: *mut IShockwaveFlash,
+        param9: *mut VARIANT,
     ) {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
