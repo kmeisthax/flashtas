@@ -2901,7 +2901,9 @@ impl IFlashObject {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { pbstrVal: param1 },
+                    Anonymous: VARIANT_0_0_0 {
+                        pbstrVal: ::std::mem::transmute(param1),
+                    },
                     ..Default::default()
                 }),
             },

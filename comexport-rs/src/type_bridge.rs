@@ -122,6 +122,10 @@ enum WrapType {
     /// `windows` `BSTR` AND a `ManuallyDrop`.
     Bstr,
 
+    /// The Rust-side type is a `*mut *const u16` that must be wrapped into a
+    /// `windows` `*mut BSTR`.
+    BstrPtr,
+
     /// The Rust-side type must be cast to `c_void`.
     CVoidPtr,
 }
@@ -240,7 +244,7 @@ fn vt_and_ufield_for_tdesc(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapType), S
             VT_BSTR => (
                 "::windows::Win32::System::Ole::VT_BSTR",
                 "pbstrVal",
-                WrapType::Bare,
+                WrapType::BstrPtr,
             ),
             VT_BOOL => (
                 "::windows::Win32::System::Ole::VT_BOOL",
@@ -337,6 +341,7 @@ pub fn generate_dispatch_param(param_i: i16, tdesc: &TYPEDESC) -> Result<String,
             "{}: ManuallyDrop::new(::std::mem::transmute(param{}))",
             ufield, param_i
         ),
+        WrapType::BstrPtr => format!("{}: ::std::mem::transmute(param{})", ufield, param_i),
         WrapType::CVoidPtr => format!("{}: param{} as *mut c_void", ufield, param_i,),
     };
 
@@ -373,7 +378,7 @@ pub fn generate_dispatch_return(tdesc: &TYPEDESC) -> Result<String, WinError> {
             "BOOL(disp_result.Anonymous.Anonymous.Anonymous.{} as i32)",
             ufield
         ),
-        WrapType::Bstr => format!(
+        WrapType::Bstr | WrapType::BstrPtr => format!(
             "::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.{})",
             ufield
         ),
