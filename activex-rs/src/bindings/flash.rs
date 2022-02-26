@@ -119,7 +119,17 @@ impl IShockwaveFlash {
                 }),
             },
         });
-        /* invalid: only one level of pointers is permitted */
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param1 as *mut c_void,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
@@ -300,7 +310,17 @@ impl IShockwaveFlash {
                 }),
             },
         });
-        /* invalid: only one level of pointers is permitted */
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param2 as *mut c_void,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
@@ -350,7 +370,17 @@ impl IShockwaveFlash {
                 }),
             },
         });
-        /* invalid: only one level of pointers is permitted */
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_I1.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param1 as *mut c_void,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
@@ -2455,7 +2485,17 @@ impl IFlashObject {
                 }),
             },
         });
-        /* invalid: only one level of pointers is permitted */
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param1 as *mut c_void,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
@@ -2636,7 +2676,17 @@ impl IFlashObject {
                 }),
             },
         });
-        /* invalid: only one level of pointers is permitted */
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param2 as *mut c_void,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
@@ -2686,7 +2736,17 @@ impl IFlashObject {
                 }),
             },
         });
-        /* invalid: only one level of pointers is permitted */
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_I1.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param1 as *mut c_void,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
@@ -3336,7 +3396,17 @@ impl IFlashObject {
 
     pub unsafe fn GetNameSpaceParent(&self, param0: *mut IUnknown) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
-        /* invalid: cannot use VT_PTR to type 0xD in IDispatch */
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_UNKNOWN.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param0 as *mut c_void,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
