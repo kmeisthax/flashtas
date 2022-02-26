@@ -87,6 +87,9 @@ pub fn print_type_lib_class_as_rust(lib: &ITypeLib, type_index: u32) -> Result<(
 /// interface block will be printed. Things such as properties and dispatch
 /// will be skipped; those must be printed outside the interfaces block as a
 /// separate `impl` helper function.
+///
+/// To export those helper functions, see
+/// `print_type_lib_interface_impl_as_rust`.
 pub fn print_type_lib_interface_as_rust(lib: &ITypeLib, type_index: u32) -> Result<(), WinError> {
     let type_nfo = unsafe { lib.GetTypeInfo(type_index)? };
     let typeattr_raw = unsafe { type_nfo.GetTypeAttr()? };
@@ -137,6 +140,57 @@ pub fn print_type_lib_interface_as_rust(lib: &ITypeLib, type_index: u32) -> Resu
             }
 
             println!("    }}");
+            println!();
+        }
+        _ => {}
+    }
+
+    unsafe { type_nfo.ReleaseTypeAttr(typeattr_raw) };
+
+    Ok(())
+}
+
+/// Export a single interface's Rust-side helpers from a type library.
+///
+/// This should be called outside of a `com::interfaces!` block. It will only
+/// print things related to interfaces that do not fit inside of that block.
+pub fn print_type_lib_interface_impl_as_rust(
+    lib: &ITypeLib,
+    type_index: u32,
+) -> Result<(), WinError> {
+    let type_nfo = unsafe { lib.GetTypeInfo(type_index)? };
+    let typeattr_raw = unsafe { type_nfo.GetTypeAttr()? };
+    if typeattr_raw.is_null() {
+        return Err(WinError::new(HRESULT(-1), HSTRING::new()));
+    }
+
+    let typeattr: &mut TYPEATTR = unsafe { &mut *typeattr_raw };
+
+    let mut strname = BSTR::new();
+    let mut strdocstring = BSTR::new();
+    let mut whelpcontext = 0;
+    let mut strhelpfile = BSTR::new();
+
+    //TODO: This leaks.
+    unsafe {
+        lib.GetDocumentation(
+            type_index as i32,
+            &mut strname,
+            &mut strdocstring,
+            &mut whelpcontext,
+            &mut strhelpfile,
+        )?
+    };
+
+    match typeattr.typekind {
+        TKIND_INTERFACE | TKIND_DISPATCH => {
+            println!("impl {} {{", strname);
+
+            for i in 0..typeattr.cFuncs {
+                fn_export::print_type_dispatch_as_rust(&type_nfo, i as u32)?;
+            }
+
+            println!("}}");
             println!();
         }
         _ => {}

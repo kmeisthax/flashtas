@@ -13,14 +13,14 @@ use com::interfaces::IUnknown;
 use com::sys::GUID;
 use std::ffi::c_void;
 use windows::core::HRESULT;
-use windows::Win32::System::Com::{DISPPARAMS, EXCEPINFO};
+use windows::Win32::System::Com::{DISPPARAMS, EXCEPINFO, VARIANT};
 
 com::interfaces! {
     #[uuid("00020400-0000-0000-C000-000000000046")]
     pub unsafe interface IDispatch: IUnknown {
-        fn GetTypeInfoCount(&self, param0: *mut usize) -> HRESULT;
-        fn GetTypeInfo(&self, param0: usize, param1: u32, param2: *mut *mut c_void) -> HRESULT;
-        fn GetIDsOfNames(&self, param0: *mut GUID, param1: *mut *mut i8, param2: usize, param3: u32, param4: *mut i32) -> HRESULT;
-        fn Invoke(&self, param0: i32, param1: *mut GUID, param2: u32, param3: u16, param4: *mut DISPPARAMS, param5: *mut GUID, param6: *mut EXCEPINFO, param7: *mut usize) -> HRESULT;
+        pub unsafe fn GetTypeInfoCount(&self, param0: *mut usize) -> HRESULT;
+        pub unsafe fn GetTypeInfo(&self, param0: usize, param1: u32, param2: *mut *mut c_void) -> HRESULT;
+        pub unsafe fn GetIDsOfNames(&self, param0: *mut GUID, param1: *mut *mut i8, param2: usize, param3: u32, param4: *mut i32) -> HRESULT;
+        pub unsafe fn Invoke(&self, param0: i32, param1: *mut GUID, param2: u32, param3: u16, param4: *mut DISPPARAMS, param5: *mut VARIANT, param6: *mut EXCEPINFO, param7: *mut usize) -> HRESULT;
     }
 }

@@ -57,13 +57,25 @@ fn main() {
 
         println!("#![allow(clippy::too_many_arguments)]");
         println!("#![allow(clippy::upper_case_acronyms)]");
+        println!("#![allow(clippy::missing_safety_doc)]");
+        println!("#![allow(clippy::vec_init_then_push)]");
+        println!("#![allow(non_snake_case)]");
         println!();
-        println!("use com::interfaces::IUnknown;");
 
         //TODO: automatic bridging from user-defined types to `windows`/`com` types
+        println!("use crate::IDispatch;");
+        println!("use com::interfaces::IUnknown;");
         println!("use com::sys::GUID;");
         println!("use windows::core::HRESULT;");
-        println!("use windows::Win32::System::Com::{{DISPPARAMS, EXCEPINFO}};");
+        println!(
+            "use windows::Win32::System::Com::{{
+    DISPPARAMS, EXCEPINFO, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0
+}};"
+        );
+        println!("use windows::Win32::System::Ole::{{DISPATCH_METHOD, VARENUM}};");
+        println!("use windows::Win32::Foundation::BOOL;");
+        println!("use std::mem::ManuallyDrop;");
+        println!("use std::ffi::c_void;");
         println!();
         println!("type BSTR = *const u16;");
         println!();
@@ -79,6 +91,11 @@ fn main() {
         }
 
         println!("}}");
+        println!();
+
+        for i in 0..fp_lib.GetTypeInfoCount() {
+            type_export::print_type_lib_interface_impl_as_rust(&fp_lib, i).unwrap();
+        }
 
         eprintln!("Type definition export complete!");
     }
