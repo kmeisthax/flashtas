@@ -482,6 +482,24 @@ impl IShockwaveFlash {
         );
     }
 
+    //TODO: IDispatch helper for ReadyState (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for TotalFrames (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for Playing (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for Playing (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for Quality (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for Quality (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for ScaleMode (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for ScaleMode (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for AlignMode (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for AlignMode (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for BackgroundColor (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for BackgroundColor (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for Loop (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for Loop (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for Movie (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for Movie (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for FrameNum (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for FrameNum (invkind INVOKEKIND(4))
     pub unsafe fn SetZoomRect(&self, param0: i32, param1: i32, param2: i32, param3: i32) {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -1022,6 +1040,24 @@ impl IShockwaveFlash {
         }
     }
 
+    //TODO: IDispatch helper for WMode (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for WMode (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for SAlign (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for SAlign (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for Menu (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for Menu (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for Base (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for Base (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for Scale (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for Scale (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for DeviceFont (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for DeviceFont (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for EmbedMovie (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for EmbedMovie (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for BGColor (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for BGColor (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for Quality2 (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for Quality2 (invkind INVOKEKIND(4))
     pub unsafe fn LoadMovie(&self, param0: i32, param1: BSTR) {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -1811,6 +1847,18 @@ impl IShockwaveFlash {
         }
     }
 
+    //TODO: IDispatch helper for SWRemote (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for SWRemote (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for FlashVars (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for FlashVars (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for AllowScriptAccess (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for AllowScriptAccess (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for MovieData (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for MovieData (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for InlineData (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for InlineData (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for SeamlessTabbing (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for SeamlessTabbing (invkind INVOKEKIND(4))
     pub unsafe fn EnforceLocalSecurity(&self) {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1837,6 +1885,12 @@ impl IShockwaveFlash {
         );
     }
 
+    //TODO: IDispatch helper for Profile (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for Profile (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for ProfileAddress (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for ProfileAddress (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for ProfilePort (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for ProfilePort (invkind INVOKEKIND(4))
     pub unsafe fn CallFunction(&self, param0: BSTR) -> BSTR {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -1948,6 +2002,19 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
         );
     }
+
+    //TODO: IDispatch helper for AllowNetworking (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for AllowNetworking (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for AllowFullScreen (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for AllowFullScreen (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for AllowFullScreenInteractive (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for AllowFullScreenInteractive (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for IsDependent (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for IsDependent (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for BrowserZoom (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for BrowserZoom (invkind INVOKEKIND(4))
+    //TODO: IDispatch helper for IsTainted (invkind INVOKEKIND(2))
+    //TODO: IDispatch helper for IsTainted (invkind INVOKEKIND(4))
 }
 
 impl _IShockwaveFlashEvents {

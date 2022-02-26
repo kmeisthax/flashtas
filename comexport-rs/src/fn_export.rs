@@ -82,11 +82,17 @@ pub fn print_type_function_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
         }
         FUNC_VIRTUAL | FUNC_PUREVIRTUAL => {
             println!(
-                "        //TODO: {} (funckind {:?}, invkind {:?})",
+                "        //INVALID invkind: {} (funckind {:?}, invkind {:?})",
                 strname, funcdesc.funckind, funcdesc.invkind
             );
         }
-        _ => {}
+        FUNC_DISPATCH => {}
+        _ => {
+            println!(
+                "        //UNKNOWN funckind: {} (funckind {:?}, invkind {:?})",
+                strname, funcdesc.funckind, funcdesc.invkind
+            );
+        }
     }
 
     unsafe { type_nfo.ReleaseFuncDesc(funcdesc) };
@@ -199,6 +205,12 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
 
             println!("    }}");
             println!();
+        }
+        FUNC_DISPATCH => {
+            println!(
+                "        //TODO: IDispatch helper for {} (invkind {:?})",
+                strname, funcdesc.invkind
+            );
         }
         _ => {}
     }
