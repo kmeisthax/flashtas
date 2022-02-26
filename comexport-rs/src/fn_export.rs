@@ -10,11 +10,15 @@ use windows::Win32::System::Ole::{VARENUM, VT_VOID};
 
 /// Print valid Rust source code that matches the type signature of a COM
 /// method.
+///
+/// COM methods are meant to correspond directly to the vtable that coclasses
+/// expose. In a type library this includes `FUNC_VIRTUAL` and
+/// `FUNC_PUREVIRTUAL`. They go into the `interface` block of a given
+/// interface.
 fn rust_fn_for_com_method(
     type_nfo: &ITypeInfo,
     funcdesc: &FUNCDESC,
     fn_name: BSTR,
-    has_impl: bool,
 ) -> Result<String, WinError> {
     let mut param_types = vec!["&self".to_string()];
     for i in 0..funcdesc.cParams {
@@ -37,11 +41,10 @@ fn rust_fn_for_com_method(
     };
 
     Ok(format!(
-        "pub unsafe fn {}({}){}{}",
+        "pub unsafe fn {}({}){};",
         fn_name,
         param_types.join(", "),
-        return_type,
-        if has_impl { "" } else { ";" }
+        return_type
     ))
 }
 
@@ -77,7 +80,7 @@ pub fn print_type_function_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
         FUNC_VIRTUAL | FUNC_PUREVIRTUAL if funcdesc.invkind == INVOKE_FUNC => {
             println!(
                 "        {}",
-                rust_fn_for_com_method(type_nfo, funcdesc, strname, false)?
+                rust_fn_for_com_method(type_nfo, funcdesc, strname)?
             );
         }
         FUNC_VIRTUAL | FUNC_PUREVIRTUAL => {
@@ -98,6 +101,50 @@ pub fn print_type_function_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
     unsafe { type_nfo.ReleaseFuncDesc(funcdesc) };
 
     Ok(())
+}
+
+/// Print valid Rust source code that matches the type signature of a COM
+/// dispatch helper.
+///
+/// COM dispatch helpers exist to allow Rust code to avoid having to handle
+/// parameter marshalling for `IDispatch`-based methods and properties. They
+/// live in a separate `impl` block for an already-defined COM interface.
+///
+/// All dispatch helpers return a `Result` whose error type is `HRESULT`. The
+/// error fork excludes `S_OK` as a value; that is treated as the success fork
+/// of the `Result` which returns the bridged Rust type the caller expects. No
+/// attempt is made to provide a Rust type for COM exceptions.
+fn rust_fn_for_com_dispatch_helper(
+    type_nfo: &ITypeInfo,
+    funcdesc: &FUNCDESC,
+    fn_name: BSTR,
+) -> Result<String, WinError> {
+    let mut param_types = vec!["&self".to_string()];
+    for i in 0..funcdesc.cParams {
+        let elemdesc: &mut ELEMDESC =
+            unsafe { &mut *funcdesc.lprgelemdescParam.offset(i as isize) };
+        param_types.push(format!(
+            "param{}: {}",
+            i,
+            type_bridge::bridge_elem_to_rust_type(type_nfo, &elemdesc.tdesc)?
+        ));
+    }
+
+    let return_type = if VARENUM(funcdesc.elemdescFunc.tdesc.vt as i32) == VT_VOID {
+        " -> Result<(), HRESULT>".to_string()
+    } else {
+        format!(
+            " -> Result<{}, HRESULT>",
+            type_bridge::bridge_elem_to_rust_type(type_nfo, &funcdesc.elemdescFunc.tdesc)?
+        )
+    };
+
+    Ok(format!(
+        "pub unsafe fn {}({}){}",
+        fn_name,
+        param_types.join(", "),
+        return_type
+    ))
 }
 
 /// Export a single dispatch property from a type info structure to Rust source
@@ -133,7 +180,7 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
         FUNC_DISPATCH if funcdesc.invkind == INVOKE_FUNC => {
             println!(
                 "    {} {{",
-                rust_fn_for_com_method(type_nfo, funcdesc, strname, true)?
+                rust_fn_for_com_dispatch_helper(type_nfo, funcdesc, strname)?
             );
 
             println!("        let mut arg_params = vec![];");
@@ -158,8 +205,8 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
             if VARENUM(funcdesc.elemdescFunc.tdesc.vt as i32) != VT_VOID {
                 println!("        let mut disp_result = VARIANT::default();");
                 println!(
-                    "        IDispatch::Invoke(
-            &self,
+                    "        let invoke_result = IDispatch::Invoke(
+            self,
             0x{:X},
             &mut GUID {{
                 data1: 0,
@@ -176,15 +223,18 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
         );",
                     funcdesc.memid
                 );
+                println!("        if invoke_result.is_err() {{");
+                println!("            return Err(invoke_result);");
+                println!("        }}");
 
                 println!(
-                    "        {}",
+                    "        Ok({})",
                     type_bridge::generate_dispatch_return(&funcdesc.elemdescFunc.tdesc)?
                 );
             } else {
                 println!(
-                    "        IDispatch::Invoke(
-            &self,
+                    "        let invoke_result = IDispatch::Invoke(
+            self,
             0x{:X},
             &mut GUID {{
                 data1: 0,
@@ -201,6 +251,11 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
         );",
                     funcdesc.memid
                 );
+                println!("        if invoke_result.is_err() {{");
+                println!("            Err(invoke_result)");
+                println!("        }} else {{");
+                println!("            Ok(())");
+                println!("        }}");
             }
 
             println!("    }}");

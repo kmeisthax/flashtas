@@ -102,7 +102,11 @@ com::interfaces! {
 }
 
 impl IShockwaveFlash {
-    pub unsafe fn QueryInterface(&self, param0: *mut GUID, param1: *mut *mut c_void) {
+    pub unsafe fn QueryInterface(
+        &self,
+        param0: *mut GUID,
+        param1: *mut *mut c_void,
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -122,8 +126,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60000000,
             &mut GUID {
                 data1: 0,
@@ -138,9 +142,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn AddRef(&self) -> u32 {
+    pub unsafe fn AddRef(&self) -> Result<u32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -149,8 +158,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60000001,
             &mut GUID {
                 data1: 0,
@@ -165,20 +174,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_UI4
-        {
-            disp_result.Anonymous.Anonymous.Anonymous.ulVal
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_UI4,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_UI4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.ulVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_UI4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn Release(&self) -> u32 {
+    pub unsafe fn Release(&self) -> Result<u32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -187,8 +201,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60000002,
             &mut GUID {
                 data1: 0,
@@ -203,20 +217,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_UI4
-        {
-            disp_result.Anonymous.Anonymous.Anonymous.ulVal
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_UI4,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_UI4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.ulVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_UI4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn GetTypeInfoCount(&self, param0: *mut u32) {
+    pub unsafe fn GetTypeInfoCount(&self, param0: *mut u32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -233,8 +252,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60010000,
             &mut GUID {
                 data1: 0,
@@ -249,9 +268,19 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn GetTypeInfo(&self, param0: u32, param1: u32, param2: *mut *mut c_void) {
+    pub unsafe fn GetTypeInfo(
+        &self,
+        param0: u32,
+        param1: u32,
+        param2: *mut *mut c_void,
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -278,8 +307,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60010001,
             &mut GUID {
                 data1: 0,
@@ -294,6 +323,11 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
     pub unsafe fn GetIDsOfNames(
@@ -303,7 +337,7 @@ impl IShockwaveFlash {
         param2: u32,
         param3: u32,
         param4: *mut i32,
-    ) {
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -350,8 +384,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60010002,
             &mut GUID {
                 data1: 0,
@@ -366,6 +400,11 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
     pub unsafe fn Invoke(
@@ -378,7 +417,7 @@ impl IShockwaveFlash {
         param5: *mut VARIANT,
         param6: *mut EXCEPINFO,
         param7: *mut u32,
-    ) {
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -464,8 +503,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60010003,
             &mut GUID {
                 data1: 0,
@@ -480,6 +519,11 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
     //TODO: IDispatch helper for ReadyState (invkind INVOKEKIND(2))
@@ -500,7 +544,13 @@ impl IShockwaveFlash {
     //TODO: IDispatch helper for Movie (invkind INVOKEKIND(4))
     //TODO: IDispatch helper for FrameNum (invkind INVOKEKIND(2))
     //TODO: IDispatch helper for FrameNum (invkind INVOKEKIND(4))
-    pub unsafe fn SetZoomRect(&self, param0: i32, param1: i32, param2: i32, param3: i32) {
+    pub unsafe fn SetZoomRect(
+        &self,
+        param0: i32,
+        param1: i32,
+        param2: i32,
+        param3: i32,
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -544,8 +594,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x6D,
             &mut GUID {
                 data1: 0,
@@ -560,9 +610,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn Zoom(&self, param0: i32) {
+    pub unsafe fn Zoom(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -579,8 +634,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x76,
             &mut GUID {
                 data1: 0,
@@ -595,9 +650,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn Pan(&self, param0: i32, param1: i32, param2: i32) {
+    pub unsafe fn Pan(&self, param0: i32, param1: i32, param2: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -632,8 +692,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x77,
             &mut GUID {
                 data1: 0,
@@ -648,9 +708,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn Play(&self) {
+    pub unsafe fn Play(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -658,8 +723,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x70,
             &mut GUID {
                 data1: 0,
@@ -674,9 +739,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn Stop(&self) {
+    pub unsafe fn Stop(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -684,8 +754,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x71,
             &mut GUID {
                 data1: 0,
@@ -700,9 +770,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn Back(&self) {
+    pub unsafe fn Back(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -710,8 +785,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x72,
             &mut GUID {
                 data1: 0,
@@ -726,9 +801,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn Forward(&self) {
+    pub unsafe fn Forward(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -736,8 +816,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x73,
             &mut GUID {
                 data1: 0,
@@ -752,9 +832,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn Rewind(&self) {
+    pub unsafe fn Rewind(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -762,8 +847,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x74,
             &mut GUID {
                 data1: 0,
@@ -778,9 +863,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn StopPlay(&self) {
+    pub unsafe fn StopPlay(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -788,8 +878,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x7E,
             &mut GUID {
                 data1: 0,
@@ -804,9 +894,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn GotoFrame(&self, param0: i32) {
+    pub unsafe fn GotoFrame(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -823,8 +918,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x7F,
             &mut GUID {
                 data1: 0,
@@ -839,9 +934,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn CurrentFrame(&self) -> i32 {
+    pub unsafe fn CurrentFrame(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -850,8 +950,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x80,
             &mut GUID {
                 data1: 0,
@@ -866,20 +966,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_I4
-        {
-            disp_result.Anonymous.Anonymous.Anonymous.lVal
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_I4,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_I4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.lVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_I4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn IsPlaying(&self) -> BOOL {
+    pub unsafe fn IsPlaying(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -888,8 +993,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x81,
             &mut GUID {
                 data1: 0,
@@ -904,20 +1009,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_BOOL
-        {
-            BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_BOOL,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn PercentLoaded(&self) -> i32 {
+    pub unsafe fn PercentLoaded(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -926,8 +1036,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x82,
             &mut GUID {
                 data1: 0,
@@ -942,20 +1052,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_I4
-        {
-            disp_result.Anonymous.Anonymous.Anonymous.lVal
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_I4,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_I4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.lVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_I4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn FrameLoaded(&self, param0: i32) -> BOOL {
+    pub unsafe fn FrameLoaded(&self, param0: i32) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -973,8 +1088,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x83,
             &mut GUID {
                 data1: 0,
@@ -989,20 +1104,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_BOOL
-        {
-            BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_BOOL,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn FlashVersion(&self) -> i32 {
+    pub unsafe fn FlashVersion(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -1011,8 +1131,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x84,
             &mut GUID {
                 data1: 0,
@@ -1027,17 +1147,22 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_I4
-        {
-            disp_result.Anonymous.Anonymous.Anonymous.lVal
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_I4,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_I4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.lVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_I4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
     //TODO: IDispatch helper for WMode (invkind INVOKEKIND(2))
@@ -1058,7 +1183,7 @@ impl IShockwaveFlash {
     //TODO: IDispatch helper for BGColor (invkind INVOKEKIND(4))
     //TODO: IDispatch helper for Quality2 (invkind INVOKEKIND(2))
     //TODO: IDispatch helper for Quality2 (invkind INVOKEKIND(4))
-    pub unsafe fn LoadMovie(&self, param0: i32, param1: BSTR) {
+    pub unsafe fn LoadMovie(&self, param0: i32, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1086,8 +1211,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x8E,
             &mut GUID {
                 data1: 0,
@@ -1102,9 +1227,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn TGotoFrame(&self, param0: BSTR, param1: i32) {
+    pub unsafe fn TGotoFrame(&self, param0: BSTR, param1: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1132,8 +1262,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x8F,
             &mut GUID {
                 data1: 0,
@@ -1148,9 +1278,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn TGotoLabel(&self, param0: BSTR, param1: BSTR) {
+    pub unsafe fn TGotoLabel(&self, param0: BSTR, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1180,8 +1315,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x90,
             &mut GUID {
                 data1: 0,
@@ -1196,9 +1331,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn TCurrentFrame(&self, param0: BSTR) -> i32 {
+    pub unsafe fn TCurrentFrame(&self, param0: BSTR) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1218,8 +1358,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x91,
             &mut GUID {
                 data1: 0,
@@ -1234,20 +1374,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_I4
-        {
-            disp_result.Anonymous.Anonymous.Anonymous.lVal
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_I4,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_I4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.lVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_I4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn TCurrentLabel(&self, param0: BSTR) -> BSTR {
+    pub unsafe fn TCurrentLabel(&self, param0: BSTR) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1267,8 +1412,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x92,
             &mut GUID {
                 data1: 0,
@@ -1283,20 +1428,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_BSTR
-        {
-            ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_BSTR,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn TPlay(&self, param0: BSTR) {
+    pub unsafe fn TPlay(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1315,8 +1465,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x93,
             &mut GUID {
                 data1: 0,
@@ -1331,9 +1481,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn TStopPlay(&self, param0: BSTR) {
+    pub unsafe fn TStopPlay(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1352,8 +1507,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x94,
             &mut GUID {
                 data1: 0,
@@ -1368,9 +1523,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn SetVariable(&self, param0: BSTR, param1: BSTR) {
+    pub unsafe fn SetVariable(&self, param0: BSTR, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1400,8 +1560,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x97,
             &mut GUID {
                 data1: 0,
@@ -1416,9 +1576,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn GetVariable(&self, param0: BSTR) -> BSTR {
+    pub unsafe fn GetVariable(&self, param0: BSTR) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1438,8 +1603,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x98,
             &mut GUID {
                 data1: 0,
@@ -1454,20 +1619,30 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_BSTR
-        {
-            ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_BSTR,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn TSetProperty(&self, param0: BSTR, param1: i32, param2: BSTR) {
+    pub unsafe fn TSetProperty(
+        &self,
+        param0: BSTR,
+        param1: i32,
+        param2: BSTR,
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1506,8 +1681,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x99,
             &mut GUID {
                 data1: 0,
@@ -1522,9 +1697,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn TGetProperty(&self, param0: BSTR, param1: i32) -> BSTR {
+    pub unsafe fn TGetProperty(&self, param0: BSTR, param1: i32) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1553,8 +1733,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x9A,
             &mut GUID {
                 data1: 0,
@@ -1569,20 +1749,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_BSTR
-        {
-            ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_BSTR,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn TCallFrame(&self, param0: BSTR, param1: i32) {
+    pub unsafe fn TCallFrame(&self, param0: BSTR, param1: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1610,8 +1795,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x9B,
             &mut GUID {
                 data1: 0,
@@ -1626,9 +1811,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn TCallLabel(&self, param0: BSTR, param1: BSTR) {
+    pub unsafe fn TCallLabel(&self, param0: BSTR, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1658,8 +1848,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x9C,
             &mut GUID {
                 data1: 0,
@@ -1674,9 +1864,19 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn TSetPropertyNum(&self, param0: BSTR, param1: i32, param2: f64) {
+    pub unsafe fn TSetPropertyNum(
+        &self,
+        param0: BSTR,
+        param1: i32,
+        param2: f64,
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1713,8 +1913,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x9D,
             &mut GUID {
                 data1: 0,
@@ -1729,9 +1929,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn TGetPropertyNum(&self, param0: BSTR, param1: i32) -> f64 {
+    pub unsafe fn TGetPropertyNum(&self, param0: BSTR, param1: i32) -> Result<f64, HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1760,8 +1965,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x9E,
             &mut GUID {
                 data1: 0,
@@ -1776,20 +1981,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_R8
-        {
-            disp_result.Anonymous.Anonymous.Anonymous.dblVal
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_R8,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_R8
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.dblVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_R8,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn TGetPropertyAsNumber(&self, param0: BSTR, param1: i32) -> f64 {
+    pub unsafe fn TGetPropertyAsNumber(&self, param0: BSTR, param1: i32) -> Result<f64, HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1818,8 +2028,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0xAC,
             &mut GUID {
                 data1: 0,
@@ -1834,17 +2044,22 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_R8
-        {
-            disp_result.Anonymous.Anonymous.Anonymous.dblVal
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_R8,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_R8
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.dblVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_R8,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
     //TODO: IDispatch helper for SWRemote (invkind INVOKEKIND(2))
@@ -1859,7 +2074,7 @@ impl IShockwaveFlash {
     //TODO: IDispatch helper for InlineData (invkind INVOKEKIND(4))
     //TODO: IDispatch helper for SeamlessTabbing (invkind INVOKEKIND(2))
     //TODO: IDispatch helper for SeamlessTabbing (invkind INVOKEKIND(4))
-    pub unsafe fn EnforceLocalSecurity(&self) {
+    pub unsafe fn EnforceLocalSecurity(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -1867,8 +2082,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0xC1,
             &mut GUID {
                 data1: 0,
@@ -1883,6 +2098,11 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
     //TODO: IDispatch helper for Profile (invkind INVOKEKIND(2))
@@ -1891,7 +2111,7 @@ impl IShockwaveFlash {
     //TODO: IDispatch helper for ProfileAddress (invkind INVOKEKIND(4))
     //TODO: IDispatch helper for ProfilePort (invkind INVOKEKIND(2))
     //TODO: IDispatch helper for ProfilePort (invkind INVOKEKIND(4))
-    pub unsafe fn CallFunction(&self, param0: BSTR) -> BSTR {
+    pub unsafe fn CallFunction(&self, param0: BSTR) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1911,8 +2131,8 @@ impl IShockwaveFlash {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0xC6,
             &mut GUID {
                 data1: 0,
@@ -1927,20 +2147,25 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_BSTR
-        {
-            ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_BSTR,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn SetReturnValue(&self, param0: BSTR) {
+    pub unsafe fn SetReturnValue(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -1959,8 +2184,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0xC7,
             &mut GUID {
                 data1: 0,
@@ -1975,9 +2200,14 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn DisableLocalSecurity(&self) {
+    pub unsafe fn DisableLocalSecurity(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -1985,8 +2215,8 @@ impl IShockwaveFlash {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0xC8,
             &mut GUID {
                 data1: 0,
@@ -2001,6 +2231,11 @@ impl IShockwaveFlash {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
     //TODO: IDispatch helper for AllowNetworking (invkind INVOKEKIND(2))
@@ -2018,7 +2253,7 @@ impl IShockwaveFlash {
 }
 
 impl _IShockwaveFlashEvents {
-    pub unsafe fn OnReadyStateChange(&self, param0: i32) {
+    pub unsafe fn OnReadyStateChange(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2035,8 +2270,8 @@ impl _IShockwaveFlashEvents {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0xFFFFFD9F,
             &mut GUID {
                 data1: 0,
@@ -2051,9 +2286,14 @@ impl _IShockwaveFlashEvents {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn OnProgress(&self, param0: i32) {
+    pub unsafe fn OnProgress(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2070,8 +2310,8 @@ impl _IShockwaveFlashEvents {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x7A6,
             &mut GUID {
                 data1: 0,
@@ -2086,9 +2326,14 @@ impl _IShockwaveFlashEvents {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn FSCommand(&self, param0: BSTR, param1: BSTR) {
+    pub unsafe fn FSCommand(&self, param0: BSTR, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2118,8 +2363,8 @@ impl _IShockwaveFlashEvents {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x96,
             &mut GUID {
                 data1: 0,
@@ -2134,9 +2379,14 @@ impl _IShockwaveFlashEvents {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn FlashCall(&self, param0: BSTR) {
+    pub unsafe fn FlashCall(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2155,8 +2405,8 @@ impl _IShockwaveFlashEvents {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0xC5,
             &mut GUID {
                 data1: 0,
@@ -2171,6 +2421,11 @@ impl _IShockwaveFlashEvents {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -2183,7 +2438,11 @@ impl IDispatchEx {}
 impl IServiceProvider {}
 
 impl IFlashObject {
-    pub unsafe fn QueryInterface(&self, param0: *mut GUID, param1: *mut *mut c_void) {
+    pub unsafe fn QueryInterface(
+        &self,
+        param0: *mut GUID,
+        param1: *mut *mut c_void,
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2203,8 +2462,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60000000,
             &mut GUID {
                 data1: 0,
@@ -2219,9 +2478,14 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn AddRef(&self) -> u32 {
+    pub unsafe fn AddRef(&self) -> Result<u32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -2230,8 +2494,8 @@ impl IFlashObject {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60000001,
             &mut GUID {
                 data1: 0,
@@ -2246,20 +2510,25 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_UI4
-        {
-            disp_result.Anonymous.Anonymous.Anonymous.ulVal
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_UI4,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_UI4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.ulVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_UI4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn Release(&self) -> u32 {
+    pub unsafe fn Release(&self) -> Result<u32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
@@ -2268,8 +2537,8 @@ impl IFlashObject {
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60000002,
             &mut GUID {
                 data1: 0,
@@ -2284,20 +2553,25 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
-        if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
-            == ::windows::Win32::System::Ole::VT_UI4
-        {
-            disp_result.Anonymous.Anonymous.Anonymous.ulVal
-        } else {
-            panic!(
-                "Expected value of type {:?}, got {}",
-                ::windows::Win32::System::Ole::VT_UI4,
-                disp_result.Anonymous.Anonymous.vt
-            );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
         }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_UI4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.ulVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_UI4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
     }
 
-    pub unsafe fn GetTypeInfoCount(&self, param0: *mut u32) {
+    pub unsafe fn GetTypeInfoCount(&self, param0: *mut u32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2314,8 +2588,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60010000,
             &mut GUID {
                 data1: 0,
@@ -2330,9 +2604,19 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn GetTypeInfo(&self, param0: u32, param1: u32, param2: *mut *mut c_void) {
+    pub unsafe fn GetTypeInfo(
+        &self,
+        param0: u32,
+        param1: u32,
+        param2: *mut *mut c_void,
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2359,8 +2643,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60010001,
             &mut GUID {
                 data1: 0,
@@ -2375,6 +2659,11 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
     pub unsafe fn GetIDsOfNames(
@@ -2384,7 +2673,7 @@ impl IFlashObject {
         param2: u32,
         param3: u32,
         param4: *mut i32,
-    ) {
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2431,8 +2720,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60010002,
             &mut GUID {
                 data1: 0,
@@ -2447,6 +2736,11 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
     pub unsafe fn Invoke(
@@ -2459,7 +2753,7 @@ impl IFlashObject {
         param5: *mut VARIANT,
         param6: *mut EXCEPINFO,
         param7: *mut u32,
-    ) {
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2545,8 +2839,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60010003,
             &mut GUID {
                 data1: 0,
@@ -2561,9 +2855,19 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn GetDispID(&self, param0: BSTR, param1: u32, param2: *mut i32) {
+    pub unsafe fn GetDispID(
+        &self,
+        param0: BSTR,
+        param1: u32,
+        param2: *mut i32,
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2600,8 +2904,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60020000,
             &mut GUID {
                 data1: 0,
@@ -2616,6 +2920,11 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
     pub unsafe fn RemoteInvokeEx(
@@ -2630,7 +2939,7 @@ impl IFlashObject {
         param7: u32,
         param8: *mut u32,
         param9: *mut VARIANT,
-    ) {
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2734,8 +3043,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60020001,
             &mut GUID {
                 data1: 0,
@@ -2750,9 +3059,14 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn DeleteMemberByName(&self, param0: BSTR, param1: u32) {
+    pub unsafe fn DeleteMemberByName(&self, param0: BSTR, param1: u32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2780,8 +3094,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60020002,
             &mut GUID {
                 data1: 0,
@@ -2796,9 +3110,14 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn DeleteMemberByDispID(&self, param0: i32) {
+    pub unsafe fn DeleteMemberByDispID(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2815,8 +3134,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60020003,
             &mut GUID {
                 data1: 0,
@@ -2831,9 +3150,19 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn GetMemberProperties(&self, param0: i32, param1: u32, param2: *mut u32) {
+    pub unsafe fn GetMemberProperties(
+        &self,
+        param0: i32,
+        param1: u32,
+        param2: *mut u32,
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2868,8 +3197,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60020004,
             &mut GUID {
                 data1: 0,
@@ -2884,9 +3213,14 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn GetMemberName(&self, param0: i32, param1: *mut BSTR) {
+    pub unsafe fn GetMemberName(&self, param0: i32, param1: *mut BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2914,8 +3248,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60020005,
             &mut GUID {
                 data1: 0,
@@ -2930,9 +3264,19 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn GetNextDispID(&self, param0: u32, param1: i32, param2: *mut i32) {
+    pub unsafe fn GetNextDispID(
+        &self,
+        param0: u32,
+        param1: i32,
+        param2: *mut i32,
+    ) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
@@ -2967,8 +3311,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60020006,
             &mut GUID {
                 data1: 0,
@@ -2983,9 +3327,14 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 
-    pub unsafe fn GetNameSpaceParent(&self, param0: *mut IUnknown) {
+    pub unsafe fn GetNameSpaceParent(&self, param0: *mut IUnknown) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         /* invalid: cannot use VT_PTR to type 0xD in IDispatch */
         let mut disp_params = DISPPARAMS {
@@ -2994,8 +3343,8 @@ impl IFlashObject {
             cArgs: 0,
             cNamedArgs: 0,
         };
-        IDispatch::Invoke(
-            &self,
+        let invoke_result = IDispatch::Invoke(
+            self,
             0x60020007,
             &mut GUID {
                 data1: 0,
@@ -3010,5 +3359,10 @@ impl IFlashObject {
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
         );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
     }
 }
