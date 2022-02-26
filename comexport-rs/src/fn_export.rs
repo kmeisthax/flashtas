@@ -207,6 +207,7 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
                 println!(
                     "        let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x{:X},
             &mut GUID {{
                 data1: 0,
@@ -235,6 +236,7 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
                 println!(
                     "        let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x{:X},
             &mut GUID {{
                 data1: 0,

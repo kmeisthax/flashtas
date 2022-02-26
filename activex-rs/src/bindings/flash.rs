@@ -138,6 +138,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60000000,
             &mut GUID {
                 data1: 0,
@@ -170,6 +171,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60000001,
             &mut GUID {
                 data1: 0,
@@ -213,6 +215,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60000002,
             &mut GUID {
                 data1: 0,
@@ -264,6 +267,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60010000,
             &mut GUID {
                 data1: 0,
@@ -329,6 +333,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60010001,
             &mut GUID {
                 data1: 0,
@@ -416,6 +421,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60010002,
             &mut GUID {
                 data1: 0,
@@ -535,6 +541,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60010003,
             &mut GUID {
                 data1: 0,
@@ -626,6 +633,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x6D,
             &mut GUID {
                 data1: 0,
@@ -666,6 +674,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x76,
             &mut GUID {
                 data1: 0,
@@ -724,6 +733,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x77,
             &mut GUID {
                 data1: 0,
@@ -755,6 +765,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x70,
             &mut GUID {
                 data1: 0,
@@ -786,6 +797,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x71,
             &mut GUID {
                 data1: 0,
@@ -817,6 +829,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x72,
             &mut GUID {
                 data1: 0,
@@ -848,6 +861,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x73,
             &mut GUID {
                 data1: 0,
@@ -879,6 +893,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x74,
             &mut GUID {
                 data1: 0,
@@ -910,6 +925,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x7E,
             &mut GUID {
                 data1: 0,
@@ -950,6 +966,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x7F,
             &mut GUID {
                 data1: 0,
@@ -982,6 +999,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x80,
             &mut GUID {
                 data1: 0,
@@ -1025,6 +1043,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x81,
             &mut GUID {
                 data1: 0,
@@ -1068,6 +1087,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x82,
             &mut GUID {
                 data1: 0,
@@ -1120,6 +1140,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x83,
             &mut GUID {
                 data1: 0,
@@ -1163,6 +1184,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x84,
             &mut GUID {
                 data1: 0,
@@ -1243,6 +1265,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x8E,
             &mut GUID {
                 data1: 0,
@@ -1294,6 +1317,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x8F,
             &mut GUID {
                 data1: 0,
@@ -1347,6 +1371,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x90,
             &mut GUID {
                 data1: 0,
@@ -1390,6 +1415,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x91,
             &mut GUID {
                 data1: 0,
@@ -1444,6 +1470,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x92,
             &mut GUID {
                 data1: 0,
@@ -1497,6 +1524,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x93,
             &mut GUID {
                 data1: 0,
@@ -1539,6 +1567,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x94,
             &mut GUID {
                 data1: 0,
@@ -1592,6 +1621,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x97,
             &mut GUID {
                 data1: 0,
@@ -1635,6 +1665,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x98,
             &mut GUID {
                 data1: 0,
@@ -1713,6 +1744,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x99,
             &mut GUID {
                 data1: 0,
@@ -1765,6 +1797,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x9A,
             &mut GUID {
                 data1: 0,
@@ -1827,6 +1860,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x9B,
             &mut GUID {
                 data1: 0,
@@ -1880,6 +1914,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x9C,
             &mut GUID {
                 data1: 0,
@@ -1945,6 +1980,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x9D,
             &mut GUID {
                 data1: 0,
@@ -1997,6 +2033,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x9E,
             &mut GUID {
                 data1: 0,
@@ -2060,6 +2097,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0xAC,
             &mut GUID {
                 data1: 0,
@@ -2114,6 +2152,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0xC1,
             &mut GUID {
                 data1: 0,
@@ -2163,6 +2202,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0xC6,
             &mut GUID {
                 data1: 0,
@@ -2216,6 +2256,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0xC7,
             &mut GUID {
                 data1: 0,
@@ -2247,6 +2288,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0xC8,
             &mut GUID {
                 data1: 0,
@@ -2302,6 +2344,7 @@ impl _IShockwaveFlashEvents {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0xFFFFFD9F,
             &mut GUID {
                 data1: 0,
@@ -2342,6 +2385,7 @@ impl _IShockwaveFlashEvents {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x7A6,
             &mut GUID {
                 data1: 0,
@@ -2395,6 +2439,7 @@ impl _IShockwaveFlashEvents {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x96,
             &mut GUID {
                 data1: 0,
@@ -2437,6 +2482,7 @@ impl _IShockwaveFlashEvents {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0xC5,
             &mut GUID {
                 data1: 0,
@@ -2504,6 +2550,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60000000,
             &mut GUID {
                 data1: 0,
@@ -2536,6 +2583,7 @@ impl IFlashObject {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60000001,
             &mut GUID {
                 data1: 0,
@@ -2579,6 +2627,7 @@ impl IFlashObject {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60000002,
             &mut GUID {
                 data1: 0,
@@ -2630,6 +2679,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60010000,
             &mut GUID {
                 data1: 0,
@@ -2695,6 +2745,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60010001,
             &mut GUID {
                 data1: 0,
@@ -2782,6 +2833,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60010002,
             &mut GUID {
                 data1: 0,
@@ -2901,6 +2953,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60010003,
             &mut GUID {
                 data1: 0,
@@ -2966,6 +3019,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60020000,
             &mut GUID {
                 data1: 0,
@@ -3105,6 +3159,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60020001,
             &mut GUID {
                 data1: 0,
@@ -3156,6 +3211,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60020002,
             &mut GUID {
                 data1: 0,
@@ -3196,6 +3252,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60020003,
             &mut GUID {
                 data1: 0,
@@ -3259,6 +3316,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60020004,
             &mut GUID {
                 data1: 0,
@@ -3310,6 +3368,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60020005,
             &mut GUID {
                 data1: 0,
@@ -3373,6 +3432,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60020006,
             &mut GUID {
                 data1: 0,
@@ -3415,6 +3475,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
+            #[allow(overflowing_literals)]
             0x60020007,
             &mut GUID {
                 data1: 0,
