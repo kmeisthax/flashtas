@@ -121,6 +121,9 @@ enum WrapType {
     /// The Rust-side type is a `*const u16` that must be wrapped into a
     /// `windows` `BSTR` AND a `ManuallyDrop`.
     Bstr,
+
+    /// The Rust-side type must be cast to `c_void`.
+    CVoidPtr,
 }
 
 /// Determine the VT_* value and union field for a given dispatch type.
@@ -207,25 +210,114 @@ fn vt_and_ufield_for_tdesc(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapType), S
             "uintVal",
             WrapType::Bare,
         ),
-        VT_VOID => (
-            "::windows::Win32::System::Ole::VT_VOID",
-            "byref",
-            WrapType::Bare,
-        ),
-        VT_HRESULT => (
-            "::windows::Win32::System::Ole::VT_HRESULT",
-            "lVal",
-            WrapType::ManuallyDrop,
-        ),
+        VT_VOID => return Err("/* invalid: cannot use VT_VOID by value */".to_string()),
         VT_UNKNOWN => (
             "::windows::Win32::System::Ole::VT_UNKNOWN",
             "ppunkVal",
             WrapType::ManuallyDrop,
         ),
-        VT_PTR => return Err("/* invalid: cannot use VT_PTR in IDispatch */".to_string()),
-        VT_USERDEFINED | VT_VARIANT => {
-            return Err("/* invalid: cannot use VT_VARIANT without byref */".to_string())
+        VT_PTR => match VARENUM(unsafe { (*tdesc.Anonymous.lptdesc).vt } as i32) {
+            VT_I2 => (
+                "::windows::Win32::System::Ole::VT_I2",
+                "piVal",
+                WrapType::Bare,
+            ),
+            VT_I4 => (
+                "::windows::Win32::System::Ole::VT_I4",
+                "plVal",
+                WrapType::Bare,
+            ),
+            VT_R4 => (
+                "::windows::Win32::System::Ole::VT_R4",
+                "pfltVal",
+                WrapType::Bare,
+            ),
+            VT_R8 => (
+                "::windows::Win32::System::Ole::VT_R8",
+                "pdblVal",
+                WrapType::Bare,
+            ),
+            VT_BSTR => (
+                "::windows::Win32::System::Ole::VT_BSTR",
+                "pbstrVal",
+                WrapType::Bare,
+            ),
+            VT_BOOL => (
+                "::windows::Win32::System::Ole::VT_BOOL",
+                "pboolVal",
+                WrapType::Bool,
+            ),
+            VT_I1 => (
+                "::windows::Win32::System::Ole::VT_I1",
+                "pcVal",
+                WrapType::Bare,
+            ),
+            VT_UI1 => (
+                "::windows::Win32::System::Ole::VT_UI1",
+                "pbVal",
+                WrapType::Bare,
+            ),
+            VT_UI2 => (
+                "::windows::Win32::System::Ole::VT_UI2",
+                "puiVal",
+                WrapType::Bare,
+            ),
+            VT_UI4 => (
+                "::windows::Win32::System::Ole::VT_UI4",
+                "pulVal",
+                WrapType::Bare,
+            ),
+            VT_I8 => (
+                "::windows::Win32::System::Ole::VT_I8",
+                "pllVal",
+                WrapType::Bare,
+            ),
+            VT_UI8 => (
+                "::windows::Win32::System::Ole::VT_UI8",
+                "pullVal",
+                WrapType::Bare,
+            ),
+            VT_INT => (
+                "::windows::Win32::System::Ole::VT_INT",
+                "pintVal",
+                WrapType::Bare,
+            ),
+            VT_UINT => (
+                "::windows::Win32::System::Ole::VT_UINT",
+                "puintVal",
+                WrapType::Bare,
+            ),
+            VT_VOID => (
+                "::windows::Win32::System::Ole::VT_VOID",
+                "byref",
+                WrapType::CVoidPtr,
+            ),
+            VT_PTR => {
+                return Err("/* invalid: only one level of pointers is permitted */".to_string())
+            }
+            VT_USERDEFINED => (
+                "::windows::Win32::System::Ole::VT_USERDEFINED",
+                "byref",
+                WrapType::CVoidPtr,
+            ),
+            VT_VARIANT => (
+                "::windows::Win32::System::Ole::VT_VARIANT",
+                "pvarVal",
+                WrapType::Bare,
+            ),
+            VT_HRESULT => return Err("/* invalid: cannot use VT_HRESULT by ptr */".to_string()),
+            unk => {
+                return Err(format!(
+                    "/* invalid: cannot use VT_PTR to type 0x{:X} in IDispatch */",
+                    unk.0
+                ))
+            }
+        },
+        VT_USERDEFINED => {
+            return Err("/* invalid: cannot use VT_USERDEFINED by value */".to_string())
         }
+        VT_VARIANT => return Err("/* invalid: cannot use VT_VARIANT by value */".to_string()),
+        VT_HRESULT => return Err("/* invalid: cannot use VT_HRESULT by value */".to_string()),
         _ => return Err(format!("/* unknown type 0x{:X} */", tdesc.vt)),
     })
 }
@@ -245,6 +337,7 @@ pub fn generate_dispatch_param(param_i: i16, tdesc: &TYPEDESC) -> Result<String,
             "{}: ManuallyDrop::new(::std::mem::transmute(param{}))",
             ufield, param_i
         ),
+        WrapType::CVoidPtr => format!("{}: param{} as *mut c_void", ufield, param_i,),
     };
 
     Ok(format!(
@@ -284,6 +377,7 @@ pub fn generate_dispatch_return(tdesc: &TYPEDESC) -> Result<String, WinError> {
             "::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.{})",
             ufield
         ),
+        WrapType::CVoidPtr => format!("disp_result.Anonymous.Anonymous.Anonymous.{}", ufield),
     };
 
     Ok(format!("if VARENUM(disp_result.Anonymous.Anonymous.vt as i32) == {0} {{
