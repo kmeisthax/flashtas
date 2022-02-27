@@ -1,6 +1,6 @@
 //! Exporters for single COM functions
 
-use crate::type_bridge;
+use crate::{dispatch_bridge, type_bridge};
 use windows::core::{Error as WinError, HRESULT, HSTRING};
 use windows::Win32::Foundation::BSTR;
 use windows::Win32::System::Com::{
@@ -191,7 +191,7 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
 
                 println!(
                     "        {}",
-                    type_bridge::generate_dispatch_param(i, &elemdesc.tdesc)?
+                    dispatch_bridge::generate_param(i, &elemdesc.tdesc)?
                 );
             }
 
@@ -230,7 +230,7 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
 
                 println!(
                     "        Ok({})",
-                    type_bridge::generate_dispatch_return(&funcdesc.elemdescFunc.tdesc)?
+                    dispatch_bridge::generate_return(&funcdesc.elemdescFunc.tdesc)?
                 );
             } else {
                 println!(

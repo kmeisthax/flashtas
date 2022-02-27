@@ -12,6 +12,7 @@ use windows::core::{Error as WinError, HRESULT, HSTRING};
 use windows::Win32::System::Com::{ITypeLib, TLIBATTR};
 use windows::Win32::System::Ole::LoadTypeLib;
 
+mod dispatch_bridge;
 mod fn_export;
 mod type_bridge;
 mod type_export;
