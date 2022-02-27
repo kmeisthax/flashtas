@@ -127,7 +127,7 @@ pub fn print_type_lib_interface_as_rust(lib: &ITypeLib, type_index: u32) -> Resu
 
     match typeattr.typekind {
         //TODO: Other types of COM types
-        TKIND_INTERFACE | TKIND_DISPATCH => {
+        TKIND_INTERFACE | TKIND_DISPATCH if typeattr.cImplTypes > 0 => {
             if !strdocstring.is_empty() {
                 println!("    /// {}", strdocstring);
             }
@@ -151,6 +151,9 @@ pub fn print_type_lib_interface_as_rust(lib: &ITypeLib, type_index: u32) -> Resu
 
             println!("    }}");
             println!();
+        }
+        TKIND_INTERFACE | TKIND_DISPATCH => {
+            println!("    // TODO: Bare interface type named {}", strname);
         }
         _ => {}
     }
