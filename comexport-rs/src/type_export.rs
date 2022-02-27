@@ -5,8 +5,33 @@ use convert_case::{Case, Casing};
 use windows::core::{Error as WinError, HRESULT, HSTRING};
 use windows::Win32::Foundation::BSTR;
 use windows::Win32::System::Com::{
-    ITypeLib, TKIND_COCLASS, TKIND_DISPATCH, TKIND_INTERFACE, TYPEATTR,
+    ITypeInfo, ITypeLib, TKIND_COCLASS, TKIND_DISPATCH, TKIND_INTERFACE, TKIND_RECORD, TYPEATTR,
 };
+
+fn print_com_type_doccomment(
+    type_nfo: &ITypeInfo,
+    typeattr: &TYPEATTR,
+    strdocstring: BSTR,
+) -> Result<(), WinError> {
+    if !strdocstring.is_empty() {
+        println!("/// {}", strdocstring);
+        println!("///");
+    }
+
+    println!("/// GUID: {:?}", typeattr.guid);
+
+    let mut superinterfaces = vec![];
+    for i in 0..typeattr.cImplTypes {
+        let href = unsafe { type_nfo.GetRefTypeOfImplType(i as u32)? };
+        superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(type_nfo, href)?);
+    }
+
+    if !superinterfaces.is_empty() {
+        println!("/// Interfaces: {}", superinterfaces.join(", "));
+    }
+
+    Ok(())
+}
 
 /// Export a single class from a type library.
 ///
@@ -39,23 +64,7 @@ pub fn print_type_lib_class_as_rust(lib: &ITypeLib, type_index: u32) -> Result<(
 
     match typeattr.typekind {
         TKIND_COCLASS => {
-            if !strdocstring.is_empty() {
-                println!("/// {}", strdocstring);
-                println!("///");
-            }
-
-            println!("/// GUID: {:?}", typeattr.guid);
-
-            let mut superinterfaces = vec![];
-            for i in 0..typeattr.cImplTypes {
-                let href = unsafe { type_nfo.GetRefTypeOfImplType(i as u32)? };
-                superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(&type_nfo, href)?);
-            }
-
-            if !superinterfaces.is_empty() {
-                println!("/// Interfaces: {}", superinterfaces.join(", "));
-            }
-
+            print_com_type_doccomment(&type_nfo, typeattr, strdocstring)?;
             println!(
                 "pub const {}_CLSID: GUID = GUID {{",
                 strname.to_string().to_case(Case::UpperSnake)
@@ -76,6 +85,11 @@ pub fn print_type_lib_class_as_rust(lib: &ITypeLib, type_index: u32) -> Result<(
             );
             println!("}};");
             println!();
+        }
+        TKIND_RECORD => {
+            print_com_type_doccomment(&type_nfo, typeattr, strdocstring)?;
+            println!("pub struct {} {{", strname);
+            println!("}}");
         }
         TKIND_INTERFACE | TKIND_DISPATCH => {}
         k => {

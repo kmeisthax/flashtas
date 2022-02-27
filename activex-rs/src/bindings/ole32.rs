@@ -27,18 +27,28 @@ use windows::Win32::System::Ole::{DISPATCH_METHOD, VARENUM};
 type BSTR = *const u16;
 type CY = i64;
 
-//WARN: Unknown type OLERECT of kind TYPEKIND(1)
-//WARN: Unknown type OLEPOINT of kind TYPEKIND(1)
-//WARN: Unknown type OLEACCELMSG of kind TYPEKIND(1)
-//WARN: Unknown type OLESIZE of kind TYPEKIND(1)
-//WARN: Unknown type OLEINPLACEFRAMEINFO of kind TYPEKIND(1)
-//WARN: Unknown type OLECONTROLINFO of kind TYPEKIND(1)
-//WARN: Unknown type OLECLSID of kind TYPEKIND(1)
-//WARN: Unknown type OLECAUUID of kind TYPEKIND(1)
-//WARN: Unknown type OLECALPOLESTR of kind TYPEKIND(1)
-//WARN: Unknown type OLECADWORD of kind TYPEKIND(1)
+/// GUID: 00000000-0000-0000-0000-000000000000
+pub struct OLERECT {}
+/// GUID: 00000000-0000-0000-0000-000000000000
+pub struct OLEPOINT {}
+/// GUID: 00000000-0000-0000-0000-000000000000
+pub struct OLEACCELMSG {}
+/// GUID: 00000000-0000-0000-0000-000000000000
+pub struct OLESIZE {}
+/// GUID: 00000000-0000-0000-0000-000000000000
+pub struct OLEINPLACEFRAMEINFO {}
+/// GUID: 00000000-0000-0000-0000-000000000000
+pub struct OLECONTROLINFO {}
+/// GUID: 00000000-0000-0000-0000-000000000000
+pub struct OLECLSID {}
+/// GUID: 00000000-0000-0000-0000-000000000000
+pub struct OLECAUUID {}
+/// GUID: 00000000-0000-0000-0000-000000000000
+pub struct OLECALPOLESTR {}
+/// GUID: 00000000-0000-0000-0000-000000000000
+pub struct OLECADWORD {}
 com::interfaces! {
-    // TODO: Bare interface typp named IUnknownUnrestricted
+    // TODO: Bare interface type named IUnknownUnrestricted
     #[uuid("00000114-0000-0000-C000-000000000046")]
     pub unsafe interface IOleWindow: IUnknown {
         pub unsafe fn GetWindow(&self, param0: *mut i32) -> HRESULT;
@@ -90,7 +100,7 @@ com::interfaces! {
     }
 
     #[uuid("00000117-0000-0000-C000-000000000046")]
-    pub unsafe interface IOleInPlaceActiveObject: IUnknownUnrestricted {
+    pub unsafe interface IOleInPlaceActiveObject: IUnknown {
         pub unsafe fn GetWindow(&self, param0: *mut i32) -> i32;
         pub unsafe fn ContextSensitiveHelp(&self, param0: i32) -> i32;
         pub unsafe fn TranslateAccelerator(&self, param0: i32) -> i32;
@@ -126,14 +136,6 @@ com::interfaces! {
         pub unsafe fn OnPosRectChange(&self, param0: i32) -> HRESULT;
     }
 
-    #[uuid("00020400-0000-0000-C000-000000000046")]
-    pub unsafe interface IDispatch: IUnknown {
-        pub unsafe fn GetTypeInfoCount(&self, param0: *mut i32) -> HRESULT;
-        pub unsafe fn GetTypeInfo(&self, param0: i32, param1: i32, param2: *mut i32) -> HRESULT;
-        pub unsafe fn GetIDsOfNames(&self, param0: *mut OLECLSID, param1: *mut *mut u16, param2: i32, param3: i32, param4: *mut i32) -> HRESULT;
-        pub unsafe fn Invoke(&self, param0: i32, param1: *mut OLECLSID, param2: i32, param3: i16, param4: *mut DISPPARAMS, param5: *mut VARIANT, param6: *mut EXCEPINFO, param7: *mut i32) -> HRESULT;
-    }
-
     #[uuid("376BD3AA-3845-101B-84ED-08002B2EC713")]
     pub unsafe interface IPerPropertyBrowsing: IUnknown {
         pub unsafe fn GetDisplayString(&self, param0: i32, param1: *mut i32) -> i32;
@@ -145,14 +147,6 @@ com::interfaces! {
     #[uuid("B196B28B-BAB4-101A-B69C-00AA00341D07")]
     pub unsafe interface ISpecifyPropertyPages: IUnknown {
         pub unsafe fn GetPages(&self, param0: *mut OLECAUUID) -> HRESULT;
-    }
-
-    #[uuid("00020404-0000-0000-C000-000000000046")]
-    pub unsafe interface IEnumVARIANTUnrestricted: IDispatch {
-        pub unsafe fn Next(&self, param0: i32, param1: *mut VARIANT, param2: i32) -> HRESULT;
-        pub unsafe fn Skip(&self, param0: i32) -> HRESULT;
-        pub unsafe fn Reset(&self) -> HRESULT;
-        pub unsafe fn Clone(&self, param0: *mut *mut IEnumVARIANT) -> HRESULT;
     }
 
     #[uuid("0000000B-0000-0000-C000-000000000046")]
@@ -217,8 +211,6 @@ com::interfaces! {
 
 }
 
-impl IUnknownUnrestricted {}
-
 impl IOleWindow {}
 
 impl IOleClientSite {}
@@ -244,8 +236,6 @@ impl IDispatch {}
 impl IPerPropertyBrowsing {}
 
 impl ISpecifyPropertyPages {}
-
-impl IEnumVARIANTUnrestricted {}
 
 impl IStorage {}
 
