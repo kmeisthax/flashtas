@@ -123,6 +123,16 @@ enum WrapType {
     /// The Rust-side type must be unwrapped from a `windows` `BOOL`.
     Bool,
 
+    /// The Rust-side type must be cast to `i32`.
+    ///
+    /// TODO: I'm not actually sure if `IDispatch` wants `BOOL` as a `*mut i32`,
+    /// or if it wants us to cast to an i16 var (the type of `pBool`) and then
+    /// copy that back into the `BOOL` ptr.
+    ///
+    /// Or it could actually just be stuffing `*mut i32` straight into a
+    /// `*mut i16` and just dealing with it 🤡🤡🤡
+    BoolPtr,
+
     /// The Rust-side type is a `*const u16` that must be wrapped into a
     /// `windows` `BSTR` AND a `ManuallyDrop`.
     Bstr,
@@ -189,7 +199,7 @@ fn vt_and_ufield_for_tdesc_ptr(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapType
         VT_R8 => ("pdblVal", WrapType::Bare),
         VT_CY => ("pcyVal", WrapType::Bare),
         VT_BSTR => ("pbstrVal", WrapType::BstrPtr),
-        VT_BOOL => ("pboolVal", WrapType::Bool),
+        VT_BOOL => ("plVal", WrapType::BoolPtr), //TODO: See comments on `BoolPtr`
         VT_I1 => ("pcVal", WrapType::Bare),
         VT_UI1 => ("pbVal", WrapType::Bare),
         VT_UI2 => ("puiVal", WrapType::Bare),
@@ -284,7 +294,8 @@ pub fn generate_dispatch_param(param_i: i16, tdesc: &TYPEDESC) -> Result<String,
             ufield, param_i
         ),
         WrapType::BstrPtr => format!("{}: ::std::mem::transmute(param{})", ufield, param_i),
-        WrapType::CVoidPtr => format!("{}: param{} as *mut c_void", ufield, param_i,),
+        WrapType::BoolPtr => format!("{}: param{} as *mut i32", ufield, param_i),
+        WrapType::CVoidPtr => format!("{}: param{} as *mut c_void", ufield, param_i),
     };
 
     Ok(format!(
@@ -320,7 +331,7 @@ pub fn generate_dispatch_return(tdesc: &TYPEDESC) -> Result<String, WinError> {
             "BOOL(disp_result.Anonymous.Anonymous.Anonymous.{} as i32)",
             ufield
         ),
-        WrapType::Bstr | WrapType::BstrPtr => format!(
+        WrapType::Bstr | WrapType::BstrPtr | WrapType::BoolPtr => format!(
             "::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.{})",
             ufield
         ),

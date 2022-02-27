@@ -727,7 +727,9 @@ impl IOleInPlaceActiveObjectVB {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { pboolVal: param0.0 },
+                    Anonymous: VARIANT_0_0_0 {
+                        plVal: param0 as *mut i32,
+                    },
                     ..Default::default()
                 }),
             },
@@ -1289,7 +1291,9 @@ impl IOleControlVB {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { pboolVal: param0.0 },
+                    Anonymous: VARIANT_0_0_0 {
+                        plVal: param0 as *mut i32,
+                    },
                     ..Default::default()
                 }),
             },
@@ -1365,7 +1369,9 @@ impl IOleControlVB {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { pboolVal: param0.0 },
+                    Anonymous: VARIANT_0_0_0 {
+                        plVal: param0 as *mut i32,
+                    },
                     ..Default::default()
                 }),
             },
@@ -1917,7 +1923,9 @@ impl IPerPropertyBrowsingVB {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { pboolVal: param0.0 },
+                    Anonymous: VARIANT_0_0_0 {
+                        plVal: param0 as *mut i32,
+                    },
                     ..Default::default()
                 }),
             },
@@ -1984,7 +1992,9 @@ impl IPerPropertyBrowsingVB {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { pboolVal: param0.0 },
+                    Anonymous: VARIANT_0_0_0 {
+                        plVal: param0 as *mut i32,
+                    },
                     ..Default::default()
                 }),
             },
@@ -2042,7 +2052,9 @@ impl IPerPropertyBrowsingVB {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { pboolVal: param0.0 },
+                    Anonymous: VARIANT_0_0_0 {
+                        plVal: param0 as *mut i32,
+                    },
                     ..Default::default()
                 }),
             },
