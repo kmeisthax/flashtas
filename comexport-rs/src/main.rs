@@ -12,6 +12,7 @@ use windows::core::{Error as WinError, HRESULT, HSTRING};
 use windows::Win32::System::Com::{ITypeLib, TLIBATTR};
 use windows::Win32::System::Ole::LoadTypeLib;
 
+mod context;
 mod dispatch_bridge;
 mod fn_export;
 mod type_bridge;
@@ -50,6 +51,8 @@ fn main() {
     let path = args().nth(1).expect("Path to .exe, .dll, .tlb, or .ocx");
     let fp_ocx_name = OsStr::new(&path);
     let fp_lib = unsafe { LoadTypeLib(fp_ocx_name).expect("Loaded type lib") };
+    let mut codegen = context::CodeGen::new();
+    let mut context = codegen.borrow();
 
     unsafe {
         eprintln!("{} has {} entries", path, fp_lib.GetTypeInfoCount());
@@ -83,20 +86,20 @@ fn main() {
         println!();
 
         for i in 0..fp_lib.GetTypeInfoCount() {
-            type_export::print_type_lib_class_as_rust(&fp_lib, i).unwrap();
+            type_export::print_type_lib_class_as_rust(&mut context, &fp_lib, i).unwrap();
         }
 
         println!("com::interfaces! {{");
 
         for i in 0..fp_lib.GetTypeInfoCount() {
-            type_export::print_type_lib_interface_as_rust(&fp_lib, i).unwrap();
+            type_export::print_type_lib_interface_as_rust(&mut context, &fp_lib, i).unwrap();
         }
 
         println!("}}");
         println!();
 
         for i in 0..fp_lib.GetTypeInfoCount() {
-            type_export::print_type_lib_interface_impl_as_rust(&fp_lib, i).unwrap();
+            type_export::print_type_lib_interface_impl_as_rust(&mut context, &fp_lib, i).unwrap();
         }
 
         eprintln!("Type definition export complete!");

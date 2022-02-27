@@ -1,5 +1,6 @@
 //! Exporters for single COM functions
 
+use crate::context::Context;
 use crate::{dispatch_bridge, type_bridge};
 use windows::core::{Error as WinError, HRESULT, HSTRING};
 use windows::Win32::Foundation::BSTR;
@@ -16,6 +17,7 @@ use windows::Win32::System::Ole::{VARENUM, VT_VOID};
 /// `FUNC_PUREVIRTUAL`. They go into the `interface` block of a given
 /// interface.
 fn rust_fn_for_com_method(
+    context: &mut Context<'_>,
     type_nfo: &ITypeInfo,
     funcdesc: &FUNCDESC,
     fn_name: BSTR,
@@ -27,7 +29,7 @@ fn rust_fn_for_com_method(
         param_types.push(format!(
             "param{}: {}",
             i,
-            type_bridge::bridge_elem_to_rust_type(type_nfo, &elemdesc.tdesc)?
+            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &elemdesc.tdesc)?
         ));
     }
 
@@ -36,7 +38,7 @@ fn rust_fn_for_com_method(
     } else {
         format!(
             " -> {}",
-            type_bridge::bridge_elem_to_rust_type(type_nfo, &funcdesc.elemdescFunc.tdesc)?
+            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &funcdesc.elemdescFunc.tdesc)?
         )
     };
 
@@ -51,7 +53,11 @@ fn rust_fn_for_com_method(
 /// Export a single function from a type info structure to Rust source code.
 ///
 /// This is intended to be called within an `interface` block.
-pub fn print_type_function_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Result<(), WinError> {
+pub fn print_type_function_as_rust(
+    context: &mut Context<'_>,
+    type_nfo: &ITypeInfo,
+    fn_index: u32,
+) -> Result<(), WinError> {
     let funcdesc_raw = unsafe { type_nfo.GetFuncDesc(fn_index)? };
     if funcdesc_raw.is_null() {
         return Err(WinError::new(HRESULT(-1), HSTRING::new()));
@@ -80,7 +86,7 @@ pub fn print_type_function_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
         FUNC_VIRTUAL | FUNC_PUREVIRTUAL if funcdesc.invkind == INVOKE_FUNC => {
             println!(
                 "        {}",
-                rust_fn_for_com_method(type_nfo, funcdesc, strname)?
+                rust_fn_for_com_method(context, type_nfo, funcdesc, strname)?
             );
         }
         FUNC_VIRTUAL | FUNC_PUREVIRTUAL => {
@@ -115,6 +121,7 @@ pub fn print_type_function_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
 /// of the `Result` which returns the bridged Rust type the caller expects. No
 /// attempt is made to provide a Rust type for COM exceptions.
 fn rust_fn_for_com_dispatch_helper(
+    context: &'_ mut Context<'_>,
     type_nfo: &ITypeInfo,
     funcdesc: &FUNCDESC,
     fn_name: BSTR,
@@ -126,7 +133,7 @@ fn rust_fn_for_com_dispatch_helper(
         param_types.push(format!(
             "param{}: {}",
             i,
-            type_bridge::bridge_elem_to_rust_type(type_nfo, &elemdesc.tdesc)?
+            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &elemdesc.tdesc)?
         ));
     }
 
@@ -135,7 +142,7 @@ fn rust_fn_for_com_dispatch_helper(
     } else {
         format!(
             " -> Result<{}, HRESULT>",
-            type_bridge::bridge_elem_to_rust_type(type_nfo, &funcdesc.elemdescFunc.tdesc)?
+            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &funcdesc.elemdescFunc.tdesc)?
         )
     };
 
@@ -151,7 +158,11 @@ fn rust_fn_for_com_dispatch_helper(
 /// code.
 ///
 /// This is intended to be called within a Rust `impl` block.
-pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Result<(), WinError> {
+pub fn print_type_dispatch_as_rust(
+    context: &mut Context<'_>,
+    type_nfo: &ITypeInfo,
+    fn_index: u32,
+) -> Result<(), WinError> {
     let funcdesc_raw = unsafe { type_nfo.GetFuncDesc(fn_index)? };
     if funcdesc_raw.is_null() {
         return Err(WinError::new(HRESULT(-1), HSTRING::new()));
@@ -180,7 +191,7 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
         FUNC_DISPATCH if funcdesc.invkind == INVOKE_FUNC => {
             println!(
                 "    {} {{",
-                rust_fn_for_com_dispatch_helper(type_nfo, funcdesc, strname)?
+                rust_fn_for_com_dispatch_helper(context, type_nfo, funcdesc, strname)?
             );
 
             println!("        let mut arg_params = vec![];");

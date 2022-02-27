@@ -1,5 +1,6 @@
 //! Exporters for whole COM types
 
+use crate::context::Context;
 use crate::{fn_export, type_bridge};
 use convert_case::{Case, Casing};
 use windows::core::{Error as WinError, HRESULT, HSTRING};
@@ -9,6 +10,7 @@ use windows::Win32::System::Com::{
 };
 
 fn print_com_type_doccomment(
+    context: &Context<'_>,
     type_nfo: &ITypeInfo,
     typeattr: &TYPEATTR,
     strdocstring: BSTR,
@@ -23,7 +25,9 @@ fn print_com_type_doccomment(
     let mut superinterfaces = vec![];
     for i in 0..typeattr.cImplTypes {
         let href = unsafe { type_nfo.GetRefTypeOfImplType(i as u32)? };
-        superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(type_nfo, href)?);
+        superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(
+            context, type_nfo, href,
+        )?);
     }
 
     if !superinterfaces.is_empty() {
@@ -37,7 +41,11 @@ fn print_com_type_doccomment(
 ///
 /// This should be called outside of a `com::interfaces!` block. It will only
 /// print things related to external classes, other types are silently skipped.
-pub fn print_type_lib_class_as_rust(lib: &ITypeLib, type_index: u32) -> Result<(), WinError> {
+pub fn print_type_lib_class_as_rust(
+    context: &mut Context<'_>,
+    lib: &ITypeLib,
+    type_index: u32,
+) -> Result<(), WinError> {
     let type_nfo = unsafe { lib.GetTypeInfo(type_index)? };
     let typeattr_raw = unsafe { type_nfo.GetTypeAttr()? };
     if typeattr_raw.is_null() {
@@ -64,7 +72,7 @@ pub fn print_type_lib_class_as_rust(lib: &ITypeLib, type_index: u32) -> Result<(
 
     match typeattr.typekind {
         TKIND_COCLASS => {
-            print_com_type_doccomment(&type_nfo, typeattr, strdocstring)?;
+            print_com_type_doccomment(context, &type_nfo, typeattr, strdocstring)?;
             println!(
                 "pub const {}_CLSID: GUID = GUID {{",
                 strname.to_string().to_case(Case::UpperSnake)
@@ -87,7 +95,7 @@ pub fn print_type_lib_class_as_rust(lib: &ITypeLib, type_index: u32) -> Result<(
             println!();
         }
         TKIND_RECORD => {
-            print_com_type_doccomment(&type_nfo, typeattr, strdocstring)?;
+            print_com_type_doccomment(context, &type_nfo, typeattr, strdocstring)?;
             println!("pub struct {} {{", strname);
             println!("}}");
         }
@@ -114,7 +122,11 @@ pub fn print_type_lib_class_as_rust(lib: &ITypeLib, type_index: u32) -> Result<(
 ///
 /// To export those helper functions, see
 /// `print_type_lib_interface_impl_as_rust`.
-pub fn print_type_lib_interface_as_rust(lib: &ITypeLib, type_index: u32) -> Result<(), WinError> {
+pub fn print_type_lib_interface_as_rust(
+    context: &mut Context<'_>,
+    lib: &ITypeLib,
+    type_index: u32,
+) -> Result<(), WinError> {
     let type_nfo = unsafe { lib.GetTypeInfo(type_index)? };
     let typeattr_raw = unsafe { type_nfo.GetTypeAttr()? };
     if typeattr_raw.is_null() {
@@ -149,7 +161,9 @@ pub fn print_type_lib_interface_as_rust(lib: &ITypeLib, type_index: u32) -> Resu
             let mut superinterfaces = vec![];
             for i in 0..typeattr.cImplTypes {
                 let href = unsafe { type_nfo.GetRefTypeOfImplType(i as u32)? };
-                superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(&type_nfo, href)?);
+                superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(
+                    context, &type_nfo, href,
+                )?);
             }
 
             println!("    #[uuid(\"{:?}\")]", typeattr.guid);
@@ -160,7 +174,7 @@ pub fn print_type_lib_interface_as_rust(lib: &ITypeLib, type_index: u32) -> Resu
             );
 
             for i in 0..typeattr.cFuncs {
-                fn_export::print_type_function_as_rust(&type_nfo, i as u32)?;
+                fn_export::print_type_function_as_rust(context, &type_nfo, i as u32)?;
             }
 
             println!("    }}");
@@ -182,6 +196,7 @@ pub fn print_type_lib_interface_as_rust(lib: &ITypeLib, type_index: u32) -> Resu
 /// This should be called outside of a `com::interfaces!` block. It will only
 /// print things related to interfaces that do not fit inside of that block.
 pub fn print_type_lib_interface_impl_as_rust(
+    context: &mut Context<'_>,
     lib: &ITypeLib,
     type_index: u32,
 ) -> Result<(), WinError> {
@@ -214,7 +229,7 @@ pub fn print_type_lib_interface_impl_as_rust(
             println!("impl {} {{", strname);
 
             for i in 0..typeattr.cFuncs {
-                fn_export::print_type_dispatch_as_rust(&type_nfo, i as u32)?;
+                fn_export::print_type_dispatch_as_rust(context, &type_nfo, i as u32)?;
             }
 
             println!("}}");
