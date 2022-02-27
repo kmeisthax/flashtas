@@ -46,6 +46,16 @@ pub fn print_type_lib_class_as_rust(lib: &ITypeLib, type_index: u32) -> Result<(
 
             println!("/// GUID: {:?}", typeattr.guid);
 
+            let mut superinterfaces = vec![];
+            for i in 0..typeattr.cImplTypes {
+                let href = unsafe { type_nfo.GetRefTypeOfImplType(i as u32)? };
+                superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(&type_nfo, href)?);
+            }
+
+            if !superinterfaces.is_empty() {
+                println!("/// Interfaces: {}", superinterfaces.join(", "));
+            }
+
             println!(
                 "pub const {}_CLSID: GUID = GUID {{",
                 strname.to_string().to_case(Case::UpperSnake)

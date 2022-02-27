@@ -29,6 +29,7 @@ type BSTR = *const u16;
 /// Shockwave Flash
 ///
 /// GUID: D27CDB6E-AE6D-11CF-96B8-444553540000
+/// Interfaces: IShockwaveFlash, _IShockwaveFlashEvents
 pub const SHOCKWAVE_FLASH_CLSID: GUID = GUID {
     data1: 0xD27CDB6E,
     data2: 0xAE6D,
@@ -39,6 +40,7 @@ pub const SHOCKWAVE_FLASH_CLSID: GUID = GUID {
 /// IFlashObjectInterface Interface
 ///
 /// GUID: D27CDB71-AE6D-11CF-96B8-444553540000
+/// Interfaces: IFlashObjectInterface
 pub const FLASH_OBJECT_INTERFACE_CLSID: GUID = GUID {
     data1: 0xD27CDB71,
     data2: 0xAE6D,
@@ -49,6 +51,7 @@ pub const FLASH_OBJECT_INTERFACE_CLSID: GUID = GUID {
 /// FlashObject Class
 ///
 /// GUID: E0920E11-6B65-4D5D-9C58-B1FC5C07DC43
+/// Interfaces: IFlashObject
 pub const FLASH_OBJECT_CLSID: GUID = GUID {
     data1: 0xE0920E11,
     data2: 0x6B65,
