@@ -45,11 +45,9 @@ fn com_type_doccomment(
     Ok(ret)
 }
 
-/// Export a single class from a type library.
-///
-/// This should be called outside of a `com::interfaces!` block. It will only
-/// print things related to external classes, other types are silently skipped.
-pub fn print_type_lib_class_as_rust(
+/// Export a COM/OLE Automation type from a typelib to the given codegen
+/// context.
+pub fn gen_typelib_type(
     context: &mut Context<'_>,
     lib: &ITypeLib,
     type_index: u32,
@@ -78,113 +76,56 @@ pub fn print_type_lib_class_as_rust(
         )?
     };
 
-    match typeattr.typekind {
-        TKIND_COCLASS => {
-            let doccomment = com_type_doccomment(context, &type_nfo, typeattr, strdocstring)?;
-            write!(context.structs, "{}", doccomment)?;
+    let rustname = format!("{}", strname);
+    let already_defined = context.types.type_by_guid(typeattr.guid).is_some()
+        || context.types.type_by_name(&rustname).is_some();
 
-            writeln!(
-                context.structs,
-                "pub const {}_CLSID: GUID = GUID {{",
-                strname.to_string().to_case(Case::UpperSnake)
-            )?;
-            writeln!(context.structs, "    data1: 0x{:X},", typeattr.guid.data1)?;
-            writeln!(context.structs, "    data2: 0x{:X},", typeattr.guid.data2)?;
-            writeln!(context.structs, "    data3: 0x{:X},", typeattr.guid.data3)?;
-            writeln!(
-                context.structs,
-                "    data4: [0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}],",
-                typeattr.guid.data4[0],
-                typeattr.guid.data4[1],
-                typeattr.guid.data4[2],
-                typeattr.guid.data4[3],
-                typeattr.guid.data4[4],
-                typeattr.guid.data4[5],
-                typeattr.guid.data4[6],
-                typeattr.guid.data4[7]
-            )?;
-            writeln!(context.structs, "}};")?;
-            writeln!(context.structs)?;
-        }
-        TKIND_RECORD => {
-            let rustname = format!("{}", strname);
+    if !already_defined {
+        match typeattr.typekind {
+            TKIND_COCLASS => {
+                let doccomment =
+                    com_type_doccomment(context, &type_nfo, typeattr, strdocstring.clone())?;
+                write!(context.structs, "{}", doccomment)?;
 
-            if context.types.type_by_name(&rustname).is_none() {
+                writeln!(
+                    context.structs,
+                    "pub const {}_CLSID: GUID = GUID {{",
+                    strname.to_string().to_case(Case::UpperSnake)
+                )?;
+                writeln!(context.structs, "    data1: 0x{:X},", typeattr.guid.data1)?;
+                writeln!(context.structs, "    data2: 0x{:X},", typeattr.guid.data2)?;
+                writeln!(context.structs, "    data3: 0x{:X},", typeattr.guid.data3)?;
+                writeln!(
+                    context.structs,
+                    "    data4: [0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}],",
+                    typeattr.guid.data4[0],
+                    typeattr.guid.data4[1],
+                    typeattr.guid.data4[2],
+                    typeattr.guid.data4[3],
+                    typeattr.guid.data4[4],
+                    typeattr.guid.data4[5],
+                    typeattr.guid.data4[6],
+                    typeattr.guid.data4[7]
+                )?;
+                writeln!(context.structs, "}};")?;
+                writeln!(context.structs)?;
+            }
+            TKIND_RECORD => {
                 context
                     .types
                     .define_generated_bridge(typeattr.guid, rustname);
 
-                let doccomment = com_type_doccomment(context, &type_nfo, typeattr, strdocstring)?;
+                let doccomment =
+                    com_type_doccomment(context, &type_nfo, typeattr, strdocstring.clone())?;
                 write!(context.structs, "{}", doccomment)?;
                 writeln!(context.structs, "pub struct {} {{", strname)?;
                 writeln!(context.structs, "}}")?;
             }
-        }
-        TKIND_INTERFACE | TKIND_DISPATCH => {}
-        k => {
-            writeln!(
-                context.structs,
-                "//WARN: Unknown type {} of kind {:?}",
-                strname, k
-            )?;
-        }
-    }
-
-    unsafe { type_nfo.ReleaseTypeAttr(typeattr_raw) };
-
-    Ok(())
-}
-
-/// Export a single interface from a type library.
-///
-/// This should be called within a `com::interfaces!` block. It will only print
-/// things related to interfaces, other types are silently skipped.
-///
-/// Furthermore, only type members that can be expressed within the `com` crate
-/// interface block will be printed. Things such as properties and dispatch
-/// will be skipped; those must be printed outside the interfaces block as a
-/// separate `impl` helper function.
-///
-/// To export those helper functions, see
-/// `print_type_lib_interface_impl_as_rust`.
-pub fn print_type_lib_interface_as_rust(
-    context: &mut Context<'_>,
-    lib: &ITypeLib,
-    type_index: u32,
-) -> Result<(), Error> {
-    let type_nfo = unsafe { lib.GetTypeInfo(type_index)? };
-    let typeattr_raw = unsafe { type_nfo.GetTypeAttr()? };
-    if typeattr_raw.is_null() {
-        return Err(Error::NoTypeAttrForComType);
-    }
-
-    let typeattr: &mut TYPEATTR = unsafe { &mut *typeattr_raw };
-
-    let mut strname = BSTR::new();
-    let mut strdocstring = BSTR::new();
-    let mut whelpcontext = 0;
-    let mut strhelpfile = BSTR::new();
-
-    //TODO: This leaks.
-    unsafe {
-        lib.GetDocumentation(
-            type_index as i32,
-            &mut strname,
-            &mut strdocstring,
-            &mut whelpcontext,
-            &mut strhelpfile,
-        )?
-    };
-
-    if context.types.type_by_guid(typeattr.guid).is_none() {
-        let rustname = format!("{}", strname);
-        context
-            .types
-            .define_generated_bridge(typeattr.guid, rustname);
-
-        match typeattr.typekind {
-            //TODO: Other types of COM types
             TKIND_INTERFACE | TKIND_DISPATCH if typeattr.cImplTypes > 0 => {
+                context
+                    .types
+                    .define_generated_bridge(typeattr.guid, rustname);
+
                 if !strdocstring.is_empty() {
                     writeln!(context.interfaces, "    /// {}", strdocstring)?;
                 }
@@ -214,59 +155,7 @@ pub fn print_type_lib_interface_as_rust(
 
                 writeln!(context.interfaces, "    }}")?;
                 writeln!(context.interfaces)?;
-            }
-            TKIND_INTERFACE | TKIND_DISPATCH => {
-                writeln!(
-                    context.interfaces,
-                    "    // TODO: Bare interface type named {}",
-                    strname
-                )?;
-            }
-            _ => {}
-        }
-    }
 
-    unsafe { type_nfo.ReleaseTypeAttr(typeattr_raw) };
-
-    Ok(())
-}
-
-/// Export a single interface's Rust-side helpers from a type library.
-///
-/// This should be called outside of a `com::interfaces!` block. It will only
-/// print things related to interfaces that do not fit inside of that block.
-pub fn print_type_lib_interface_impl_as_rust(
-    context: &mut Context<'_>,
-    lib: &ITypeLib,
-    type_index: u32,
-) -> Result<(), Error> {
-    let type_nfo = unsafe { lib.GetTypeInfo(type_index)? };
-    let typeattr_raw = unsafe { type_nfo.GetTypeAttr()? };
-    if typeattr_raw.is_null() {
-        return Err(Error::NoTypeAttrForComType);
-    }
-
-    let typeattr: &mut TYPEATTR = unsafe { &mut *typeattr_raw };
-
-    let mut strname = BSTR::new();
-    let mut strdocstring = BSTR::new();
-    let mut whelpcontext = 0;
-    let mut strhelpfile = BSTR::new();
-
-    //TODO: This leaks.
-    unsafe {
-        lib.GetDocumentation(
-            type_index as i32,
-            &mut strname,
-            &mut strdocstring,
-            &mut whelpcontext,
-            &mut strhelpfile,
-        )?
-    };
-
-    if context.types.type_by_guid(typeattr.guid).is_some() {
-        match typeattr.typekind {
-            TKIND_INTERFACE | TKIND_DISPATCH => {
                 writeln!(context.impls, "impl {} {{", strname)?;
 
                 for i in 0..typeattr.cFuncs {
@@ -278,7 +167,24 @@ pub fn print_type_lib_interface_impl_as_rust(
                 writeln!(context.impls, "}}")?;
                 writeln!(context.impls)?;
             }
-            _ => {}
+            TKIND_INTERFACE | TKIND_DISPATCH => {
+                context
+                    .types
+                    .define_generated_bridge(typeattr.guid, rustname);
+
+                writeln!(
+                    context.interfaces,
+                    "    // TODO: Bare interface type named {}",
+                    strname
+                )?;
+            }
+            k => {
+                writeln!(
+                    context.structs,
+                    "//WARN: Unknown type {} of kind {:?}",
+                    strname, k
+                )?;
+            }
         }
     }
 

@@ -58,6 +58,10 @@ fn main() {
     unsafe {
         eprintln!("{} has {} entries", path, fp_lib.GetTypeInfoCount());
 
+        for i in 0..fp_lib.GetTypeInfoCount() {
+            type_export::gen_typelib_type(&mut context, &fp_lib, i).unwrap();
+        }
+
         print_type_lib_doccomment(&fp_lib).unwrap();
 
         println!("#![allow(clippy::too_many_arguments)]");
@@ -86,26 +90,14 @@ fn main() {
         println!("type CY = i64;");
         println!();
 
-        for i in 0..fp_lib.GetTypeInfoCount() {
-            type_export::print_type_lib_class_as_rust(&mut context, &fp_lib, i).unwrap();
-        }
-
         print!("{}", context.structs);
 
         println!("com::interfaces! {{");
-
-        for i in 0..fp_lib.GetTypeInfoCount() {
-            type_export::print_type_lib_interface_as_rust(&mut context, &fp_lib, i).unwrap();
-        }
 
         print!("{}", context.interfaces);
 
         println!("}}");
         println!();
-
-        for i in 0..fp_lib.GetTypeInfoCount() {
-            type_export::print_type_lib_interface_impl_as_rust(&mut context, &fp_lib, i).unwrap();
-        }
 
         print!("{}", context.impls);
 

@@ -238,8 +238,6 @@ impl IOleInPlaceFrame {}
 
 impl IOleInPlaceSite {}
 
-impl IDispatch {}
-
 impl IPerPropertyBrowsing {}
 
 impl ISpecifyPropertyPages {}
