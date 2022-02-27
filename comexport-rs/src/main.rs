@@ -69,7 +69,7 @@ fn main() {
         println!("use windows::core::HRESULT;");
         println!(
             "use windows::Win32::System::Com::{{
-    DISPPARAMS, EXCEPINFO, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0, CY, SAFEARRAY
+    DISPPARAMS, EXCEPINFO, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0, SAFEARRAY
 }};"
         );
         println!("use windows::Win32::System::Ole::{{DISPATCH_METHOD, VARENUM}};");
@@ -78,6 +78,7 @@ fn main() {
         println!("use std::ffi::c_void;");
         println!();
         println!("type BSTR = *const u16;");
+        println!("type CY = i64;");
         println!();
 
         for i in 0..fp_lib.GetTypeInfoCount() {

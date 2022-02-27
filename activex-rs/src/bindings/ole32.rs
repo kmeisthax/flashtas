@@ -20,11 +20,12 @@ use std::mem::ManuallyDrop;
 use windows::core::HRESULT;
 use windows::Win32::Foundation::BOOL;
 use windows::Win32::System::Com::{
-    CY, DISPPARAMS, EXCEPINFO, SAFEARRAY, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0,
+    DISPPARAMS, EXCEPINFO, SAFEARRAY, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0,
 };
 use windows::Win32::System::Ole::{DISPATCH_METHOD, VARENUM};
 
 type BSTR = *const u16;
+type CY = i64;
 
 //WARN: Unknown type OLERECT of kind TYPEKIND(1)
 //WARN: Unknown type OLEPOINT of kind TYPEKIND(1)
