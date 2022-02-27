@@ -64,6 +64,22 @@ impl BridgedType {
         }
     }
 
+    /// Create a type by bridging it in the current module
+    fn from_define(guid: impl ToWindowsGuid, rust_name: impl Into<Cow<'static, str>>) -> Self {
+        let guid = guid.to_win_guid();
+        let id = if guid == GUID::zeroed() {
+            None
+        } else {
+            Some(guid)
+        };
+
+        Self {
+            id,
+            rust_name: rust_name.into(),
+            rust_module: None,
+        }
+    }
+
     pub fn rust_name(&self) -> &str {
         &self.rust_name
     }
@@ -157,5 +173,15 @@ impl BridgedTypeLibrary {
         }
 
         self.guid_idx.get(&guid).and_then(|i| self.defs.get(*i))
+    }
+
+    /// Retrieve a bridged type by it's Rust-side name.
+    pub fn type_by_name(&self, name: &str) -> Option<&BridgedType> {
+        self.name_idx.get(name).and_then(|i| self.defs.get(*i))
+    }
+
+    /// Bridge a struct or class by defining it in the current module.
+    pub fn define_generated_bridge(&mut self, guid: impl ToWindowsGuid, name: String) {
+        self.define_bridged_type(BridgedType::from_define(guid, name));
     }
 }

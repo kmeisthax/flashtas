@@ -95,9 +95,17 @@ pub fn print_type_lib_class_as_rust(
             println!();
         }
         TKIND_RECORD => {
-            print_com_type_doccomment(context, &type_nfo, typeattr, strdocstring)?;
-            println!("pub struct {} {{", strname);
-            println!("}}");
+            let rustname = format!("{}", strname);
+
+            if context.types.type_by_name(&rustname).is_none() {
+                context
+                    .types
+                    .define_generated_bridge(typeattr.guid, rustname);
+
+                print_com_type_doccomment(context, &type_nfo, typeattr, strdocstring)?;
+                println!("pub struct {} {{", strname);
+                println!("}}");
+            }
         }
         TKIND_INTERFACE | TKIND_DISPATCH => {}
         k => {
@@ -151,39 +159,46 @@ pub fn print_type_lib_interface_as_rust(
         )?
     };
 
-    match typeattr.typekind {
-        //TODO: Other types of COM types
-        TKIND_INTERFACE | TKIND_DISPATCH if typeattr.cImplTypes > 0 => {
-            if !strdocstring.is_empty() {
-                println!("    /// {}", strdocstring);
+    if context.types.type_by_guid(typeattr.guid).is_none() {
+        let rustname = format!("{}", strname);
+        context
+            .types
+            .define_generated_bridge(typeattr.guid, rustname);
+
+        match typeattr.typekind {
+            //TODO: Other types of COM types
+            TKIND_INTERFACE | TKIND_DISPATCH if typeattr.cImplTypes > 0 => {
+                if !strdocstring.is_empty() {
+                    println!("    /// {}", strdocstring);
+                }
+
+                let mut superinterfaces = vec![];
+                for i in 0..typeattr.cImplTypes {
+                    let href = unsafe { type_nfo.GetRefTypeOfImplType(i as u32)? };
+                    superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(
+                        context, &type_nfo, href,
+                    )?);
+                }
+
+                println!("    #[uuid(\"{:?}\")]", typeattr.guid);
+                println!(
+                    "    pub unsafe interface {}: {} {{",
+                    strname,
+                    superinterfaces.join(", ")
+                );
+
+                for i in 0..typeattr.cFuncs {
+                    fn_export::print_type_function_as_rust(context, &type_nfo, i as u32)?;
+                }
+
+                println!("    }}");
+                println!();
             }
-
-            let mut superinterfaces = vec![];
-            for i in 0..typeattr.cImplTypes {
-                let href = unsafe { type_nfo.GetRefTypeOfImplType(i as u32)? };
-                superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(
-                    context, &type_nfo, href,
-                )?);
+            TKIND_INTERFACE | TKIND_DISPATCH => {
+                println!("    // TODO: Bare interface type named {}", strname);
             }
-
-            println!("    #[uuid(\"{:?}\")]", typeattr.guid);
-            println!(
-                "    pub unsafe interface {}: {} {{",
-                strname,
-                superinterfaces.join(", ")
-            );
-
-            for i in 0..typeattr.cFuncs {
-                fn_export::print_type_function_as_rust(context, &type_nfo, i as u32)?;
-            }
-
-            println!("    }}");
-            println!();
+            _ => {}
         }
-        TKIND_INTERFACE | TKIND_DISPATCH => {
-            println!("    // TODO: Bare interface type named {}", strname);
-        }
-        _ => {}
     }
 
     unsafe { type_nfo.ReleaseTypeAttr(typeattr_raw) };
@@ -224,18 +239,20 @@ pub fn print_type_lib_interface_impl_as_rust(
         )?
     };
 
-    match typeattr.typekind {
-        TKIND_INTERFACE | TKIND_DISPATCH => {
-            println!("impl {} {{", strname);
+    if context.types.type_by_guid(typeattr.guid).is_some() {
+        match typeattr.typekind {
+            TKIND_INTERFACE | TKIND_DISPATCH => {
+                println!("impl {} {{", strname);
 
-            for i in 0..typeattr.cFuncs {
-                fn_export::print_type_dispatch_as_rust(context, &type_nfo, i as u32)?;
+                for i in 0..typeattr.cFuncs {
+                    fn_export::print_type_dispatch_as_rust(context, &type_nfo, i as u32)?;
+                }
+
+                println!("}}");
+                println!();
             }
-
-            println!("}}");
-            println!();
+            _ => {}
         }
-        _ => {}
     }
 
     unsafe { type_nfo.ReleaseTypeAttr(typeattr_raw) };

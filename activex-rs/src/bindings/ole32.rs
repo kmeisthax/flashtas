@@ -48,7 +48,6 @@ pub struct OLECALPOLESTR {}
 /// GUID: 00000000-0000-0000-0000-000000000000
 pub struct OLECADWORD {}
 com::interfaces! {
-    // TODO: Bare interface type named IUnknownUnrestricted
     #[uuid("00000114-0000-0000-C000-000000000046")]
     pub unsafe interface IOleWindow: IUnknown {
         pub unsafe fn GetWindow(&self, param0: *mut i32) -> HRESULT;
@@ -149,6 +148,14 @@ com::interfaces! {
         pub unsafe fn GetPages(&self, param0: *mut OLECAUUID) -> HRESULT;
     }
 
+    #[uuid("00020404-0000-0000-C000-000000000046")]
+    pub unsafe interface IEnumVARIANTUnrestricted: IDispatch {
+        pub unsafe fn Next(&self, param0: i32, param1: *mut VARIANT, param2: i32) -> HRESULT;
+        pub unsafe fn Skip(&self, param0: i32) -> HRESULT;
+        pub unsafe fn Reset(&self) -> HRESULT;
+        pub unsafe fn Clone(&self, param0: *mut *mut IEnumVARIANTUnrestricted) -> HRESULT;
+    }
+
     #[uuid("0000000B-0000-0000-C000-000000000046")]
     pub unsafe interface IStorage: IUnknown {
     }
@@ -236,6 +243,8 @@ impl IDispatch {}
 impl IPerPropertyBrowsing {}
 
 impl ISpecifyPropertyPages {}
+
+impl IEnumVARIANTUnrestricted {}
 
 impl IStorage {}
 
