@@ -69,7 +69,7 @@ fn main() {
         println!("use windows::core::HRESULT;");
         println!(
             "use windows::Win32::System::Com::{{
-    DISPPARAMS, EXCEPINFO, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0
+    DISPPARAMS, EXCEPINFO, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0, CY, SAFEARRAY
 }};"
         );
         println!("use windows::Win32::System::Ole::{{DISPATCH_METHOD, VARENUM}};");

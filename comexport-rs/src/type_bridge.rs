@@ -9,9 +9,9 @@ use windows::Win32::Foundation::BSTR;
 use windows::Win32::System::Com::{ITypeInfo, TYPEDESC};
 use windows::Win32::System::Ole::{
     VARENUM, VT_BOOL, VT_BSTR, VT_CARRAY, VT_CY, VT_DATE, VT_DECIMAL, VT_DISPATCH, VT_EMPTY,
-    VT_ERROR, VT_HRESULT, VT_I1, VT_I2, VT_I4, VT_I8, VT_INT, VT_NULL, VT_PTR, VT_R4, VT_R8,
-    VT_SAFEARRAY, VT_UI1, VT_UI2, VT_UI4, VT_UI8, VT_UINT, VT_UNKNOWN, VT_USERDEFINED, VT_VARIANT,
-    VT_VOID,
+    VT_ERROR, VT_HRESULT, VT_I1, VT_I2, VT_I4, VT_I8, VT_INT, VT_LPSTR, VT_LPWSTR, VT_NULL, VT_PTR,
+    VT_R4, VT_R8, VT_SAFEARRAY, VT_UI1, VT_UI2, VT_UI4, VT_UI8, VT_UINT, VT_UNKNOWN,
+    VT_USERDEFINED, VT_VARIANT, VT_VOID,
 };
 
 /// Given a type and a referred type ID, print the type it would be if defined
@@ -81,6 +81,7 @@ pub fn bridge_elem_to_rust_type(
         VT_I4 => "i32".to_string(),
         VT_R4 => "f32".to_string(),
         VT_R8 => "f64".to_string(),
+        VT_CY => "CY".to_string(),
         VT_BSTR => "BSTR".to_string(),
         VT_DISPATCH => "IDispatch".to_string(),
         VT_BOOL => "BOOL".to_string(),
@@ -100,10 +101,13 @@ pub fn bridge_elem_to_rust_type(
             let target_type: &TYPEDESC = unsafe { &*tdesc.Anonymous.lptdesc };
             format!("*mut {}", bridge_elem_to_rust_type(typeinfo, target_type)?)
         }
+        VT_SAFEARRAY => "*mut SAFEARRAY".to_string(),
         VT_USERDEFINED => {
             let href_type = unsafe { tdesc.Anonymous.hreftype };
             bridge_usertype_to_rust_type(typeinfo, href_type)?
         }
+        VT_LPSTR => "*mut u8".to_string(), //NOTE: not an str, Windows only does WTF-8
+        VT_LPWSTR => "*mut u16".to_string(), //TODO: OsStr bridge
         _ => format!("/* unknown type 0x{:X} */", tdesc.vt),
     })
 }
@@ -162,8 +166,10 @@ fn fully_qualified_name_for_vt_value(vt_val: VARENUM) -> &'static str {
         VT_SAFEARRAY => "::windows::Win32::System::Ole::VT_SAFEARRAY",
         VT_CARRAY => "::windows::Win32::System::Ole::VT_CARRAY",
         VT_USERDEFINED => "::windows::Win32::System::Ole::VT_USERDEFINED",
+        VT_LPSTR => "::windows::Win32::System::Ole::VT_LPSTR",
+        VT_LPWSTR => "::windows::Win32::System::Ole::VT_LPWSTR",
         VT_HRESULT => "::windows::Win32::System::Ole::HRESULT",
-        _ => unimplemented!(),
+        vt_really_unk => panic!("Unknown VT variant {:?}", vt_really_unk),
     }
 }
 
@@ -181,6 +187,7 @@ fn vt_and_ufield_for_tdesc_ptr(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapType
         VT_I4 => ("plVal", WrapType::Bare),
         VT_R4 => ("pfltVal", WrapType::Bare),
         VT_R8 => ("pdblVal", WrapType::Bare),
+        VT_CY => ("pcyVal", WrapType::Bare),
         VT_BSTR => ("pbstrVal", WrapType::BstrPtr),
         VT_BOOL => ("pboolVal", WrapType::Bool),
         VT_I1 => ("pcVal", WrapType::Bare),
@@ -208,7 +215,9 @@ fn vt_and_ufield_for_tdesc_ptr(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapType
         }
 
         // TODO: This also assumes `c_void` handles pointers to COM interfaces.
-        VT_USERDEFINED | VT_DISPATCH | VT_UNKNOWN => ("byref", WrapType::CVoidPtr),
+        VT_USERDEFINED | VT_DISPATCH | VT_UNKNOWN | VT_LPWSTR | VT_LPSTR => {
+            ("byref", WrapType::CVoidPtr)
+        }
         VT_VARIANT => ("pvarVal", WrapType::Bare),
         VT_HRESULT => return Err("/* invalid: cannot use VT_HRESULT by ptr */".to_string()),
         _ => return Err(format!("/* pointer to unknown type 0x{:X} */", tdesc.vt)),
@@ -231,6 +240,7 @@ fn vt_and_ufield_for_tdesc_value(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapTy
         VT_I4 => ("lVal", WrapType::Bare),
         VT_R4 => ("fltVal", WrapType::Bare),
         VT_R8 => ("dblVal", WrapType::Bare),
+        VT_CY => ("cyVal", WrapType::Bare),
         VT_BSTR => ("bstrVal", WrapType::Bstr),
         VT_DISPATCH => ("ppdispVal", WrapType::ManuallyDrop),
         VT_BOOL => ("boolVal", WrapType::Bool),
@@ -248,6 +258,8 @@ fn vt_and_ufield_for_tdesc_value(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapTy
         VT_USERDEFINED => {
             return Err("/* invalid: cannot use VT_USERDEFINED by value */".to_string())
         }
+        VT_LPSTR => ("pcVal", WrapType::Bare), //TODO: This is wrong.
+        VT_LPWSTR => ("puival", WrapType::Bare), //TODO: This is wrong.
         VT_VARIANT => return Err("/* invalid: cannot use VT_VARIANT by value */".to_string()),
         VT_HRESULT => return Err("/* invalid: cannot use VT_HRESULT by value */".to_string()),
         _ => return Err(format!("/* unknown type 0x{:X} */", tdesc.vt)),
