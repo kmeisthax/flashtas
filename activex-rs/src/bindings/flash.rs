@@ -133,7 +133,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -165,7 +165,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -209,7 +209,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -262,7 +262,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -328,7 +328,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -416,7 +416,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -536,7 +536,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -628,7 +628,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -669,7 +669,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -728,7 +728,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -760,7 +760,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -792,7 +792,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -824,7 +824,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -856,7 +856,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -888,7 +888,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -920,7 +920,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -961,7 +961,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -993,7 +993,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -1037,7 +1037,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -1081,7 +1081,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -1134,7 +1134,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -1178,7 +1178,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -1260,7 +1260,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -1312,7 +1312,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -1366,7 +1366,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -1409,7 +1409,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -1464,7 +1464,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -1519,7 +1519,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -1562,7 +1562,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -1616,7 +1616,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -1659,7 +1659,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -1739,7 +1739,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -1791,7 +1791,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -1855,7 +1855,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -1909,7 +1909,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -1975,7 +1975,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2027,7 +2027,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -2091,7 +2091,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -2147,7 +2147,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2196,7 +2196,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -2251,7 +2251,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2283,7 +2283,7 @@ impl IShockwaveFlash {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2339,7 +2339,7 @@ impl _IShockwaveFlashEvents {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2380,7 +2380,7 @@ impl _IShockwaveFlashEvents {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2434,7 +2434,7 @@ impl _IShockwaveFlashEvents {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2477,7 +2477,7 @@ impl _IShockwaveFlashEvents {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2545,7 +2545,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2577,7 +2577,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -2621,7 +2621,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let mut disp_result = VARIANT::default();
@@ -2674,7 +2674,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2740,7 +2740,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2828,7 +2828,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -2948,7 +2948,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -3014,7 +3014,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -3154,7 +3154,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -3206,7 +3206,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -3247,7 +3247,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -3311,7 +3311,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -3363,7 +3363,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -3427,7 +3427,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(
@@ -3470,7 +3470,7 @@ impl IFlashObject {
         let mut disp_params = DISPPARAMS {
             rgvarg: arg_params.as_mut_ptr(),
             rgdispidNamedArgs: ::std::ptr::null_mut(),
-            cArgs: 0,
+            cArgs: arg_params.len() as u32,
             cNamedArgs: 0,
         };
         let invoke_result = IDispatch::Invoke(

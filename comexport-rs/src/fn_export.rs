@@ -198,7 +198,7 @@ pub fn print_type_dispatch_as_rust(type_nfo: &ITypeInfo, fn_index: u32) -> Resul
             println!("        let mut disp_params = DISPPARAMS {{");
             println!("            rgvarg: arg_params.as_mut_ptr(),");
             println!("            rgdispidNamedArgs: ::std::ptr::null_mut(),");
-            println!("            cArgs: 0,");
+            println!("            cArgs: arg_params.len() as u32,");
             println!("            cNamedArgs: 0");
             println!("        }};");
 
