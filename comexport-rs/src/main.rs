@@ -14,6 +14,7 @@ use windows::Win32::System::Ole::LoadTypeLib;
 
 mod context;
 mod dispatch_bridge;
+mod error;
 mod fn_export;
 mod type_bridge;
 mod type_export;
@@ -89,11 +90,15 @@ fn main() {
             type_export::print_type_lib_class_as_rust(&mut context, &fp_lib, i).unwrap();
         }
 
+        print!("{}", context.structs);
+
         println!("com::interfaces! {{");
 
         for i in 0..fp_lib.GetTypeInfoCount() {
             type_export::print_type_lib_interface_as_rust(&mut context, &fp_lib, i).unwrap();
         }
+
+        print!("{}", context.interfaces);
 
         println!("}}");
         println!();
@@ -101,6 +106,8 @@ fn main() {
         for i in 0..fp_lib.GetTypeInfoCount() {
             type_export::print_type_lib_interface_impl_as_rust(&mut context, &fp_lib, i).unwrap();
         }
+
+        print!("{}", context.impls);
 
         eprintln!("Type definition export complete!");
     }

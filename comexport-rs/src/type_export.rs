@@ -1,26 +1,34 @@
 //! Exporters for whole COM types
 
 use crate::context::Context;
+use crate::error::Error;
 use crate::{fn_export, type_bridge};
 use convert_case::{Case, Casing};
-use windows::core::{Error as WinError, HRESULT, HSTRING};
+use std::fmt::Write;
 use windows::Win32::Foundation::BSTR;
 use windows::Win32::System::Com::{
     ITypeInfo, ITypeLib, TKIND_COCLASS, TKIND_DISPATCH, TKIND_INTERFACE, TKIND_RECORD, TYPEATTR,
 };
 
-fn print_com_type_doccomment(
+/// Generate a doccomment for a COM type
+///
+/// If this function returns a string with any text, it is guaranteed to also
+/// contain at least one newline. Callers should print the returned string
+/// directly into the stream without adding a newline.
+fn com_type_doccomment(
     context: &Context<'_>,
     type_nfo: &ITypeInfo,
     typeattr: &TYPEATTR,
     strdocstring: BSTR,
-) -> Result<(), WinError> {
+) -> Result<String, Error> {
+    let mut ret = String::new();
+
     if !strdocstring.is_empty() {
-        println!("/// {}", strdocstring);
-        println!("///");
+        writeln!(ret, "/// {}", strdocstring)?;
+        writeln!(ret, "///")?;
     }
 
-    println!("/// GUID: {:?}", typeattr.guid);
+    writeln!(ret, "/// GUID: {:?}", typeattr.guid)?;
 
     let mut superinterfaces = vec![];
     for i in 0..typeattr.cImplTypes {
@@ -31,10 +39,10 @@ fn print_com_type_doccomment(
     }
 
     if !superinterfaces.is_empty() {
-        println!("/// Interfaces: {}", superinterfaces.join(", "));
+        writeln!(ret, "/// Interfaces: {}", superinterfaces.join(", "))?;
     }
 
-    Ok(())
+    Ok(ret)
 }
 
 /// Export a single class from a type library.
@@ -45,11 +53,11 @@ pub fn print_type_lib_class_as_rust(
     context: &mut Context<'_>,
     lib: &ITypeLib,
     type_index: u32,
-) -> Result<(), WinError> {
+) -> Result<(), Error> {
     let type_nfo = unsafe { lib.GetTypeInfo(type_index)? };
     let typeattr_raw = unsafe { type_nfo.GetTypeAttr()? };
     if typeattr_raw.is_null() {
-        return Err(WinError::new(HRESULT(-1), HSTRING::new()));
+        return Err(Error::NoTypeAttrForComType);
     }
 
     let typeattr: &mut TYPEATTR = unsafe { &mut *typeattr_raw };
@@ -72,15 +80,19 @@ pub fn print_type_lib_class_as_rust(
 
     match typeattr.typekind {
         TKIND_COCLASS => {
-            print_com_type_doccomment(context, &type_nfo, typeattr, strdocstring)?;
-            println!(
+            let doccomment = com_type_doccomment(context, &type_nfo, typeattr, strdocstring)?;
+            write!(context.structs, "{}", doccomment)?;
+
+            writeln!(
+                context.structs,
                 "pub const {}_CLSID: GUID = GUID {{",
                 strname.to_string().to_case(Case::UpperSnake)
-            );
-            println!("    data1: 0x{:X},", typeattr.guid.data1);
-            println!("    data2: 0x{:X},", typeattr.guid.data2);
-            println!("    data3: 0x{:X},", typeattr.guid.data3);
-            println!(
+            )?;
+            writeln!(context.structs, "    data1: 0x{:X},", typeattr.guid.data1)?;
+            writeln!(context.structs, "    data2: 0x{:X},", typeattr.guid.data2)?;
+            writeln!(context.structs, "    data3: 0x{:X},", typeattr.guid.data3)?;
+            writeln!(
+                context.structs,
                 "    data4: [0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}, 0x{:X}],",
                 typeattr.guid.data4[0],
                 typeattr.guid.data4[1],
@@ -90,9 +102,9 @@ pub fn print_type_lib_class_as_rust(
                 typeattr.guid.data4[5],
                 typeattr.guid.data4[6],
                 typeattr.guid.data4[7]
-            );
-            println!("}};");
-            println!();
+            )?;
+            writeln!(context.structs, "}};")?;
+            writeln!(context.structs)?;
         }
         TKIND_RECORD => {
             let rustname = format!("{}", strname);
@@ -102,14 +114,19 @@ pub fn print_type_lib_class_as_rust(
                     .types
                     .define_generated_bridge(typeattr.guid, rustname);
 
-                print_com_type_doccomment(context, &type_nfo, typeattr, strdocstring)?;
-                println!("pub struct {} {{", strname);
-                println!("}}");
+                let doccomment = com_type_doccomment(context, &type_nfo, typeattr, strdocstring)?;
+                write!(context.structs, "{}", doccomment)?;
+                writeln!(context.structs, "pub struct {} {{", strname)?;
+                writeln!(context.structs, "}}")?;
             }
         }
         TKIND_INTERFACE | TKIND_DISPATCH => {}
         k => {
-            println!("//WARN: Unknown type {} of kind {:?}", strname, k);
+            writeln!(
+                context.structs,
+                "//WARN: Unknown type {} of kind {:?}",
+                strname, k
+            )?;
         }
     }
 
@@ -134,11 +151,11 @@ pub fn print_type_lib_interface_as_rust(
     context: &mut Context<'_>,
     lib: &ITypeLib,
     type_index: u32,
-) -> Result<(), WinError> {
+) -> Result<(), Error> {
     let type_nfo = unsafe { lib.GetTypeInfo(type_index)? };
     let typeattr_raw = unsafe { type_nfo.GetTypeAttr()? };
     if typeattr_raw.is_null() {
-        return Err(WinError::new(HRESULT(-1), HSTRING::new()));
+        return Err(Error::NoTypeAttrForComType);
     }
 
     let typeattr: &mut TYPEATTR = unsafe { &mut *typeattr_raw };
@@ -169,7 +186,7 @@ pub fn print_type_lib_interface_as_rust(
             //TODO: Other types of COM types
             TKIND_INTERFACE | TKIND_DISPATCH if typeattr.cImplTypes > 0 => {
                 if !strdocstring.is_empty() {
-                    println!("    /// {}", strdocstring);
+                    writeln!(context.interfaces, "    /// {}", strdocstring)?;
                 }
 
                 let mut superinterfaces = vec![];
@@ -179,23 +196,31 @@ pub fn print_type_lib_interface_as_rust(
                         context, &type_nfo, href,
                     )?);
                 }
+                let superinterfaces = superinterfaces.join(", ");
 
-                println!("    #[uuid(\"{:?}\")]", typeattr.guid);
-                println!(
+                writeln!(context.interfaces, "    #[uuid(\"{:?}\")]", typeattr.guid)?;
+                writeln!(
+                    context.interfaces,
                     "    pub unsafe interface {}: {} {{",
-                    strname,
-                    superinterfaces.join(", ")
-                );
+                    strname, superinterfaces
+                )?;
 
                 for i in 0..typeattr.cFuncs {
-                    fn_export::print_type_function_as_rust(context, &type_nfo, i as u32)?;
+                    let func_decl = fn_export::type_function_as_rust(context, &type_nfo, i as u32)?;
+                    if !func_decl.is_empty() {
+                        writeln!(context.interfaces, "{}", func_decl)?;
+                    }
                 }
 
-                println!("    }}");
-                println!();
+                writeln!(context.interfaces, "    }}")?;
+                writeln!(context.interfaces)?;
             }
             TKIND_INTERFACE | TKIND_DISPATCH => {
-                println!("    // TODO: Bare interface type named {}", strname);
+                writeln!(
+                    context.interfaces,
+                    "    // TODO: Bare interface type named {}",
+                    strname
+                )?;
             }
             _ => {}
         }
@@ -214,11 +239,11 @@ pub fn print_type_lib_interface_impl_as_rust(
     context: &mut Context<'_>,
     lib: &ITypeLib,
     type_index: u32,
-) -> Result<(), WinError> {
+) -> Result<(), Error> {
     let type_nfo = unsafe { lib.GetTypeInfo(type_index)? };
     let typeattr_raw = unsafe { type_nfo.GetTypeAttr()? };
     if typeattr_raw.is_null() {
-        return Err(WinError::new(HRESULT(-1), HSTRING::new()));
+        return Err(Error::NoTypeAttrForComType);
     }
 
     let typeattr: &mut TYPEATTR = unsafe { &mut *typeattr_raw };
@@ -242,14 +267,16 @@ pub fn print_type_lib_interface_impl_as_rust(
     if context.types.type_by_guid(typeattr.guid).is_some() {
         match typeattr.typekind {
             TKIND_INTERFACE | TKIND_DISPATCH => {
-                println!("impl {} {{", strname);
+                writeln!(context.impls, "impl {} {{", strname)?;
 
                 for i in 0..typeattr.cFuncs {
-                    fn_export::print_type_dispatch_as_rust(context, &type_nfo, i as u32)?;
+                    let impl_str =
+                        fn_export::print_type_dispatch_as_rust(context, &type_nfo, i as u32)?;
+                    writeln!(context.impls, "{}", impl_str)?;
                 }
 
-                println!("}}");
-                println!();
+                writeln!(context.impls, "}}")?;
+                writeln!(context.impls)?;
             }
             _ => {}
         }

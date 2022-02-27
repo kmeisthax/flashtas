@@ -1,8 +1,9 @@
 //! Exporters for single COM functions
 
 use crate::context::Context;
+use crate::error::Error;
 use crate::{dispatch_bridge, type_bridge};
-use windows::core::{Error as WinError, HRESULT, HSTRING};
+use std::fmt::Write;
 use windows::Win32::Foundation::BSTR;
 use windows::Win32::System::Com::{
     ITypeInfo, ELEMDESC, FUNCDESC, FUNC_DISPATCH, FUNC_PUREVIRTUAL, FUNC_VIRTUAL, INVOKE_FUNC,
@@ -21,7 +22,7 @@ fn rust_fn_for_com_method(
     type_nfo: &ITypeInfo,
     funcdesc: &FUNCDESC,
     fn_name: BSTR,
-) -> Result<String, WinError> {
+) -> Result<String, Error> {
     let mut param_types = vec!["&self".to_string()];
     for i in 0..funcdesc.cParams {
         let elemdesc: &mut ELEMDESC =
@@ -51,16 +52,16 @@ fn rust_fn_for_com_method(
 }
 
 /// Export a single function from a type info structure to Rust source code.
-///
-/// This is intended to be called within an `interface` block.
-pub fn print_type_function_as_rust(
+pub fn type_function_as_rust(
     context: &mut Context<'_>,
     type_nfo: &ITypeInfo,
     fn_index: u32,
-) -> Result<(), WinError> {
+) -> Result<String, Error> {
+    let mut ret = String::new();
+
     let funcdesc_raw = unsafe { type_nfo.GetFuncDesc(fn_index)? };
     if funcdesc_raw.is_null() {
-        return Err(WinError::new(HRESULT(-1), HSTRING::new()));
+        return Err(Error::NoFuncDescForComFn);
     }
 
     let funcdesc: &mut FUNCDESC = unsafe { &mut *funcdesc_raw };
@@ -84,29 +85,32 @@ pub fn print_type_function_as_rust(
     //TODO: CALLCONV?
     match funcdesc.funckind {
         FUNC_VIRTUAL | FUNC_PUREVIRTUAL if funcdesc.invkind == INVOKE_FUNC => {
-            println!(
+            write!(
+                ret,
                 "        {}",
                 rust_fn_for_com_method(context, type_nfo, funcdesc, strname)?
-            );
+            )?;
         }
         FUNC_VIRTUAL | FUNC_PUREVIRTUAL => {
-            println!(
+            write!(
+                ret,
                 "        //INVALID invkind: {} (funckind {:?}, invkind {:?})",
                 strname, funcdesc.funckind, funcdesc.invkind
-            );
+            )?;
         }
         FUNC_DISPATCH => {}
         _ => {
-            println!(
+            write!(
+                ret,
                 "        //UNKNOWN funckind: {} (funckind {:?}, invkind {:?})",
                 strname, funcdesc.funckind, funcdesc.invkind
-            );
+            )?;
         }
     }
 
     unsafe { type_nfo.ReleaseFuncDesc(funcdesc) };
 
-    Ok(())
+    Ok(ret)
 }
 
 /// Print valid Rust source code that matches the type signature of a COM
@@ -125,7 +129,7 @@ fn rust_fn_for_com_dispatch_helper(
     type_nfo: &ITypeInfo,
     funcdesc: &FUNCDESC,
     fn_name: BSTR,
-) -> Result<String, WinError> {
+) -> Result<String, Error> {
     let mut param_types = vec!["&self".to_string()];
     for i in 0..funcdesc.cParams {
         let elemdesc: &mut ELEMDESC =
@@ -156,16 +160,16 @@ fn rust_fn_for_com_dispatch_helper(
 
 /// Export a single dispatch property from a type info structure to Rust source
 /// code.
-///
-/// This is intended to be called within a Rust `impl` block.
 pub fn print_type_dispatch_as_rust(
     context: &mut Context<'_>,
     type_nfo: &ITypeInfo,
     fn_index: u32,
-) -> Result<(), WinError> {
+) -> Result<String, Error> {
+    let mut ret = String::new();
+
     let funcdesc_raw = unsafe { type_nfo.GetFuncDesc(fn_index)? };
     if funcdesc_raw.is_null() {
-        return Err(WinError::new(HRESULT(-1), HSTRING::new()));
+        return Err(Error::NoFuncDescForComFn);
     }
 
     let funcdesc: &mut FUNCDESC = unsafe { &mut *funcdesc_raw };
@@ -189,33 +193,39 @@ pub fn print_type_dispatch_as_rust(
     //TODO: CALLCONV?
     match funcdesc.funckind {
         FUNC_DISPATCH if funcdesc.invkind == INVOKE_FUNC => {
-            println!(
+            writeln!(
+                ret,
                 "    {} {{",
                 rust_fn_for_com_dispatch_helper(context, type_nfo, funcdesc, strname)?
-            );
+            )?;
 
-            println!("        let mut arg_params = vec![];");
+            writeln!(ret, "        let mut arg_params = vec![];")?;
 
             for i in 0..funcdesc.cParams {
                 let elemdesc: &mut ELEMDESC =
                     unsafe { &mut *funcdesc.lprgelemdescParam.offset(i as isize) };
 
-                println!(
+                writeln!(
+                    ret,
                     "        {}",
                     dispatch_bridge::generate_param(i, &elemdesc.tdesc)?
-                );
+                )?;
             }
 
-            println!("        let mut disp_params = DISPPARAMS {{");
-            println!("            rgvarg: arg_params.as_mut_ptr(),");
-            println!("            rgdispidNamedArgs: ::std::ptr::null_mut(),");
-            println!("            cArgs: arg_params.len() as u32,");
-            println!("            cNamedArgs: 0");
-            println!("        }};");
+            writeln!(ret, "        let mut disp_params = DISPPARAMS {{")?;
+            writeln!(ret, "            rgvarg: arg_params.as_mut_ptr(),")?;
+            writeln!(
+                ret,
+                "            rgdispidNamedArgs: ::std::ptr::null_mut(),"
+            )?;
+            writeln!(ret, "            cArgs: arg_params.len() as u32,")?;
+            writeln!(ret, "            cNamedArgs: 0")?;
+            writeln!(ret, "        }};")?;
 
             if VARENUM(funcdesc.elemdescFunc.tdesc.vt as i32) != VT_VOID {
-                println!("        let mut disp_result = VARIANT::default();");
-                println!(
+                writeln!(ret, "        let mut disp_result = VARIANT::default();")?;
+                writeln!(
+                    ret,
                     "        let invoke_result = IDispatch::Invoke(
             self,
             #[allow(overflowing_literals)]
@@ -234,17 +244,19 @@ pub fn print_type_dispatch_as_rust(
             ::std::ptr::null_mut()
         );",
                     funcdesc.memid
-                );
-                println!("        if invoke_result.is_err() {{");
-                println!("            return Err(invoke_result);");
-                println!("        }}");
+                )?;
+                writeln!(ret, "        if invoke_result.is_err() {{")?;
+                writeln!(ret, "            return Err(invoke_result);")?;
+                writeln!(ret, "        }}")?;
 
-                println!(
+                writeln!(
+                    ret,
                     "        Ok({})",
                     dispatch_bridge::generate_return(&funcdesc.elemdescFunc.tdesc)?
-                );
+                )?;
             } else {
-                println!(
+                writeln!(
+                    ret,
                     "        let invoke_result = IDispatch::Invoke(
             self,
             #[allow(overflowing_literals)]
@@ -263,27 +275,27 @@ pub fn print_type_dispatch_as_rust(
             ::std::ptr::null_mut()
         );",
                     funcdesc.memid
-                );
-                println!("        if invoke_result.is_err() {{");
-                println!("            Err(invoke_result)");
-                println!("        }} else {{");
-                println!("            Ok(())");
-                println!("        }}");
+                )?;
+                writeln!(ret, "        if invoke_result.is_err() {{")?;
+                writeln!(ret, "            Err(invoke_result)")?;
+                writeln!(ret, "        }} else {{")?;
+                writeln!(ret, "            Ok(())")?;
+                writeln!(ret, "        }}")?;
             }
 
-            println!("    }}");
-            println!();
+            writeln!(ret, "    }}")?;
         }
         FUNC_DISPATCH => {
-            println!(
+            write!(
+                ret,
                 "        //TODO: IDispatch helper for {} (invkind {:?})",
                 strname, funcdesc.invkind
-            );
+            )?;
         }
         _ => {}
     }
 
     unsafe { type_nfo.ReleaseFuncDesc(funcdesc) };
 
-    Ok(())
+    Ok(ret)
 }
