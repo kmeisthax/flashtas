@@ -16,6 +16,7 @@ mod context;
 mod dispatch_bridge;
 mod error;
 mod fn_export;
+mod mem_export;
 mod type_bridge;
 mod type_export;
 

@@ -28,25 +28,78 @@ type BSTR = *const u16;
 type CY = i64;
 
 /// GUID: 00000000-0000-0000-0000-000000000000
-pub struct OLERECT {}
+#[repr(C)]
+pub struct OLERECT {
+    pub Left: i32,
+    pub Top: i32,
+    pub Right: i32,
+    pub Bottom: i32,
+}
 /// GUID: 00000000-0000-0000-0000-000000000000
-pub struct OLEPOINT {}
+#[repr(C)]
+pub struct OLEPOINT {
+    pub X: i32,
+    pub Y: i32,
+}
 /// GUID: 00000000-0000-0000-0000-000000000000
-pub struct OLEACCELMSG {}
+#[repr(C)]
+pub struct OLEACCELMSG {
+    pub hWnd: i32,
+    pub Message: i32,
+    pub wParam: i32,
+    pub lParam: i32,
+    pub Time: i32,
+    pub PT: OLEPOINT,
+}
 /// GUID: 00000000-0000-0000-0000-000000000000
-pub struct OLESIZE {}
+#[repr(C)]
+pub struct OLESIZE {
+    pub CX: i32,
+    pub CY: i32,
+}
 /// GUID: 00000000-0000-0000-0000-000000000000
-pub struct OLEINPLACEFRAMEINFO {}
+#[repr(C)]
+pub struct OLEINPLACEFRAMEINFO {
+    pub cb: i32,
+    pub fMDIApp: i32,
+    pub hWndFrame: OLE_HANDLE,
+    pub hAccel: OLE_HANDLE,
+    pub cAccelEntries: i32,
+}
 /// GUID: 00000000-0000-0000-0000-000000000000
-pub struct OLECONTROLINFO {}
+#[repr(C)]
+pub struct OLECONTROLINFO {
+    pub cb: i32,
+    pub hAccel: i32,
+    pub cAccel: i16,
+    pub dwFlags: i32,
+}
 /// GUID: 00000000-0000-0000-0000-000000000000
-pub struct OLECLSID {}
+#[repr(C)]
+pub struct OLECLSID {
+    pub Data1: i32,
+    pub Data2: i16,
+    pub Data3: i16,
+    pub Data4: [u8; 8],
+}
 /// GUID: 00000000-0000-0000-0000-000000000000
-pub struct OLECAUUID {}
+#[repr(C)]
+pub struct OLECAUUID {
+    pub cElems: i32,
+    pub pElems: i32,
+}
 /// GUID: 00000000-0000-0000-0000-000000000000
-pub struct OLECALPOLESTR {}
+#[repr(C)]
+pub struct OLECALPOLESTR {
+    pub cElems: i32,
+    pub pElems: i32,
+}
 /// GUID: 00000000-0000-0000-0000-000000000000
-pub struct OLECADWORD {}
+#[repr(C)]
+pub struct OLECADWORD {
+    pub cElems: i32,
+    pub pElems: i32,
+}
 com::interfaces! {
     #[uuid("00000114-0000-0000-C000-000000000046")]
     pub unsafe interface IOleWindow: IUnknown {

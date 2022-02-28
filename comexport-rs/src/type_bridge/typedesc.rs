@@ -5,11 +5,11 @@ use std::borrow::Cow;
 use std::ptr::null_mut;
 use windows::core::Error as WinError;
 use windows::Win32::Foundation::BSTR;
-use windows::Win32::System::Com::{ITypeInfo, TYPEATTR, TYPEDESC};
+use windows::Win32::System::Com::{ITypeInfo, SAFEARRAYBOUND, TYPEATTR, TYPEDESC};
 use windows::Win32::System::Ole::{
-    VARENUM, VT_BOOL, VT_BSTR, VT_CY, VT_DISPATCH, VT_HRESULT, VT_I1, VT_I2, VT_I4, VT_I8, VT_INT,
-    VT_LPSTR, VT_LPWSTR, VT_PTR, VT_R4, VT_R8, VT_SAFEARRAY, VT_UI1, VT_UI2, VT_UI4, VT_UI8,
-    VT_UINT, VT_UNKNOWN, VT_USERDEFINED, VT_VARIANT, VT_VOID,
+    ARRAYDESC, VARENUM, VT_BOOL, VT_BSTR, VT_CARRAY, VT_CY, VT_DISPATCH, VT_HRESULT, VT_I1, VT_I2,
+    VT_I4, VT_I8, VT_INT, VT_LPSTR, VT_LPWSTR, VT_PTR, VT_R4, VT_R8, VT_SAFEARRAY, VT_UI1, VT_UI2,
+    VT_UI4, VT_UI8, VT_UINT, VT_UNKNOWN, VT_USERDEFINED, VT_VARIANT, VT_VOID,
 };
 
 /// Given a type and a referred type ID, print the type it would be if defined
@@ -118,6 +118,20 @@ pub fn bridge_elem_to_rust_type<'a>(
             .into()
         }
         VT_SAFEARRAY => "*mut SAFEARRAY".into(),
+        VT_CARRAY => {
+            let arraydesc: &ARRAYDESC = unsafe { &*tdesc.Anonymous.lpadesc };
+            let mut elem = bridge_elem_to_rust_type(context, typeinfo, &arraydesc.tdescElem)?;
+
+            for i in 0..arraydesc.cDims {
+                // TODO: When Rust can actually express variable-length structs
+                // remove this code
+                let bound_base = &arraydesc.rgbounds[0] as *const SAFEARRAYBOUND;
+                let bound = unsafe { &*bound_base.offset(i as isize) };
+                elem = format!("[{}; {}]", elem, bound.cElements).into();
+            }
+
+            elem
+        }
         VT_USERDEFINED => {
             let href_type = unsafe { tdesc.Anonymous.hreftype };
             bridge_usertype_to_rust_type(context, typeinfo, href_type)?

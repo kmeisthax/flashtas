@@ -2,6 +2,7 @@
 
 use crate::context::Context;
 use crate::error::Error;
+use crate::mem_export::type_member_as_rust;
 use crate::{fn_export, type_bridge};
 use convert_case::{Case, Casing};
 use std::fmt::Write;
@@ -118,7 +119,18 @@ pub fn gen_typelib_type(
                 let doccomment =
                     com_type_doccomment(context, &type_nfo, typeattr, strdocstring.clone())?;
                 write!(context.structs, "{}", doccomment)?;
+                writeln!(context.structs, "#[repr(C)]")?;
                 writeln!(context.structs, "pub struct {} {{", strname)?;
+
+                for i in 0..typeattr.cVars {
+                    writeln!(
+                        context.structs,
+                        "{}{}",
+                        type_member_as_rust(context, &type_nfo, i as u32)?,
+                        if i + 1 < typeattr.cVars { "," } else { "" }
+                    )?;
+                }
+
                 writeln!(context.structs, "}}")?;
             }
             TKIND_INTERFACE | TKIND_DISPATCH if typeattr.cImplTypes > 0 => {

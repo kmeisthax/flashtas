@@ -7,6 +7,7 @@ pub enum Error {
     RustFmt(FmtError),
     NoFuncDescForComFn,
     NoTypeAttrForComType,
+    NoVarDescForComVar,
 }
 
 impl From<WinError> for Error {
