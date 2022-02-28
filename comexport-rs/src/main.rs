@@ -70,6 +70,7 @@ fn main() {
         println!("#![allow(clippy::missing_safety_doc)]");
         println!("#![allow(clippy::vec_init_then_push)]");
         println!("#![allow(non_snake_case)]");
+        println!("#![allow(non_camel_case_types)]");
         println!();
 
         //TODO: automatic bridging from user-defined types to `windows`/`com` types
@@ -89,6 +90,7 @@ fn main() {
         println!();
         println!("type BSTR = *const u16;");
         println!("type CY = i64;");
+        println!("type OLE_HANDLE = u32;");
         println!();
 
         print!("{}", context.structs);

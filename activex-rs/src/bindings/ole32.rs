@@ -11,6 +11,7 @@
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::vec_init_then_push)]
 #![allow(non_snake_case)]
+#![allow(non_camel_case_types)]
 
 use crate::IDispatch;
 use com::interfaces::IUnknown;
@@ -26,6 +27,7 @@ use windows::Win32::System::Ole::{DISPATCH_METHOD, VARENUM};
 
 type BSTR = *const u16;
 type CY = i64;
+type OLE_HANDLE = u32;
 
 /// GUID: 00000000-0000-0000-0000-000000000000
 #[repr(C)]
