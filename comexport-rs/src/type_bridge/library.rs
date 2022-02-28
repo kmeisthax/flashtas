@@ -5,6 +5,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::mem::transmute;
 use windows::core::GUID;
+use windows::Win32::System::Com::{TKIND_INTERFACE, TKIND_RECORD, TYPEKIND};
 
 /// Convert from COM to Windows `GUID` structures.
 ///
@@ -36,6 +37,13 @@ pub struct BridgedType {
     /// only have a valid GUID if they are coclasses or interfaces.
     id: Option<GUID>,
 
+    /// The typekind of a given bridged type.
+    ///
+    /// Certain typekinds are bridged differently in Rust: for example, `com`
+    /// treats all INTERFACE types as smart pointers, whereas in C++ they are
+    /// just bare types.
+    com_type: TYPEKIND,
+
     /// The Rust-side name of the type.
     rust_name: Cow<'static, str>,
 
@@ -54,18 +62,24 @@ impl BridgedType {
     /// again.
     fn from_predefined(
         id: Option<GUID>,
+        com_type: TYPEKIND,
         rust_name: impl Into<Cow<'static, str>>,
         rust_module: &'static str,
     ) -> Self {
         Self {
             id,
+            com_type,
             rust_name: rust_name.into(),
             rust_module: Some(rust_module),
         }
     }
 
     /// Create a type by bridging it in the current module
-    fn from_define(guid: impl ToWindowsGuid, rust_name: impl Into<Cow<'static, str>>) -> Self {
+    fn from_define(
+        guid: impl ToWindowsGuid,
+        com_type: TYPEKIND,
+        rust_name: impl Into<Cow<'static, str>>,
+    ) -> Self {
         let guid = guid.to_win_guid();
         let id = if guid == GUID::zeroed() {
             None
@@ -75,6 +89,7 @@ impl BridgedType {
 
         Self {
             id,
+            com_type,
             rust_name: rust_name.into(),
             rust_module: None,
         }
@@ -151,6 +166,7 @@ impl BridgedTypeLibrary {
         let win_id = id.to_win_guid();
         self.define_bridged_type(BridgedType::from_predefined(
             Some(win_id),
+            TKIND_INTERFACE,
             rust_name,
             rust_module,
         ));
@@ -162,7 +178,12 @@ impl BridgedTypeLibrary {
         rust_name: impl Clone + Into<Cow<'static, str>>,
         rust_module: &'static str,
     ) {
-        self.define_bridged_type(BridgedType::from_predefined(None, rust_name, rust_module));
+        self.define_bridged_type(BridgedType::from_predefined(
+            None,
+            TKIND_RECORD,
+            rust_name,
+            rust_module,
+        ));
     }
 
     /// Retrieve a bridged type by it's GUID.
@@ -181,7 +202,12 @@ impl BridgedTypeLibrary {
     }
 
     /// Bridge a struct or class by defining it in the current module.
-    pub fn define_generated_bridge(&mut self, guid: impl ToWindowsGuid, name: String) {
-        self.define_bridged_type(BridgedType::from_define(guid, name));
+    pub fn define_generated_bridge(
+        &mut self,
+        guid: impl ToWindowsGuid,
+        com_type: TYPEKIND,
+        name: String,
+    ) {
+        self.define_bridged_type(BridgedType::from_define(guid, com_type, name));
     }
 }

@@ -117,7 +117,7 @@ pub fn gen_typelib_type(
             TKIND_RECORD => {
                 context
                     .types
-                    .define_generated_bridge(typeattr.guid, rustname);
+                    .define_generated_bridge(typeattr.guid, typeattr.typekind, rustname);
 
                 let doccomment =
                     com_type_doccomment(context, &type_nfo, typeattr, strdocstring.clone())?;
@@ -140,7 +140,7 @@ pub fn gen_typelib_type(
             TKIND_INTERFACE | TKIND_DISPATCH if typeattr.cImplTypes > 0 => {
                 context
                     .types
-                    .define_generated_bridge(typeattr.guid, rustname);
+                    .define_generated_bridge(typeattr.guid, typeattr.typekind, rustname);
 
                 if !strdocstring.is_empty() {
                     writeln!(context.interfaces, "    /// {}", strdocstring)?;
@@ -186,7 +186,7 @@ pub fn gen_typelib_type(
             TKIND_INTERFACE | TKIND_DISPATCH => {
                 context
                     .types
-                    .define_generated_bridge(typeattr.guid, rustname);
+                    .define_generated_bridge(typeattr.guid, typeattr.typekind, rustname);
 
                 writeln!(
                     context.interfaces,
