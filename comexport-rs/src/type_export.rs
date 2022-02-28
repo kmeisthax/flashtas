@@ -6,6 +6,7 @@ use crate::mem_export::type_member_as_rust;
 use crate::{fn_export, type_bridge};
 use convert_case::{Case, Casing};
 use std::fmt::Write;
+use windows::core::GUID;
 use windows::Win32::Foundation::BSTR;
 use windows::Win32::System::Com::{
     ITypeInfo, ITypeLib, TKIND_COCLASS, TKIND_DISPATCH, TKIND_INTERFACE, TKIND_RECORD, TYPEATTR,
@@ -29,7 +30,9 @@ fn com_type_doccomment(
         writeln!(ret, "///")?;
     }
 
-    writeln!(ret, "/// GUID: {:?}", typeattr.guid)?;
+    if typeattr.guid != GUID::zeroed() {
+        writeln!(ret, "/// GUID: {:?}", typeattr.guid)?;
+    }
 
     let mut superinterfaces = vec![];
     for i in 0..typeattr.cImplTypes {
@@ -132,6 +135,7 @@ pub fn gen_typelib_type(
                 }
 
                 writeln!(context.structs, "}}")?;
+                writeln!(context.structs)?;
             }
             TKIND_INTERFACE | TKIND_DISPATCH if typeattr.cImplTypes > 0 => {
                 context

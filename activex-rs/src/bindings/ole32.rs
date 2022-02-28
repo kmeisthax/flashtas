@@ -29,7 +29,6 @@ type BSTR = *const u16;
 type CY = i64;
 type OLE_HANDLE = u32;
 
-/// GUID: 00000000-0000-0000-0000-000000000000
 #[repr(C)]
 pub struct OLERECT {
     pub Left: i32,
@@ -37,13 +36,13 @@ pub struct OLERECT {
     pub Right: i32,
     pub Bottom: i32,
 }
-/// GUID: 00000000-0000-0000-0000-000000000000
+
 #[repr(C)]
 pub struct OLEPOINT {
     pub X: i32,
     pub Y: i32,
 }
-/// GUID: 00000000-0000-0000-0000-000000000000
+
 #[repr(C)]
 pub struct OLEACCELMSG {
     pub hWnd: i32,
@@ -53,13 +52,13 @@ pub struct OLEACCELMSG {
     pub Time: i32,
     pub PT: OLEPOINT,
 }
-/// GUID: 00000000-0000-0000-0000-000000000000
+
 #[repr(C)]
 pub struct OLESIZE {
     pub CX: i32,
     pub CY: i32,
 }
-/// GUID: 00000000-0000-0000-0000-000000000000
+
 #[repr(C)]
 pub struct OLEINPLACEFRAMEINFO {
     pub cb: i32,
@@ -68,7 +67,7 @@ pub struct OLEINPLACEFRAMEINFO {
     pub hAccel: OLE_HANDLE,
     pub cAccelEntries: i32,
 }
-/// GUID: 00000000-0000-0000-0000-000000000000
+
 #[repr(C)]
 pub struct OLECONTROLINFO {
     pub cb: i32,
@@ -76,7 +75,7 @@ pub struct OLECONTROLINFO {
     pub cAccel: i16,
     pub dwFlags: i32,
 }
-/// GUID: 00000000-0000-0000-0000-000000000000
+
 #[repr(C)]
 pub struct OLECLSID {
     pub Data1: i32,
@@ -84,24 +83,25 @@ pub struct OLECLSID {
     pub Data3: i16,
     pub Data4: [u8; 8],
 }
-/// GUID: 00000000-0000-0000-0000-000000000000
+
 #[repr(C)]
 pub struct OLECAUUID {
     pub cElems: i32,
     pub pElems: i32,
 }
-/// GUID: 00000000-0000-0000-0000-000000000000
+
 #[repr(C)]
 pub struct OLECALPOLESTR {
     pub cElems: i32,
     pub pElems: i32,
 }
-/// GUID: 00000000-0000-0000-0000-000000000000
+
 #[repr(C)]
 pub struct OLECADWORD {
     pub cElems: i32,
     pub pElems: i32,
 }
+
 com::interfaces! {
     #[uuid("00000114-0000-0000-C000-000000000046")]
     pub unsafe interface IOleWindow: IUnknown {
