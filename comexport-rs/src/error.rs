@@ -1,5 +1,6 @@
 use std::fmt::Error as FmtError;
 use windows::core::Error as WinError;
+use windows::Win32::System::Ole::VARENUM;
 
 #[derive(Debug)]
 pub enum Error {
@@ -8,6 +9,7 @@ pub enum Error {
     NoFuncDescForComFn,
     NoTypeAttrForComType,
     NoVarDescForComVar,
+    UnknownVariantType(VARENUM),
 }
 
 impl From<WinError> for Error {
@@ -19,5 +21,11 @@ impl From<WinError> for Error {
 impl From<FmtError> for Error {
     fn from(error: FmtError) -> Error {
         Error::RustFmt(error)
+    }
+}
+
+impl From<VARENUM> for Error {
+    fn from(error: VARENUM) -> Error {
+        Error::UnknownVariantType(error)
     }
 }

@@ -17,7 +17,7 @@ pub fn type_member_as_rust(
     }
 
     let vardesc: &mut VARDESC = unsafe { &mut *vardesc_raw };
-    let typestring = bridge_elem_to_rust_type(context, typeinfo, &vardesc.elemdescVar.tdesc)?;
+    let typestring = bridge_elem_to_rust_type(context, typeinfo, &vardesc.elemdescVar.tdesc);
 
     let mut strname = BSTR::new();
     let mut strdocstring = BSTR::new();

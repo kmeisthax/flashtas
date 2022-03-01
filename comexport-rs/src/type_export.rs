@@ -39,7 +39,7 @@ fn com_type_doccomment(
         let href = unsafe { type_nfo.GetRefTypeOfImplType(i as u32)? };
         superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(
             context, type_nfo, href,
-        )?);
+        ));
     }
 
     if !superinterfaces.is_empty() {
@@ -151,7 +151,7 @@ pub fn gen_typelib_type(
                     let href = unsafe { type_nfo.GetRefTypeOfImplType(i as u32)? };
                     superinterfaces.push(type_bridge::bridge_usertype_to_rust_type(
                         context, &type_nfo, href,
-                    )?);
+                    ));
                 }
                 let superinterfaces = superinterfaces.join(", ");
 

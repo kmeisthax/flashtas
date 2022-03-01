@@ -30,7 +30,7 @@ fn rust_fn_for_com_method(
         param_types.push(format!(
             "param{}: {}",
             i,
-            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &elemdesc.tdesc)?
+            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &elemdesc.tdesc)
         ));
     }
 
@@ -39,7 +39,7 @@ fn rust_fn_for_com_method(
     } else {
         format!(
             " -> {}",
-            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &funcdesc.elemdescFunc.tdesc)?
+            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &funcdesc.elemdescFunc.tdesc)
         )
     };
 
@@ -137,7 +137,7 @@ fn rust_fn_for_com_dispatch_helper(
         param_types.push(format!(
             "param{}: {}",
             i,
-            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &elemdesc.tdesc)?
+            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &elemdesc.tdesc)
         ));
     }
 
@@ -146,7 +146,7 @@ fn rust_fn_for_com_dispatch_helper(
     } else {
         format!(
             " -> Result<{}, HRESULT>",
-            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &funcdesc.elemdescFunc.tdesc)?
+            type_bridge::bridge_elem_to_rust_type(context, type_nfo, &funcdesc.elemdescFunc.tdesc)
         )
     };
 

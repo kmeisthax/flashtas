@@ -98,6 +98,10 @@ impl BridgedType {
     pub fn rust_name(&self) -> &str {
         &self.rust_name
     }
+
+    pub fn com_type(&self) -> TYPEKIND {
+        self.com_type
+    }
 }
 
 #[derive(Default)]
