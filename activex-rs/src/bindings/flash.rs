@@ -11,20 +11,24 @@
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::vec_init_then_push)]
 #![allow(non_snake_case)]
+#![allow(non_camel_case_types)]
 
 use crate::IDispatch;
 use com::interfaces::IUnknown;
 use com::sys::GUID;
+use com::Interface;
 use std::ffi::c_void;
 use std::mem::ManuallyDrop;
 use windows::core::HRESULT;
 use windows::Win32::Foundation::BOOL;
 use windows::Win32::System::Com::{
-    DISPPARAMS, EXCEPINFO, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0,
+    DISPPARAMS, EXCEPINFO, SAFEARRAY, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0,
 };
 use windows::Win32::System::Ole::{DISPATCH_METHOD, VARENUM};
 
 type BSTR = *const u16;
+type CY = i64;
+type OLE_HANDLE = u32;
 
 /// Shockwave Flash
 ///
@@ -83,18 +87,18 @@ com::interfaces! {
     #[uuid("A6EF9860-C720-11D0-9337-00A0C90DCAA9")]
     pub unsafe interface IDispatchEx: IDispatch {
         pub unsafe fn GetDispID(&self, param0: BSTR, param1: u32, param2: *mut i32) -> HRESULT;
-        pub unsafe fn RemoteInvokeEx(&self, param0: i32, param1: u32, param2: u32, param3: *mut DISPPARAMS, param4: *mut VARIANT, param5: *mut EXCEPINFO, param6: *mut IServiceProvider, param7: u32, param8: *mut u32, param9: *mut VARIANT) -> HRESULT;
+        pub unsafe fn RemoteInvokeEx(&self, param0: i32, param1: u32, param2: u32, param3: *mut DISPPARAMS, param4: *mut VARIANT, param5: *mut EXCEPINFO, param6: IServiceProvider, param7: u32, param8: *mut u32, param9: *mut VARIANT) -> HRESULT;
         pub unsafe fn DeleteMemberByName(&self, param0: BSTR, param1: u32) -> HRESULT;
         pub unsafe fn DeleteMemberByDispID(&self, param0: i32) -> HRESULT;
         pub unsafe fn GetMemberProperties(&self, param0: i32, param1: u32, param2: *mut u32) -> HRESULT;
         pub unsafe fn GetMemberName(&self, param0: i32, param1: *mut BSTR) -> HRESULT;
         pub unsafe fn GetNextDispID(&self, param0: u32, param1: i32, param2: *mut i32) -> HRESULT;
-        pub unsafe fn GetNameSpaceParent(&self, param0: *mut IUnknown) -> HRESULT;
+        pub unsafe fn GetNameSpaceParent(&self, param0: IUnknown) -> HRESULT;
     }
 
     #[uuid("6D5140C1-7436-11CE-8034-00AA006009FA")]
     pub unsafe interface IServiceProvider: IUnknown {
-        pub unsafe fn RemoteQueryService(&self, param0: *mut GUID, param1: *mut GUID, param2: *mut IUnknown) -> HRESULT;
+        pub unsafe fn RemoteQueryService(&self, param0: *mut GUID, param1: *mut GUID, param2: IUnknown) -> HRESULT;
     }
 
     /// IFlashObject Interface
@@ -3052,7 +3056,7 @@ impl IFlashObject {
         param3: *mut DISPPARAMS,
         param4: *mut VARIANT,
         param5: *mut EXCEPINFO,
-        param6: *mut IServiceProvider,
+        param6: IServiceProvider,
         param7: u32,
         param8: *mut u32,
         param9: *mut VARIANT,
@@ -3121,7 +3125,7 @@ impl IFlashObject {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param6 as *mut c_void,
+                        byref: ::std::mem::transmute(param6.as_raw()),
                     },
                     ..Default::default()
                 }),
@@ -3457,14 +3461,14 @@ impl IFlashObject {
         }
     }
 
-    pub unsafe fn GetNameSpaceParent(&self, param0: *mut IUnknown) -> Result<(), HRESULT> {
+    pub unsafe fn GetNameSpaceParent(&self, param0: IUnknown) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_UNKNOWN.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param0 as *mut c_void,
+                        byref: ::std::mem::transmute(param0.as_raw()),
                     },
                     ..Default::default()
                 }),

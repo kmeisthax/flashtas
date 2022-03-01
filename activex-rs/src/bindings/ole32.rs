@@ -16,6 +16,7 @@
 use crate::{IDispatch, IMoniker, IOleContainer};
 use com::interfaces::IUnknown;
 use com::sys::GUID;
+use com::Interface;
 use std::ffi::c_void;
 use std::mem::ManuallyDrop;
 use windows::core::HRESULT;
@@ -115,7 +116,7 @@ com::interfaces! {
         // In fact, most of these OLE interfaces do NOT have a TypeLib!
         pub unsafe fn SaveObject(&self) -> HRESULT;
         pub unsafe fn GetMoniker(&self, param0: u32, param1: u32, param2: *mut IMoniker) -> HRESULT;
-        pub unsafe fn GetContainer(&self, param0: IOleContainer) -> HRESULT;
+        pub unsafe fn GetContainer(&self, param0: *mut IOleContainer) -> HRESULT;
         pub unsafe fn ShowObject(&self) -> HRESULT;
         pub unsafe fn OnShowWindow(&self, param0: ::com::sys::BOOL) -> HRESULT;
         pub unsafe fn RequestNewObjectLayout(&self) -> HRESULT;
@@ -124,14 +125,14 @@ com::interfaces! {
     #[uuid("00000112-0000-0000-C000-000000000046")]
     pub unsafe interface IOleObject: IUnknown {
         pub unsafe fn SetClientSite(&self, param0: IOleClientSite) -> HRESULT;
-        pub unsafe fn GetClientSite(&self, param0: *mut *mut IOleClientSite) -> HRESULT;
+        pub unsafe fn GetClientSite(&self, param0: *mut IOleClientSite) -> HRESULT;
         pub unsafe fn SetHostNames(&self, param0: *mut u16, param1: *mut u16) -> HRESULT;
         pub unsafe fn Close(&self, param0: i32) -> HRESULT;
         pub unsafe fn SetMoniker(&self, param0: i32, param1: i32) -> HRESULT;
         pub unsafe fn GetMoniker(&self, param0: i32, param1: i32, param2: *mut i32) -> HRESULT;
         pub unsafe fn InitFromData(&self, param0: i32, param1: i32, param2: i32) -> HRESULT;
         pub unsafe fn GetClipboardData(&self, param0: i32, param1: *mut i32) -> HRESULT;
-        pub unsafe fn DoVerb(&self, param0: i32, param1: i32, param2: *mut IOleClientSite, param3: i32, param4: i32, param5: i32) -> i32;
+        pub unsafe fn DoVerb(&self, param0: i32, param1: i32, param2: IOleClientSite, param3: i32, param4: i32, param5: i32) -> i32;
     }
 
     #[uuid("00000113-0000-0000-C000-000000000046")]
@@ -154,7 +155,7 @@ com::interfaces! {
     pub unsafe interface IOleControlSite: IUnknown {
         pub unsafe fn OnControlInfoChanged(&self) -> HRESULT;
         pub unsafe fn LockInPlaceActive(&self, param0: i32) -> HRESULT;
-        pub unsafe fn GetExtendedControl(&self, param0: *mut IDispatch) -> HRESULT;
+        pub unsafe fn GetExtendedControl(&self, param0: IDispatch) -> HRESULT;
         pub unsafe fn TransformCoords(&self, param0: i32, param1: i32, param2: i32) -> HRESULT;
         pub unsafe fn TranslateAccelerator(&self, param0: i32, param1: i32) -> i32;
         pub unsafe fn OnFocus(&self, param0: i32) -> HRESULT;
@@ -168,7 +169,7 @@ com::interfaces! {
         pub unsafe fn TranslateAccelerator(&self, param0: i32) -> i32;
         pub unsafe fn OnFrameWindowActivate(&self, param0: i32) -> i32;
         pub unsafe fn OnDocWindowActivate(&self, param0: i32) -> i32;
-        pub unsafe fn ResizeBorder(&self, param0: i32, param1: *mut IOleInPlaceUIWindow, param2: i32) -> i32;
+        pub unsafe fn ResizeBorder(&self, param0: i32, param1: IOleInPlaceUIWindow, param2: i32) -> i32;
         pub unsafe fn EnableModeless(&self, param0: i32) -> i32;
     }
 
@@ -177,7 +178,7 @@ com::interfaces! {
         pub unsafe fn GetBorder(&self, param0: i32) -> HRESULT;
         pub unsafe fn RequestBorderSpace(&self, param0: i32) -> HRESULT;
         pub unsafe fn SetBorderSpace(&self, param0: i32) -> HRESULT;
-        pub unsafe fn SetActiveObject(&self, param0: *mut IOleInPlaceActiveObject, param1: *mut u16) -> HRESULT;
+        pub unsafe fn SetActiveObject(&self, param0: IOleInPlaceActiveObject, param1: *mut u16) -> HRESULT;
     }
 
     #[uuid("00000116-0000-0000-C000-000000000046")]
@@ -189,7 +190,7 @@ com::interfaces! {
         pub unsafe fn CanInPlaceActivate(&self) -> i32;
         pub unsafe fn OnInPlaceActivate(&self) -> HRESULT;
         pub unsafe fn OnUIActivate(&self) -> HRESULT;
-        pub unsafe fn GetWindowContext(&self, param0: *mut *mut IOleInPlaceFrame, param1: *mut *mut IOleInPlaceUIWindow, param2: i32, param3: i32, param4: i32) -> HRESULT;
+        pub unsafe fn GetWindowContext(&self, param0: *mut IOleInPlaceFrame, param1: *mut IOleInPlaceUIWindow, param2: i32, param3: i32, param4: i32) -> HRESULT;
         pub unsafe fn Scroll(&self, param0: CY) -> HRESULT;
         pub unsafe fn OnUIDeactivate(&self, param0: i32) -> HRESULT;
         pub unsafe fn OnInPlaceDeactivate(&self) -> HRESULT;
@@ -216,7 +217,7 @@ com::interfaces! {
         pub unsafe fn Next(&self, param0: i32, param1: *mut VARIANT, param2: i32) -> HRESULT;
         pub unsafe fn Skip(&self, param0: i32) -> HRESULT;
         pub unsafe fn Reset(&self) -> HRESULT;
-        pub unsafe fn Clone(&self, param0: *mut *mut IEnumVARIANTUnrestricted) -> HRESULT;
+        pub unsafe fn Clone(&self, param0: *mut IEnumVARIANTUnrestricted) -> HRESULT;
     }
 
     #[uuid("0000000B-0000-0000-C000-000000000046")]
@@ -247,7 +248,7 @@ com::interfaces! {
 
     #[uuid("00020D00-0000-0000-C000-000000000046")]
     pub unsafe interface IRichEditOle: IUnknown {
-        pub unsafe fn GetClientSite(&self, param0: *mut *mut IOleClientSite) -> HRESULT;
+        pub unsafe fn GetClientSite(&self, param0: *mut IOleClientSite) -> HRESULT;
         pub unsafe fn GetObjectCount(&self) -> i32;
         pub unsafe fn GetLinkCount(&self) -> i32;
         pub unsafe fn GetObject(&self, param0: i32, param1: *mut c_void, param2: i32) -> i32;
@@ -258,23 +259,23 @@ com::interfaces! {
         pub unsafe fn SetLinkAvailable(&self, param0: i32, param1: i32) -> i32;
         pub unsafe fn SetDvaspect(&self, param0: i32, param1: i32) -> i32;
         pub unsafe fn HandsOffStorage(&self, param0: i32) -> i32;
-        pub unsafe fn SaveCompleted(&self, param0: i32, param1: *mut IStorage) -> i32;
+        pub unsafe fn SaveCompleted(&self, param0: i32, param1: IStorage) -> i32;
         pub unsafe fn InPlaceDeactivate(&self) -> i32;
         pub unsafe fn ContextSensitiveHelp(&self, param0: i32) -> i32;
-        pub unsafe fn GetClipboardData(&self, param0: i32, param1: i32, param2: *mut *mut IDataObject) -> i32;
-        pub unsafe fn ImportDataObject(&self, param0: *mut IDataObject, param1: i16, param2: i32) -> i32;
+        pub unsafe fn GetClipboardData(&self, param0: i32, param1: i32, param2: *mut IDataObject) -> i32;
+        pub unsafe fn ImportDataObject(&self, param0: IDataObject, param1: i16, param2: i32) -> i32;
     }
 
     #[uuid("00020D03-0000-0000-C000-000000000046")]
     pub unsafe interface IRichEditOleCallback: IUnknown {
-        pub unsafe fn GetNewStorage(&self, param0: *mut *mut IStorage) -> HRESULT;
-        pub unsafe fn GetInPlaceContext(&self, param0: *mut *mut IOleInPlaceFrame, param1: *mut *mut IOleInPlaceUIWindow, param2: *mut OLEINPLACEFRAMEINFO) -> HRESULT;
+        pub unsafe fn GetNewStorage(&self, param0: *mut IStorage) -> HRESULT;
+        pub unsafe fn GetInPlaceContext(&self, param0: *mut IOleInPlaceFrame, param1: *mut IOleInPlaceUIWindow, param2: *mut OLEINPLACEFRAMEINFO) -> HRESULT;
         pub unsafe fn ShowContainerUI(&self, param0: i32) -> HRESULT;
-        pub unsafe fn QueryInsertObject(&self, param0: *mut OLECLSID, param1: *mut IStorage, param2: i32) -> HRESULT;
+        pub unsafe fn QueryInsertObject(&self, param0: *mut OLECLSID, param1: IStorage, param2: i32) -> HRESULT;
         pub unsafe fn DeleteObject(&self, param0: i32) -> HRESULT;
-        pub unsafe fn QueryAcceptData(&self, param0: *mut IDataObject, param1: *mut i16, param2: i32, param3: i32, param4: i32) -> HRESULT;
+        pub unsafe fn QueryAcceptData(&self, param0: IDataObject, param1: *mut i16, param2: i32, param3: i32, param4: i32) -> HRESULT;
         pub unsafe fn ContextSensitiveHelp(&self, param0: i32) -> HRESULT;
-        pub unsafe fn GetClipboardData(&self, param0: i32, param1: i32, param2: *mut *mut IDataObject) -> HRESULT;
+        pub unsafe fn GetClipboardData(&self, param0: i32, param1: i32, param2: *mut IDataObject) -> HRESULT;
         pub unsafe fn GetDragDropEffect(&self, param0: i32, param1: i32, param2: *mut i32) -> HRESULT;
         pub unsafe fn GetContextMenu(&self, param0: i16, param1: i32, param2: i32, param3: *mut i32) -> HRESULT;
     }
