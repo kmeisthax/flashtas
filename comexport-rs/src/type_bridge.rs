@@ -7,4 +7,4 @@ mod library;
 mod typedesc;
 
 pub use library::BridgedTypeLibrary;
-pub use typedesc::{bridge_elem_to_rust_type, bridge_usertype_to_rust_type};
+pub use typedesc::{bridge_elem_to_rust_type, bridge_usertype_to_rust_type, bridged_hreftype};

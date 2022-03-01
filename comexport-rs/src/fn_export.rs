@@ -208,7 +208,7 @@ pub fn print_type_dispatch_as_rust(
                 writeln!(
                     ret,
                     "        {}",
-                    dispatch_bridge::generate_param(i, &elemdesc.tdesc)?
+                    dispatch_bridge::generate_param(context, type_nfo, i, &elemdesc.tdesc)?
                 )?;
             }
 
@@ -252,7 +252,11 @@ pub fn print_type_dispatch_as_rust(
                 writeln!(
                     ret,
                     "        Ok({})",
-                    dispatch_bridge::generate_return(&funcdesc.elemdescFunc.tdesc)?
+                    dispatch_bridge::generate_return(
+                        context,
+                        type_nfo,
+                        &funcdesc.elemdescFunc.tdesc
+                    )?
                 )?;
             } else {
                 writeln!(

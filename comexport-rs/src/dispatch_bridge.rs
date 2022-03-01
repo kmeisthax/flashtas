@@ -1,7 +1,10 @@
 //! Code generators for `IDispatch` helper code generation
 
+use crate::context::Context;
+use crate::type_bridge::bridged_hreftype;
+use std::borrow::Cow;
 use windows::core::Error as WinError;
-use windows::Win32::System::Com::TYPEDESC;
+use windows::Win32::System::Com::{ITypeInfo, TKIND_INTERFACE, TYPEDESC};
 use windows::Win32::System::Ole::{
     VARENUM, VT_BOOL, VT_BSTR, VT_CARRAY, VT_CY, VT_DATE, VT_DECIMAL, VT_DISPATCH, VT_EMPTY,
     VT_ERROR, VT_HRESULT, VT_I1, VT_I2, VT_I4, VT_I8, VT_INT, VT_LPSTR, VT_LPWSTR, VT_NULL, VT_PTR,
@@ -50,9 +53,17 @@ fn fully_qualified_name_for_vt_value(vt_val: VARENUM) -> &'static str {
 /// Determine the VT_* name and union field for a given dispatch type passed
 /// by pointer.
 ///
+/// The `ITypeInfo` should correspond to the type we are currently generating
+/// an `IDispatch` bridge for. The `TYPEDESC` can refer to any type
+/// description.
+///
 /// If this function returns an error, the error value will be a Rust comment
 /// that is expected to be printed inline with the source.
-fn vt_and_ufield_for_tdesc_ptr(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapType), String> {
+fn vt_and_ufield_for_tdesc_ptr<'a>(
+    context: &'a Context<'a>,
+    typeinfo: &ITypeInfo,
+    tdesc: &TYPEDESC,
+) -> Result<(&'static str, &'static str, WrapType<'a>), String> {
     let vt_val = VARENUM(tdesc.vt as i32);
     let fq_name = fully_qualified_name_for_vt_value(vt_val);
 
@@ -82,16 +93,30 @@ fn vt_and_ufield_for_tdesc_ptr(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapType
         // expect COM/OLE Automation to know that it needs to transmute to a
         // doubly-indirect pointer.
         VT_PTR => {
-            let (vt, _ufield, _wraptype) =
-                vt_and_ufield_for_tdesc_ptr(unsafe { &*tdesc.Anonymous.lptdesc })?;
+            let (vt, _ufield, wraptype) = vt_and_ufield_for_tdesc_ptr(context, typeinfo, unsafe {
+                &*tdesc.Anonymous.lptdesc
+            })?;
 
-            return Ok((vt, "byref", WrapType::CVoidPtr));
+            if matches!(wraptype, WrapType::ComPtr(_)) {
+                return Ok((vt, "byref", wraptype));
+            } else {
+                return Ok((vt, "byref", WrapType::CVoidPtr));
+            }
         }
+        VT_USERDEFINED => {
+            let href = unsafe { tdesc.Anonymous.hreftype };
+            let (comtype, name) = bridged_hreftype(context, typeinfo, href)
+                .map_err(|e| format!("/* unbridgeable type {} due to {} */", href, e))?;
 
-        // TODO: This also assumes `c_void` handles pointers to COM interfaces.
-        VT_USERDEFINED | VT_DISPATCH | VT_UNKNOWN | VT_LPWSTR | VT_LPSTR => {
-            ("byref", WrapType::CVoidPtr)
+            if matches!(comtype, TKIND_INTERFACE) {
+                ("byref", WrapType::ComPtr(name))
+            } else {
+                ("byref", WrapType::CVoidPtr)
+            }
         }
+        VT_DISPATCH => ("byref", WrapType::ComPtr("IDispatch".into())),
+        VT_UNKNOWN => ("byref", WrapType::ComPtr("IUnknown".into())),
+        VT_LPWSTR | VT_LPSTR => ("byref", WrapType::CVoidPtr),
         VT_VARIANT => ("pvarVal", WrapType::Bare),
         VT_HRESULT => return Err("/* invalid: cannot use VT_HRESULT by ptr */".to_string()),
         _ => return Err(format!("/* pointer to unknown type 0x{:X} */", tdesc.vt)),
@@ -103,9 +128,17 @@ fn vt_and_ufield_for_tdesc_ptr(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapType
 /// Determine the VT_* name and union field for a given dispatch type passed
 /// by value.
 ///
+/// The `ITypeInfo` should correspond to the type we are currently generating
+/// an `IDispatch` bridge for. The `TYPEDESC` can refer to any type
+/// description.
+///
 /// If this function returns an error, the error value will be a Rust comment
 /// that is expected to be printed inline with the source.
-fn vt_and_ufield_for_tdesc_value(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapType), String> {
+fn vt_and_ufield_for_tdesc_value<'a>(
+    context: &'a Context<'a>,
+    typeinfo: &ITypeInfo,
+    tdesc: &TYPEDESC,
+) -> Result<(&'static str, &'static str, WrapType<'a>), String> {
     let vt_val = VARENUM(tdesc.vt as i32);
     let fq_name = fully_qualified_name_for_vt_value(vt_val);
 
@@ -128,7 +161,11 @@ fn vt_and_ufield_for_tdesc_value(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapTy
         VT_UINT => ("uintVal", WrapType::Bare),
         VT_VOID => return Err("/* invalid: cannot use VT_VOID by value */".to_string()),
         VT_UNKNOWN => ("ppunkVal", WrapType::ManuallyDrop),
-        VT_PTR => return vt_and_ufield_for_tdesc_ptr(unsafe { &*tdesc.Anonymous.lptdesc }),
+        VT_PTR => {
+            return vt_and_ufield_for_tdesc_ptr(context, typeinfo, unsafe {
+                &*tdesc.Anonymous.lptdesc
+            })
+        }
         VT_USERDEFINED => {
             return Err("/* invalid: cannot use VT_USERDEFINED by value */".to_string())
         }
@@ -143,7 +180,9 @@ fn vt_and_ufield_for_tdesc_value(tdesc: &TYPEDESC) -> Result<(&str, &str, WrapTy
 }
 
 /// Flag what kind of wrapping the parameter is expected to have.
-enum WrapType {
+///
+/// `'a` is the lifetime of the current codegen context.
+enum WrapType<'a> {
     /// The Rust-side type requires no wrapping.
     Bare,
 
@@ -173,11 +212,27 @@ enum WrapType {
 
     /// The Rust-side type must be cast to `c_void`.
     CVoidPtr,
+
+    /// The Rust-side type implements `com::Interface` and must be unwrapped
+    /// with `as_raw` and then cast to `c_void`.
+    ///
+    /// Unwrapping a `ComPtr` requires wrapping it with `transmute_copy` and
+    /// then `AddRef`ing it before returning.
+    ComPtr(Cow<'a, str>),
 }
 
 /// Generate code that sets a `VARIANT` for a given param in a Dispatch helper
-pub fn generate_param(param_i: i16, tdesc: &TYPEDESC) -> Result<String, WinError> {
-    let (vt, ufield, wraptype) = match vt_and_ufield_for_tdesc_value(tdesc) {
+///
+/// The `ITypeInfo` should correspond to the type we are currently generating
+/// an `IDispatch` bridge for. The `TYPEDESC` should come from the param type
+/// we are bridging, and NOT the type this function was defined in.
+pub fn generate_param(
+    context: &Context<'_>,
+    typeinfo: &ITypeInfo,
+    param_i: i16,
+    tdesc: &TYPEDESC,
+) -> Result<String, WinError> {
+    let (vt, ufield, wraptype) = match vt_and_ufield_for_tdesc_value(context, typeinfo, tdesc) {
         Ok((vt, ufield, wraptype)) => (vt, ufield, wraptype),
         Err(e) => return Ok(e),
     };
@@ -193,6 +248,10 @@ pub fn generate_param(param_i: i16, tdesc: &TYPEDESC) -> Result<String, WinError
         WrapType::BstrPtr => format!("{}: ::std::mem::transmute(param{})", ufield, param_i),
         WrapType::BoolPtr => format!("{}: param{} as *mut i32", ufield, param_i),
         WrapType::CVoidPtr => format!("{}: param{} as *mut c_void", ufield, param_i),
+        WrapType::ComPtr(_) => format!(
+            "{}: ::std::mem::transmute(param{}.as_raw())",
+            ufield, param_i
+        ),
     };
 
     Ok(format!(
@@ -213,10 +272,18 @@ pub fn generate_param(param_i: i16, tdesc: &TYPEDESC) -> Result<String, WinError
 
 /// Generate code that unwraps a `VARIANT` back into a Rust type.
 ///
+/// The `ITypeInfo` should correspond to the type we are currently generating
+/// an `IDispatch` bridge for. The `TYPEDESC` should come from the return type
+/// we are bridging, and NOT the type this function was defined in.
+///
 /// This function assumes that the generated code has a local variable titled
 /// `disp_result`, which the function will attempt to access.
-pub fn generate_return(tdesc: &TYPEDESC) -> Result<String, WinError> {
-    let (vt, ufield, wraptype) = match vt_and_ufield_for_tdesc_value(tdesc) {
+pub fn generate_return(
+    context: &Context<'_>,
+    typeinfo: &ITypeInfo,
+    tdesc: &TYPEDESC,
+) -> Result<String, WinError> {
+    let (vt, ufield, wraptype) = match vt_and_ufield_for_tdesc_value(context, typeinfo, tdesc) {
         Ok((vt, ufield, wraptype)) => (vt, ufield, wraptype),
         Err(e) => return Ok(e),
     };
@@ -233,6 +300,12 @@ pub fn generate_return(tdesc: &TYPEDESC) -> Result<String, WinError> {
             ufield
         ),
         WrapType::CVoidPtr => format!("disp_result.Anonymous.Anonymous.Anonymous.{}", ufield),
+        WrapType::ComPtr(bridged_type) => format!(
+            "let com_ptr: {} = ::std::mem::transmute(disp_result.Anonymous.Anonymous.Anonymous.{});
+            com_ptr.AddRef();
+            com_ptr",
+            bridged_type, ufield
+        ),
     };
 
     Ok(format!("if VARENUM(disp_result.Anonymous.Anonymous.vt as i32) == {0} {{

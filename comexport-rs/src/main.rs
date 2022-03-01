@@ -77,6 +77,7 @@ fn main() {
         println!("use crate::IDispatch;");
         println!("use com::interfaces::IUnknown;");
         println!("use com::sys::GUID;");
+        println!("use com::Interface;");
         println!("use windows::core::HRESULT;");
         println!(
             "use windows::Win32::System::Com::{{

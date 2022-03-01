@@ -15,13 +15,9 @@ use windows::Win32::System::Ole::{
     VT_UI4, VT_UI8, VT_UINT, VT_UNKNOWN, VT_USERDEFINED, VT_VARIANT, VT_VOID,
 };
 
-/// Inner impl function for `bridge_usertype_to_rust_type`.
-///
-/// The returned `TYPEKIND` is present for the sake of
-/// `bridge_elem_to_rust_type`, since it signals if we need to add a `*mut` for
-/// `VT_PTR` types or not. Interfaces are smart pointers in Rust and do not
-/// need a `*mut`.
-fn bridge_usertype_to_rust_type_impl<'a>(
+/// Given a type and a referred type ID, yield it's `TYPEKIND` and bridged type
+/// name.
+pub fn bridged_hreftype<'a>(
     context: &'a Context<'a>,
     typeinfo: &ITypeInfo,
     href: u32,
@@ -68,7 +64,7 @@ pub fn bridge_usertype_to_rust_type<'a>(
     typeinfo: &ITypeInfo,
     href: u32,
 ) -> Cow<'a, str> {
-    match bridge_usertype_to_rust_type_impl(context, typeinfo, href) {
+    match bridged_hreftype(context, typeinfo, href) {
         Ok((_, name)) => name,
         Err(e) => format!("/* unbridgeable hreftype {}, because {:?} */", href, e).into(),
     }
@@ -131,7 +127,7 @@ fn bridge_elem_to_rust_type_impl<'a>(
         }
         VT_USERDEFINED => {
             let href_type = unsafe { tdesc.Anonymous.hreftype };
-            let (com_type, name) = bridge_usertype_to_rust_type_impl(context, typeinfo, href_type)?;
+            let (com_type, name) = bridged_hreftype(context, typeinfo, href_type)?;
 
             (com_type, name, num_pointers)
         }
