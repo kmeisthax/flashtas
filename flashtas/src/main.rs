@@ -1,15 +1,41 @@
-use activex_rs::bindings::flash::{IShockwaveFlash, SHOCKWAVE_FLASH_CLSID};
-use com::runtime::{create_instance, init_runtime};
+use std::mem::size_of;
+use windows::Win32::Foundation::HWND;
+use windows::Win32::System::Threading::{GetStartupInfoW, STARTUPINFOW};
+use windows::Win32::UI::WindowsAndMessaging::{
+    DispatchMessageW, GetMessageW, ShowWindow, TranslateMessage, MSG, SHOW_WINDOW_CMD, SW_HIDE,
+    SW_SHOWNORMAL,
+};
+
+mod display;
+mod tas_client;
 
 fn main() {
-    init_runtime().expect("A working COM runtime");
+    let mainwnd = display::DisplayWindow::create().unwrap();
+    let mut si = STARTUPINFOW {
+        cb: size_of::<STARTUPINFOW>() as u32,
+        ..Default::default()
+    };
 
-    let fp = create_instance::<IShockwaveFlash>(&SHOCKWAVE_FLASH_CLSID).expect("Flash");
+    unsafe {
+        GetStartupInfoW(&mut si);
+    }
 
-    unsafe { fp.Zoom(1).expect("No whammies no whammies no whammies") };
+    // For some reason the VSCode terminal sets `nCmdShow` to `SW_HIDE`, which
+    // means windows never actually display. :/
+    if si.wShowWindow == SW_HIDE.0 as u16 {
+        si.wShowWindow = SW_SHOWNORMAL.0 as u16;
+    }
 
-    println!(
-        "Flash version: {}",
-        unsafe { fp.FlashVersion() }.expect("Flash version")
-    );
+    unsafe {
+        ShowWindow(mainwnd.window(), SHOW_WINDOW_CMD(si.wShowWindow as u32));
+    }
+
+    let mut msg = MSG::default();
+
+    while unsafe { GetMessageW(&mut msg, HWND::default(), 0, 0) }.as_bool() {
+        unsafe {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+    }
 }
