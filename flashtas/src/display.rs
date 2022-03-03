@@ -4,7 +4,7 @@ use crate::tas_client;
 use activex_rs::bindings::flash::{IShockwaveFlash, SHOCKWAVE_FLASH_CLSID};
 use activex_rs::bindings::ole32::{IOleClientSite, IOleObject, IOleWindow};
 use com::interfaces::IClassFactory;
-use com::runtime::{create_instance, init_runtime};
+use com::runtime::create_instance;
 use lazy_static::lazy_static;
 use std::ffi::c_void;
 use std::ffi::OsStr;
@@ -130,8 +130,6 @@ impl DisplayWindow {
     pub fn process_message(&self, msg: u32, _hparam: WPARAM, _lparam: LPARAM) -> Option<LRESULT> {
         match msg {
             WM_CREATE => {
-                init_runtime().expect("A working COM runtime");
-
                 let fp = create_instance::<IShockwaveFlash>(&SHOCKWAVE_FLASH_CLSID).expect("Flash");
 
                 println!(

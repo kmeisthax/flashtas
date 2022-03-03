@@ -1,5 +1,7 @@
 use std::mem::size_of;
+use std::ptr::null_mut;
 use windows::Win32::Foundation::HWND;
+use windows::Win32::System::Ole::OleInitialize;
 use windows::Win32::System::Threading::{GetStartupInfoW, STARTUPINFOW};
 use windows::Win32::UI::WindowsAndMessaging::{
     DispatchMessageW, GetMessageW, ShowWindow, TranslateMessage, MSG, SHOW_WINDOW_CMD, SW_HIDE,
@@ -10,6 +12,8 @@ mod display;
 mod tas_client;
 
 fn main() {
+    unsafe { OleInitialize(null_mut()) }.expect("Initialized OLE session");
+
     let mainwnd = display::DisplayWindow::create().unwrap();
     let mut si = STARTUPINFOW {
         cb: size_of::<STARTUPINFOW>() as u32,
