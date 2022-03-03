@@ -133,6 +133,26 @@ com::interfaces! {
         pub unsafe fn InitFromData(&self, param0: i32, param1: i32, param2: i32) -> HRESULT;
         pub unsafe fn GetClipboardData(&self, param0: i32, param1: *mut i32) -> HRESULT;
         pub unsafe fn DoVerb(&self, param0: i32, param1: i32, param2: IOleClientSite, param3: i32, param4: i32, param5: i32) -> i32;
+
+        // NOTE: These are also missing from the type library I pulled these from
+        pub unsafe fn EnumVerbs(&self, param0: *mut IEnumOLEVERB) -> HRESULT;
+        pub unsafe fn Update(&self) -> HRESULT;
+        pub unsafe fn IsUpToDate(&self) -> HRESULT;
+        pub unsafe fn GetUserClassID(&self, param0: *mut GUID) -> HRESULT;
+        pub unsafe fn GetUserType(&self, param0: u32, param1: BSTR) -> HRESULT;
+        //pub unsafe fn SetExtent(&self, param0: u32, param1: *mut OLESIZE) -> HRESULT;
+        //pub unsafe fn GetExtent(&self, param0: u32, param1: *mut OLESIZE) -> HRESULT;
+        //pub unsafe fn Advise(&self, param0: IAdviseSink, param1: u32) -> HRESULT;
+        pub unsafe fn Unadvise(&self, param0: u32) -> HRESULT;
+        //pub unsafe fn EnumAdvise(&self, param0: *mut IEnumSTATDATA) -> HRESULT;
+        pub unsafe fn GetMiscStatus(&self, param0: u32, param1: *mut u32) -> HRESULT;
+        //pub unsafe fn SetColorScheme(&self, param0: *mut LOGPALETTE) -> HRESULT;
+    }
+
+    #[uuid("00000104-0000-0000-c000-000000000046")]
+    pub unsafe interface IEnumOLEVERB: IUnknown {
+        // TODO: This is also not an extractable type. Someone will need to
+        // bridge these methods.
     }
 
     #[uuid("00000113-0000-0000-C000-000000000046")]
