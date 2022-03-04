@@ -201,7 +201,7 @@ pub fn print_type_dispatch_as_rust(
 
             writeln!(ret, "        let mut arg_params = vec![];")?;
 
-            for i in 0..funcdesc.cParams {
+            for i in (0..funcdesc.cParams).rev() {
                 let elemdesc: &mut ELEMDESC =
                     unsafe { &mut *funcdesc.lprgelemdescParam.offset(i as isize) };
 

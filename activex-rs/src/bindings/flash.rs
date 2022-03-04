@@ -118,9 +118,9 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
+                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param0 as *mut c_void,
+                        byref: param1 as *mut c_void,
                     },
                     ..Default::default()
                 }),
@@ -129,9 +129,9 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
+                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param1 as *mut c_void,
+                        byref: param0 as *mut c_void,
                     },
                     ..Default::default()
                 }),
@@ -306,8 +306,10 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { uintVal: param0 },
+                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param2 as *mut c_void,
+                    },
                     ..Default::default()
                 }),
             },
@@ -324,10 +326,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        byref: param2 as *mut c_void,
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { uintVal: param0 },
                     ..Default::default()
                 }),
             },
@@ -374,10 +374,26 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        byref: param0 as *mut c_void,
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { plVal: param4 },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { ulVal: param3 },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { uintVal: param2 },
                     ..Default::default()
                 }),
             },
@@ -396,26 +412,10 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { uintVal: param2 },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { ulVal: param3 },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { plVal: param4 },
+                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param0 as *mut c_void,
+                    },
                     ..Default::default()
                 }),
             },
@@ -465,8 +465,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
+                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { puintVal: param7 },
                     ..Default::default()
                 }),
             },
@@ -476,36 +476,7 @@ impl IShockwaveFlash {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param1 as *mut c_void,
-                    },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { ulVal: param2 },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI2.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { uiVal: param3 },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        byref: param4 as *mut c_void,
+                        byref: param6 as *mut c_void,
                     },
                     ..Default::default()
                 }),
@@ -525,7 +496,7 @@ impl IShockwaveFlash {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param6 as *mut c_void,
+                        byref: param4 as *mut c_void,
                     },
                     ..Default::default()
                 }),
@@ -534,8 +505,37 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { puintVal: param7 },
+                    vt: ::windows::Win32::System::Ole::VT_UI2.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { uiVal: param3 },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { ulVal: param2 },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param1 as *mut c_void,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
                     ..Default::default()
                 }),
             },
@@ -600,16 +600,7 @@ impl IShockwaveFlash {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { lVal: param1 },
+                    Anonymous: VARIANT_0_0_0 { lVal: param3 },
                     ..Default::default()
                 }),
             },
@@ -627,7 +618,16 @@ impl IShockwaveFlash {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { lVal: param3 },
+                    Anonymous: VARIANT_0_0_0 { lVal: param1 },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
                     ..Default::default()
                 }),
             },
@@ -708,8 +708,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
+                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { intVal: param2 },
                     ..Default::default()
                 }),
             },
@@ -726,8 +726,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { intVal: param2 },
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
                     ..Default::default()
                 }),
             },
@@ -1247,8 +1247,10 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { intVal: param0 },
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param1)),
+                    },
                     ..Default::default()
                 }),
             },
@@ -1256,10 +1258,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param1)),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { intVal: param0 },
                     ..Default::default()
                 }),
             },
@@ -1299,10 +1299,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param1 },
                     ..Default::default()
                 }),
             },
@@ -1310,8 +1308,10 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { lVal: param1 },
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
                     ..Default::default()
                 }),
             },
@@ -1353,7 +1353,7 @@ impl IShockwaveFlash {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param1)),
                     },
                     ..Default::default()
                 }),
@@ -1364,7 +1364,7 @@ impl IShockwaveFlash {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param1)),
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
                     },
                     ..Default::default()
                 }),
@@ -1603,7 +1603,7 @@ impl IShockwaveFlash {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param1)),
                     },
                     ..Default::default()
                 }),
@@ -1614,7 +1614,7 @@ impl IShockwaveFlash {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param1)),
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
                     },
                     ..Default::default()
                 }),
@@ -1717,7 +1717,7 @@ impl IShockwaveFlash {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param2)),
                     },
                     ..Default::default()
                 }),
@@ -1737,7 +1737,7 @@ impl IShockwaveFlash {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param2)),
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
                     },
                     ..Default::default()
                 }),
@@ -1778,10 +1778,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { intVal: param1 },
                     ..Default::default()
                 }),
             },
@@ -1789,8 +1787,10 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { intVal: param1 },
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
                     ..Default::default()
                 }),
             },
@@ -1842,10 +1842,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { intVal: param1 },
                     ..Default::default()
                 }),
             },
@@ -1853,8 +1851,10 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { intVal: param1 },
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
                     ..Default::default()
                 }),
             },
@@ -1896,7 +1896,7 @@ impl IShockwaveFlash {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param1)),
                     },
                     ..Default::default()
                 }),
@@ -1907,7 +1907,7 @@ impl IShockwaveFlash {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param1)),
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
                     },
                     ..Default::default()
                 }),
@@ -1953,10 +1953,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_R8.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { dblVal: param2 },
                     ..Default::default()
                 }),
             },
@@ -1973,8 +1971,10 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_R8.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { dblVal: param2 },
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
                     ..Default::default()
                 }),
             },
@@ -2014,10 +2014,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { intVal: param1 },
                     ..Default::default()
                 }),
             },
@@ -2025,8 +2023,10 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { intVal: param1 },
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
                     ..Default::default()
                 }),
             },
@@ -2078,10 +2078,8 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { intVal: param1 },
                     ..Default::default()
                 }),
             },
@@ -2089,8 +2087,10 @@ impl IShockwaveFlash {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { intVal: param1 },
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
                     ..Default::default()
                 }),
             },
@@ -2421,7 +2421,7 @@ impl _IShockwaveFlashEvents {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param1)),
                     },
                     ..Default::default()
                 }),
@@ -2432,7 +2432,7 @@ impl _IShockwaveFlashEvents {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param1)),
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
                     },
                     ..Default::default()
                 }),
@@ -2530,9 +2530,9 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
+                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param0 as *mut c_void,
+                        byref: param1 as *mut c_void,
                     },
                     ..Default::default()
                 }),
@@ -2541,9 +2541,9 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
+                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param1 as *mut c_void,
+                        byref: param0 as *mut c_void,
                     },
                     ..Default::default()
                 }),
@@ -2718,8 +2718,10 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { uintVal: param0 },
+                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param2 as *mut c_void,
+                    },
                     ..Default::default()
                 }),
             },
@@ -2736,10 +2738,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_VOID.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        byref: param2 as *mut c_void,
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { uintVal: param0 },
                     ..Default::default()
                 }),
             },
@@ -2786,10 +2786,26 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        byref: param0 as *mut c_void,
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { plVal: param4 },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { ulVal: param3 },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { uintVal: param2 },
                     ..Default::default()
                 }),
             },
@@ -2808,26 +2824,10 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { uintVal: param2 },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { ulVal: param3 },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { plVal: param4 },
+                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param0 as *mut c_void,
+                    },
                     ..Default::default()
                 }),
             },
@@ -2877,8 +2877,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
+                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { puintVal: param7 },
                     ..Default::default()
                 }),
             },
@@ -2888,36 +2888,7 @@ impl IFlashObject {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param1 as *mut c_void,
-                    },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { ulVal: param2 },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI2.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { uiVal: param3 },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        byref: param4 as *mut c_void,
+                        byref: param6 as *mut c_void,
                     },
                     ..Default::default()
                 }),
@@ -2937,7 +2908,7 @@ impl IFlashObject {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param6 as *mut c_void,
+                        byref: param4 as *mut c_void,
                     },
                     ..Default::default()
                 }),
@@ -2946,8 +2917,37 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { puintVal: param7 },
+                    vt: ::windows::Win32::System::Ole::VT_UI2.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { uiVal: param3 },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { ulVal: param2 },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param1 as *mut c_void,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
                     ..Default::default()
                 }),
             },
@@ -2992,10 +2992,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { plVal: param2 },
                     ..Default::default()
                 }),
             },
@@ -3012,8 +3010,10 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { plVal: param2 },
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
                     ..Default::default()
                 }),
             },
@@ -3065,8 +3065,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
+                    vt: ::windows::Win32::System::Ole::VT_VARIANT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { pvarVal: param9 },
                     ..Default::default()
                 }),
             },
@@ -3074,8 +3074,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { ulVal: param1 },
+                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { puintVal: param8 },
                     ..Default::default()
                 }),
             },
@@ -3083,8 +3083,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { ulVal: param2 },
+                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { uintVal: param7 },
                     ..Default::default()
                 }),
             },
@@ -3094,7 +3094,18 @@ impl IFlashObject {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param3 as *mut c_void,
+                        byref: ::std::mem::transmute(param6.as_raw()),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        byref: param5 as *mut c_void,
                     },
                     ..Default::default()
                 }),
@@ -3114,7 +3125,7 @@ impl IFlashObject {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: param5 as *mut c_void,
+                        byref: param3 as *mut c_void,
                     },
                     ..Default::default()
                 }),
@@ -3123,10 +3134,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        byref: ::std::mem::transmute(param6.as_raw()),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { ulVal: param2 },
                     ..Default::default()
                 }),
             },
@@ -3134,8 +3143,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { uintVal: param7 },
+                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { ulVal: param1 },
                     ..Default::default()
                 }),
             },
@@ -3143,17 +3152,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UINT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { puintVal: param8 },
-                    ..Default::default()
-                }),
-            },
-        });
-        arg_params.push(VARIANT {
-            Anonymous: VARIANT_0 {
-                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_VARIANT.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { pvarVal: param9 },
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
                     ..Default::default()
                 }),
             },
@@ -3193,10 +3193,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { ulVal: param1 },
                     ..Default::default()
                 }),
             },
@@ -3204,8 +3202,10 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { ulVal: param1 },
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
                     ..Default::default()
                 }),
             },
@@ -3291,8 +3291,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
+                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { pulVal: param2 },
                     ..Default::default()
                 }),
             },
@@ -3309,8 +3309,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { pulVal: param2 },
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
                     ..Default::default()
                 }),
             },
@@ -3350,8 +3350,10 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        pbstrVal: ::std::mem::transmute(param1),
+                    },
                     ..Default::default()
                 }),
             },
@@ -3359,10 +3361,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
-                    Anonymous: VARIANT_0_0_0 {
-                        pbstrVal: ::std::mem::transmute(param1),
-                    },
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
                     ..Default::default()
                 }),
             },
@@ -3407,8 +3407,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { ulVal: param0 },
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { plVal: param2 },
                     ..Default::default()
                 }),
             },
@@ -3425,8 +3425,8 @@ impl IFlashObject {
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
-                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
-                    Anonymous: VARIANT_0_0_0 { plVal: param2 },
+                    vt: ::windows::Win32::System::Ole::VT_UI4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { ulVal: param0 },
                     ..Default::default()
                 }),
             },
