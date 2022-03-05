@@ -16,18 +16,21 @@
 use crate::{IDispatch, IMoniker, IOleContainer};
 use com::interfaces::IUnknown;
 use com::sys::GUID;
-use com::Interface;
 use std::ffi::c_void;
 use std::mem::ManuallyDrop;
 use windows::core::HRESULT;
-use windows::Win32::Foundation::BOOL;
+use windows::Win32::Foundation::{BOOL, RECT};
+use windows::Win32::Graphics::Gdi::LOGPALETTE;
 use windows::Win32::System::Com::{
-    DISPPARAMS, EXCEPINFO, SAFEARRAY, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0,
+    DISPPARAMS, EXCEPINFO, FORMATETC, SAFEARRAY, STGMEDIUM, VARIANT, VARIANT_0, VARIANT_0_0,
+    VARIANT_0_0_0,
 };
-use windows::Win32::System::Ole::{DISPATCH_METHOD, VARENUM};
+use windows::Win32::System::Ole::{OleMenuGroupWidths, DISPATCH_METHOD, VARENUM};
+use windows::Win32::UI::WindowsAndMessaging::MSG;
 
-type BSTR = *const u16;
-type CY = i64;
+//TODO: Get rid of these type aliases and make windows-rs bridgeable
+pub type BSTR = *const u16;
+pub type CY = i64;
 type OLE_HANDLE = u32;
 
 #[repr(C)]
@@ -106,7 +109,7 @@ pub struct OLECADWORD {
 com::interfaces! {
     #[uuid("00000114-0000-0000-C000-000000000046")]
     pub unsafe interface IOleWindow: IUnknown {
-        pub unsafe fn GetWindow(&self, param0: *mut i32) -> HRESULT;
+        pub unsafe fn GetWindow(&self, param0: *mut isize) -> HRESULT;
         pub unsafe fn ContextSensitiveHelp(&self, param0: i32) -> HRESULT;
     }
 
@@ -132,7 +135,9 @@ com::interfaces! {
         pub unsafe fn GetMoniker(&self, param0: i32, param1: i32, param2: *mut i32) -> HRESULT;
         pub unsafe fn InitFromData(&self, param0: i32, param1: i32, param2: i32) -> HRESULT;
         pub unsafe fn GetClipboardData(&self, param0: i32, param1: *mut i32) -> HRESULT;
-        pub unsafe fn DoVerb(&self, param0: i32, param1: i32, param2: IOleClientSite, param3: i32, param4: i32, param5: i32) -> i32;
+
+        // TODO: com-rs does not allow bridging of isize or HWND
+        pub unsafe fn DoVerb(&self, param0: i32, param1: *mut MSG, param2: IOleClientSite, param3: i32, param4: i64, param5: *const RECT) -> HRESULT;
 
         // NOTE: These are also missing from the type library I pulled these from
         pub unsafe fn EnumVerbs(&self, param0: *mut IEnumOLEVERB) -> HRESULT;
@@ -140,19 +145,39 @@ com::interfaces! {
         pub unsafe fn IsUpToDate(&self) -> HRESULT;
         pub unsafe fn GetUserClassID(&self, param0: *mut GUID) -> HRESULT;
         pub unsafe fn GetUserType(&self, param0: u32, param1: BSTR) -> HRESULT;
-        //pub unsafe fn SetExtent(&self, param0: u32, param1: *mut OLESIZE) -> HRESULT;
-        //pub unsafe fn GetExtent(&self, param0: u32, param1: *mut OLESIZE) -> HRESULT;
-        //pub unsafe fn Advise(&self, param0: IAdviseSink, param1: u32) -> HRESULT;
+        pub unsafe fn SetExtent(&self, param0: u32, param1: *mut OLESIZE) -> HRESULT;
+        pub unsafe fn GetExtent(&self, param0: u32, param1: *mut OLESIZE) -> HRESULT;
+        pub unsafe fn Advise(&self, param0: IAdviseSink, param1: *mut u32) -> HRESULT;
         pub unsafe fn Unadvise(&self, param0: u32) -> HRESULT;
-        //pub unsafe fn EnumAdvise(&self, param0: *mut IEnumSTATDATA) -> HRESULT;
+        pub unsafe fn EnumAdvise(&self, param0: *mut IEnumSTATDATA) -> HRESULT;
         pub unsafe fn GetMiscStatus(&self, param0: u32, param1: *mut u32) -> HRESULT;
-        //pub unsafe fn SetColorScheme(&self, param0: *mut LOGPALETTE) -> HRESULT;
+        pub unsafe fn SetColorScheme(&self, param0: *mut LOGPALETTE) -> HRESULT;
     }
 
     #[uuid("00000104-0000-0000-c000-000000000046")]
     pub unsafe interface IEnumOLEVERB: IUnknown {
         // TODO: This is also not an extractable type. Someone will need to
         // bridge these methods.
+    }
+
+    #[uuid("0000010d-0000-0000-c000-000000000046")]
+    pub unsafe interface IViewObject: IUnknown {
+        //NOTE: Non-extractable type.
+    }
+
+    #[uuid("0000010F-0000-0000-C000-000000000046")]
+    pub unsafe interface IAdviseSink: IUnknown {
+        //NOTE: Non-extractable type.
+        pub unsafe fn OnDataChange(&self, param0: *mut FORMATETC, param1: *mut STGMEDIUM);
+        pub unsafe fn OnViewChange(&self, param0: u32, param1: i32);
+        pub unsafe fn OnRename(&self, param0: IMoniker);
+        pub unsafe fn OnSave(&self);
+        pub unsafe fn OnClose(&self);
+    }
+
+    #[uuid("00000105-0000-0000-C000-000000000046")]
+    pub unsafe interface IEnumSTATDATA: IUnknown {
+        //NOTE: Non-extractable type.
     }
 
     #[uuid("00000113-0000-0000-C000-000000000046")]
@@ -184,13 +209,14 @@ com::interfaces! {
 
     #[uuid("00000117-0000-0000-C000-000000000046")]
     pub unsafe interface IOleInPlaceActiveObject: IUnknown {
-        pub unsafe fn GetWindow(&self, param0: *mut i32) -> i32;
-        pub unsafe fn ContextSensitiveHelp(&self, param0: i32) -> i32;
-        pub unsafe fn TranslateAccelerator(&self, param0: i32) -> i32;
-        pub unsafe fn OnFrameWindowActivate(&self, param0: i32) -> i32;
-        pub unsafe fn OnDocWindowActivate(&self, param0: i32) -> i32;
-        pub unsafe fn ResizeBorder(&self, param0: i32, param1: IOleInPlaceUIWindow, param2: i32) -> i32;
-        pub unsafe fn EnableModeless(&self, param0: i32) -> i32;
+        //NOTE: Extracted TLB is wrong, these return HRESULT
+        pub unsafe fn GetWindow(&self, param0: *mut i32) -> HRESULT;
+        pub unsafe fn ContextSensitiveHelp(&self, param0: i32) -> HRESULT;
+        pub unsafe fn TranslateAccelerator(&self, param0: i32) -> HRESULT;
+        pub unsafe fn OnFrameWindowActivate(&self, param0: i32) -> HRESULT;
+        pub unsafe fn OnDocWindowActivate(&self, param0: i32) -> HRESULT;
+        pub unsafe fn ResizeBorder(&self, param0: i32, param1: IOleInPlaceUIWindow, param2: i32) -> HRESULT;
+        pub unsafe fn EnableModeless(&self, param0: i32) -> HRESULT;
     }
 
     #[uuid("00000115-0000-0000-C000-000000000046")]
@@ -203,14 +229,22 @@ com::interfaces! {
 
     #[uuid("00000116-0000-0000-C000-000000000046")]
     pub unsafe interface IOleInPlaceFrame: IOleInPlaceUIWindow {
+        //TODO: The i64s are HWNDs, HMENUs or HOLEMENUs.
+        //NOTE: This is not auto-generated code.
+        pub unsafe fn InsertMenus(&self, param0: i64, param1: *mut OleMenuGroupWidths) -> HRESULT;
+        pub unsafe fn SetMenu(&self, param0: i64, param1: i64, param2: i64) -> HRESULT;
+        pub unsafe fn RemoveMenus(&self, param0: i64) -> HRESULT;
+        pub unsafe fn SetStatusText(&self, param0: BSTR) -> HRESULT;
+        pub unsafe fn EnableModeless(&self, param0: i32) -> HRESULT;
+        pub unsafe fn TranslateAccelerator(&self, param0: *mut MSG, param1: u16) -> HRESULT;
     }
 
     #[uuid("00000119-0000-0000-C000-000000000046")]
     pub unsafe interface IOleInPlaceSite: IOleWindow {
-        pub unsafe fn CanInPlaceActivate(&self) -> i32;
+        pub unsafe fn CanInPlaceActivate(&self) -> HRESULT;
         pub unsafe fn OnInPlaceActivate(&self) -> HRESULT;
         pub unsafe fn OnUIActivate(&self) -> HRESULT;
-        pub unsafe fn GetWindowContext(&self, param0: *mut IOleInPlaceFrame, param1: *mut IOleInPlaceUIWindow, param2: i32, param3: i32, param4: i32) -> HRESULT;
+        pub unsafe fn GetWindowContext(&self, param0: *mut IOleInPlaceFrame, param1: *mut IOleInPlaceUIWindow, param2: *mut RECT, param3: *mut RECT, param4: *mut OLEINPLACEFRAMEINFO) -> HRESULT;
         pub unsafe fn Scroll(&self, param0: CY) -> HRESULT;
         pub unsafe fn OnUIDeactivate(&self, param0: i32) -> HRESULT;
         pub unsafe fn OnInPlaceDeactivate(&self) -> HRESULT;
