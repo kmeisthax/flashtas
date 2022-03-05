@@ -1,8 +1,10 @@
 //! WNDCLASS for our display window.
 
-use crate::tas_client;
+use crate::tas_client::{ITASClientSite, TASClientSite, TASClientSite__CF};
 use activex_rs::bindings::flash::{IShockwaveFlash, SHOCKWAVE_FLASH_CLSID};
-use activex_rs::bindings::ole32::{IOleClientSite, IOleObject, IOleWindow};
+use activex_rs::bindings::ole32::{
+    IAdviseSink, IOleClientSite, IOleInPlaceActiveObject, IOleObject, IOleWindow, IViewObject,
+};
 use com::interfaces::IClassFactory;
 use com::runtime::create_instance;
 use lazy_static::lazy_static;
@@ -11,11 +13,12 @@ use std::ffi::OsStr;
 use std::mem::forget;
 use std::os::windows::ffi::OsStrExt;
 use std::process::exit;
-use std::ptr::null;
+use std::ptr::{null, null_mut};
 use std::sync::{Arc, Mutex};
 use windows::core::Error as WinError;
-use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, PWSTR, WPARAM};
+use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, PWSTR, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
+use windows::Win32::System::Ole::OLEIVERB_SHOW;
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, GetWindowLongPtrW, RegisterClassW, SetWindowLongPtrW,
     CREATESTRUCTW, CW_USEDEFAULT, GWLP_USERDATA, HMENU, WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY,
@@ -23,6 +26,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
 };
 
 /// The window class of our main display window.
+#[derive(Clone)]
 pub struct DisplayWindow(Arc<Mutex<DisplayWindowData>>);
 
 pub struct DisplayWindowData {
@@ -133,7 +137,7 @@ impl DisplayWindow {
                 let fp = create_instance::<IShockwaveFlash>(&SHOCKWAVE_FLASH_CLSID).expect("Flash");
 
                 println!(
-                    "Flash version: {}",
+                    "Flash version: 0x{:x}",
                     unsafe { fp.FlashVersion() }.expect("Flash version")
                 );
 
@@ -141,21 +145,29 @@ impl DisplayWindow {
                     .query_interface::<IOleObject>()
                     .expect("Must be an OLE object too");
 
-                let class_factory = IClassFactory::from(&***tas_client::TASClientSite__CF);
-                let client_site = class_factory.create_instance::<IOleClientSite>().unwrap();
+                let class_factory = IClassFactory::from(&***TASClientSite__CF);
+                let tas_client_site = class_factory.create_instance::<ITASClientSite>().unwrap();
+                unsafe { tas_client_site.attach_to_displaywnd(self) };
 
-                unsafe { fp_ole.SetClientSite(client_site).unwrap() };
+                let client_site = tas_client_site.query_interface::<IOleClientSite>().unwrap();
+                let advise_sink = tas_client_site.query_interface::<IAdviseSink>().unwrap();
 
-                let fp_olewin = fp
-                    .query_interface::<IOleWindow>()
-                    .expect("Must be an OLE window too");
-                let mut fp_win_handle = 0;
-
-                unsafe { fp_olewin.GetWindow(&mut fp_win_handle) }.unwrap();
-
-                let fp_win = HWND(fp_win_handle as isize);
-
-                println!("Flash window: {:?}", fp_win);
+                unsafe {
+                    fp_ole.SetClientSite(client_site.clone()).unwrap();
+                    fp_ole.Advise(advise_sink, null_mut()).unwrap();
+                    fp_ole
+                        .DoVerb(OLEIVERB_SHOW, null_mut(), client_site, 0, 0, null())
+                        .unwrap();
+                    fp.LoadMovie(
+                        0,
+                        OsStr::new("test.swf\0")
+                            .encode_wide()
+                            .collect::<Vec<_>>()
+                            .leak()
+                            .as_ptr(),
+                    )
+                    .unwrap();
+                }
 
                 self.0.lock().unwrap().fp = Some(fp);
 
