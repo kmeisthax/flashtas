@@ -15,7 +15,7 @@ use std::mem::{forget, size_of, transmute};
 use std::ptr::null_mut;
 use std::sync::{Arc, Mutex};
 use windows::core::{IUnknown as WinIUnknown, HRESULT};
-use windows::Win32::Foundation::{RECT, S_FALSE, S_OK};
+use windows::Win32::Foundation::{HWND, RECT, S_FALSE, S_OK};
 use windows::Win32::Graphics::Gdi::LOGPALETTE;
 use windows::Win32::System::Com::{CreateItemMoniker, FORMATETC, STGMEDIUM};
 use windows::Win32::System::Ole::OleMenuGroupWidths;
@@ -232,10 +232,10 @@ com::class! {
             if !param4.is_null() {
                 let ipfo = &mut *param4;
 
-                ipfo.cb = size_of::<OLEINPLACEFRAMEINFO>() as i32;
-                ipfo.fMDIApp = ::windows::Win32::Foundation::BOOL::from(false).0;
-                ipfo.hWndFrame = self.associated_display.lock().unwrap().as_ref().unwrap().window().0 as u32;
-                ipfo.hAccel = 0;
+                ipfo.cb = size_of::<OLEINPLACEFRAMEINFO>();
+                ipfo.fMDIApp = ::windows::Win32::Foundation::BOOL::from(false);
+                ipfo.hWndFrame = self.associated_display.lock().unwrap().as_ref().unwrap().window();
+                ipfo.hAccel = HWND(0);
                 ipfo.cAccelEntries = 0;
             }
 

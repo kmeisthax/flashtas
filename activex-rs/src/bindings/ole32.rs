@@ -19,7 +19,7 @@ use com::sys::GUID;
 use std::ffi::c_void;
 use std::mem::ManuallyDrop;
 use windows::core::HRESULT;
-use windows::Win32::Foundation::{BOOL, RECT};
+use windows::Win32::Foundation::{BOOL, HWND, RECT};
 use windows::Win32::Graphics::Gdi::LOGPALETTE;
 use windows::Win32::System::Com::{
     DISPPARAMS, EXCEPINFO, FORMATETC, SAFEARRAY, STGMEDIUM, VARIANT, VARIANT_0, VARIANT_0_0,
@@ -65,11 +65,11 @@ pub struct OLESIZE {
 
 #[repr(C)]
 pub struct OLEINPLACEFRAMEINFO {
-    pub cb: i32,
-    pub fMDIApp: i32,
-    pub hWndFrame: OLE_HANDLE,
-    pub hAccel: OLE_HANDLE,
-    pub cAccelEntries: i32,
+    pub cb: usize,
+    pub fMDIApp: BOOL,
+    pub hWndFrame: HWND,
+    pub hAccel: HWND,
+    pub cAccelEntries: usize,
 }
 
 #[repr(C)]
