@@ -1,3 +1,4 @@
+use crate::window_class::Window;
 use std::mem::size_of;
 use std::ptr::null_mut;
 use windows::Win32::Foundation::HWND;
@@ -10,6 +11,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
 
 mod display;
 mod tas_client;
+mod window_class;
 
 #[macro_use]
 mod glue;
