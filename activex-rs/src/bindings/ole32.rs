@@ -334,6 +334,21 @@ com::interfaces! {
         pub unsafe fn GetContextMenu(&self, param0: i16, param1: i32, param2: i32, param3: *mut i32) -> HRESULT;
     }
 
+    #[uuid("00000126-0000-0000-c000-000000000046")]
+    pub unsafe interface IRunnableObject: IUnknown {
+        //NOTE: Non-extractable type.
+        pub unsafe fn GetRunningClass(&self, param0: *const GUID) -> HRESULT;
+        pub unsafe fn Run(&self, param0: IBindCtx) -> HRESULT;
+        pub unsafe fn IsRunning(&self) -> HRESULT;
+        pub unsafe fn LockRunning(&self, param0: i32, param1: i32) -> HRESULT;
+        pub unsafe fn SetContainedObject(&self, param0: i32) -> HRESULT;
+    }
+
+    #[uuid("0000000e-0000-0000-c000-000000000046")]
+    pub unsafe interface IBindCtx: IUnknown {
+        //NOTE: Non-extractable type.
+        //TODO: Add VTBL methods.
+    }
 }
 
 impl IOleWindow {}
