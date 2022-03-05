@@ -11,6 +11,9 @@ use windows::Win32::UI::WindowsAndMessaging::{
 mod display;
 mod tas_client;
 
+#[macro_use]
+mod glue;
+
 fn main() {
     unsafe { OleInitialize(null_mut()) }.expect("Initialized OLE session");
 
