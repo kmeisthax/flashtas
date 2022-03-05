@@ -1,23 +1,18 @@
 use crate::display::DisplayWindow;
 use crate::unsafe_write_com;
+use crate::window_class::Window;
 use activex_rs::bindings::ole32::{
-    IAdviseSink, IEnumOLEVERB, IEnumSTATDATA, IOleClientSite, IOleControlSite,
-    IOleInPlaceActiveObject, IOleInPlaceFrame, IOleInPlaceSite, IOleInPlaceUIWindow, IOleObject,
-    IOleWindow, BSTR, CY, OLEINPLACEFRAMEINFO, OLESIZE,
+    IAdviseSink, IOleClientSite, IOleControlSite, IOleInPlaceActiveObject, IOleInPlaceFrame,
+    IOleInPlaceSite, IOleInPlaceUIWindow, IOleWindow, BSTR, CY, OLEINPLACEFRAMEINFO,
 };
 use activex_rs::bindings::stdole::{IDispatch, IMoniker, IOleContainer};
 use com::interfaces::IUnknown;
 use com::production::ClassAllocation;
-use com::sys::GUID;
-use com::Interface;
 use lazy_static::lazy_static;
-use std::ffi::c_void;
-use std::mem::{forget, size_of, transmute};
-use std::ptr::null_mut;
+use std::mem::size_of;
 use std::sync::{Arc, Mutex};
-use windows::core::{IUnknown as WinIUnknown, HRESULT};
-use windows::Win32::Foundation::{HWND, RECT, S_FALSE, S_OK};
-use windows::Win32::Graphics::Gdi::LOGPALETTE;
+use windows::core::HRESULT;
+use windows::Win32::Foundation::{HWND, RECT, S_OK};
 use windows::Win32::System::Com::{CreateItemMoniker, FORMATETC, STGMEDIUM};
 use windows::Win32::System::Ole::OleMenuGroupWidths;
 use windows::Win32::UI::WindowsAndMessaging::MSG;
@@ -67,7 +62,7 @@ com::class! {
         }
 
         fn ShowObject(&self) -> HRESULT {
-            unimplemented!();
+            S_OK
         }
 
         fn OnShowWindow(&self, param0: ::com::sys::BOOL) -> HRESULT {
@@ -123,7 +118,7 @@ com::class! {
         }
 
         pub unsafe fn OnFocus(&self, param0: i32) -> HRESULT {
-            unimplemented!();
+            S_OK
         }
 
         pub unsafe fn ShowPropertyFrame(&self) -> HRESULT {
@@ -153,10 +148,12 @@ com::class! {
             unimplemented!();
         }
         pub unsafe fn SetBorderSpace(&self, param0: i32) -> HRESULT {
-            unimplemented!();
+            S_OK
         }
         pub unsafe fn SetActiveObject(&self, param0: IOleInPlaceActiveObject, param1: *mut u16) -> HRESULT {
-            unimplemented!();
+            self.associated_display.lock().unwrap().as_ref().unwrap().set_active_object(param0);
+
+            S_OK
         }
     }
 
@@ -170,7 +167,7 @@ com::class! {
         }
 
         pub unsafe fn OnUIActivate(&self) -> HRESULT {
-            unimplemented!();
+            S_OK
         }
 
         pub unsafe fn GetWindowContext(&self, param0: *mut IOleInPlaceFrame, param1: *mut IOleInPlaceUIWindow, param2: *mut RECT, param3: *mut RECT, param4: *mut OLEINPLACEFRAMEINFO) -> HRESULT {

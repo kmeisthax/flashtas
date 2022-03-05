@@ -3,7 +3,9 @@
 use crate::tas_client::{ITASClientSite, TASClientSite__CF};
 use crate::window_class::Window;
 use activex_rs::bindings::flash::{IShockwaveFlash, SHOCKWAVE_FLASH_CLSID};
-use activex_rs::bindings::ole32::{IAdviseSink, IOleClientSite, IOleObject};
+use activex_rs::bindings::ole32::{
+    IAdviseSink, IOleClientSite, IOleInPlaceActiveObject, IOleObject,
+};
 use com::interfaces::IClassFactory;
 use com::runtime::create_instance;
 use lazy_static::lazy_static;
@@ -14,7 +16,7 @@ use std::process::exit;
 use std::ptr::{null, null_mut};
 use std::sync::{Arc, Mutex};
 use windows::core::Error as WinError;
-use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, PWSTR, WPARAM};
+use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, PWSTR, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Ole::OLEIVERB_SHOW;
 use windows::Win32::UI::WindowsAndMessaging::{
@@ -73,6 +75,14 @@ impl DisplayWindow {
 
         Ok(Self(data))
     }
+
+    /// Set the active object for this display window.
+    pub fn set_active_object(&self, object: IOleInPlaceActiveObject) {
+        let mut child_wnd = 0;
+        unsafe { object.GetWindow(&mut child_wnd).unwrap() };
+
+        eprintln!("Child window: {}", child_wnd);
+    }
 }
 
 impl Window for DisplayWindow {
@@ -103,6 +113,7 @@ impl Window for DisplayWindow {
         match msg {
             WM_CREATE => {
                 let fp = create_instance::<IShockwaveFlash>(&SHOCKWAVE_FLASH_CLSID).expect("Flash");
+                self.0.lock().unwrap().fp = Some(fp.clone());
 
                 println!(
                     "Flash version: 0x{:x}",
@@ -124,7 +135,14 @@ impl Window for DisplayWindow {
                     fp_ole.SetClientSite(client_site.clone()).unwrap();
                     fp_ole.Advise(advise_sink, null_mut()).unwrap();
                     fp_ole
-                        .DoVerb(OLEIVERB_SHOW, null_mut(), client_site, 0, 0, null())
+                        .DoVerb(
+                            OLEIVERB_SHOW,
+                            null_mut(),
+                            client_site,
+                            0,
+                            self.window().0 as i64,
+                            null(),
+                        )
                         .unwrap();
                     fp.LoadMovie(
                         0,
@@ -136,8 +154,6 @@ impl Window for DisplayWindow {
                     )
                     .unwrap();
                 }
-
-                self.0.lock().unwrap().fp = Some(fp);
 
                 Some(LRESULT(0))
             }
