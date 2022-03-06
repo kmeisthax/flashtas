@@ -26,7 +26,7 @@ use windows::Win32::System::Com::{
     VARIANT_0_0_0,
 };
 use windows::Win32::System::Ole::{OleMenuGroupWidths, DISPATCH_METHOD, VARENUM};
-use windows::Win32::UI::WindowsAndMessaging::MSG;
+use windows::Win32::UI::WindowsAndMessaging::{MSG, HACCEL};
 
 //TODO: Get rid of these type aliases and make windows-rs bridgeable
 pub type BSTR = *const u16;
@@ -68,7 +68,7 @@ pub struct OLEINPLACEFRAMEINFO {
     pub cb: usize,
     pub fMDIApp: BOOL,
     pub hWndFrame: HWND,
-    pub hAccel: HWND,
+    pub hAccel: HACCEL,
     pub cAccelEntries: usize,
 }
 

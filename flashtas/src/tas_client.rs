@@ -198,13 +198,18 @@ com::class! {
             }
 
             if !param4.is_null() {
+                let disp = self.associated_display.lock().unwrap();
+                let disp_ref = disp.as_ref().unwrap();
                 let ipfo = &mut *param4;
 
                 ipfo.cb = size_of::<OLEINPLACEFRAMEINFO>();
                 ipfo.fMDIApp = ::windows::Win32::Foundation::BOOL::from(false);
-                ipfo.hWndFrame = self.associated_display.lock().unwrap().as_ref().unwrap().window();
-                ipfo.hAccel = HWND(0);
-                ipfo.cAccelEntries = 0;
+                ipfo.hWndFrame = disp_ref.window();
+
+                let (haccel, accel_count) = disp_ref.accel();
+                
+                ipfo.hAccel = haccel;
+                ipfo.cAccelEntries = accel_count;
             }
 
             S_OK

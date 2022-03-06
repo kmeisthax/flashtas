@@ -21,8 +21,9 @@ use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Ole::OLEIVERB_SHOW;
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, RegisterClassW, CW_USEDEFAULT, HMENU, WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY,
-    WNDCLASSW, WS_OVERLAPPEDWINDOW,
+    WNDCLASSW, WS_OVERLAPPEDWINDOW, HACCEL, ACCEL, CreateAcceleratorTableW, FALT
 };
+use windows::Win32::UI::Input::KeyboardAndMouse::VK_F4;
 
 /// The window class of our main display window.
 #[derive(Clone)]
@@ -33,6 +34,9 @@ pub struct DisplayWindowData {
 
     /// The current Flash instance.
     fp: Option<IShockwaveFlash>,
+
+    /// The current keyboard shortcut ("accelerator") table.
+    accel: HACCEL,
 }
 
 impl DisplayWindow {
@@ -42,6 +46,7 @@ impl DisplayWindow {
         let data = Arc::new(Mutex::new(DisplayWindowData {
             window: HWND(0),
             fp: None,
+            accel: HACCEL(0)
         }));
 
         // The HWND itself owns an `Arc<Mutex<Self>>` through the C pointer,
@@ -79,9 +84,24 @@ impl DisplayWindow {
     /// Set the active object for this display window.
     pub fn set_active_object(&self, object: IOleInPlaceActiveObject) {
         let mut child_wnd = 0;
-        unsafe { object.GetWindow(&mut child_wnd).unwrap() };
+        unsafe { object.OnFrameWindowActivate(BOOL::from(true).0).unwrap() };
+    }
 
-        eprintln!("Child window: {}", child_wnd);
+    pub fn accel(&self) -> (HACCEL, usize) {
+        let mut me = self.0.lock().unwrap();
+
+        if me.accel.is_invalid() {
+            let accel_table = vec![ACCEL {
+                fVirt: FALT as u8,
+                key: VK_F4.0,
+                cmd: 0
+            }];
+
+            me.accel = unsafe { CreateAcceleratorTableW(accel_table.as_ptr(), accel_table.len() as i32) };
+        }
+
+        //TODO: Actually get the accel table length
+        (me.accel, 1)
     }
 }
 
