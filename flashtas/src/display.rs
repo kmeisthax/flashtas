@@ -176,6 +176,15 @@ impl Window for DisplayWindow {
                     .unwrap();
                 }
 
+                // EVIL: For some reason, the COM pointers we currently hold
+                // are somehow unbalanced, and we can't release them normally.
+                // Don't ask me why, just never call `Release` on an Flash.ocx
+                // class.
+                //
+                // THIS IS NOT THE CORRECT WAY TO DO THINGS IN RUST.
+                ::std::mem::forget(fp_ole);
+                ::std::mem::forget(fp);
+
                 Some(LRESULT(0))
             }
             WM_DESTROY => exit(0),
