@@ -26,7 +26,7 @@ use windows::Win32::System::Com::{
     VARIANT_0_0_0,
 };
 use windows::Win32::System::Ole::{OleMenuGroupWidths, DISPATCH_METHOD, VARENUM};
-use windows::Win32::UI::WindowsAndMessaging::{MSG, HACCEL};
+use windows::Win32::UI::WindowsAndMessaging::{HACCEL, MSG};
 
 //TODO: Get rid of these type aliases and make windows-rs bridgeable
 pub type BSTR = *const u16;

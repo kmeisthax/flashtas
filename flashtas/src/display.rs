@@ -19,11 +19,11 @@ use windows::core::Error as WinError;
 use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, PWSTR, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Ole::OLEIVERB_SHOW;
-use windows::Win32::UI::WindowsAndMessaging::{
-    CreateWindowExW, RegisterClassW, CW_USEDEFAULT, HMENU, WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY,
-    WNDCLASSW, WS_OVERLAPPEDWINDOW, HACCEL, ACCEL, CreateAcceleratorTableW, FALT
-};
 use windows::Win32::UI::Input::KeyboardAndMouse::VK_F4;
+use windows::Win32::UI::WindowsAndMessaging::{
+    CreateAcceleratorTableW, CreateWindowExW, RegisterClassW, ACCEL, CW_USEDEFAULT, FALT, HACCEL,
+    HMENU, WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY, WNDCLASSW, WS_OVERLAPPEDWINDOW,
+};
 
 /// The window class of our main display window.
 #[derive(Clone)]
@@ -46,7 +46,7 @@ impl DisplayWindow {
         let data = Arc::new(Mutex::new(DisplayWindowData {
             window: HWND(0),
             fp: None,
-            accel: HACCEL(0)
+            accel: HACCEL(0),
         }));
 
         // The HWND itself owns an `Arc<Mutex<Self>>` through the C pointer,
@@ -94,10 +94,11 @@ impl DisplayWindow {
             let accel_table = vec![ACCEL {
                 fVirt: FALT as u8,
                 key: VK_F4.0,
-                cmd: 0
+                cmd: 0,
             }];
 
-            me.accel = unsafe { CreateAcceleratorTableW(accel_table.as_ptr(), accel_table.len() as i32) };
+            me.accel =
+                unsafe { CreateAcceleratorTableW(accel_table.as_ptr(), accel_table.len() as i32) };
         }
 
         //TODO: Actually get the accel table length
