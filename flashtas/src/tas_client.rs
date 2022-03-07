@@ -202,14 +202,18 @@ com::class! {
                 let disp_ref = disp.as_ref().unwrap();
                 let ipfo = &mut *param4;
 
-                ipfo.cb = size_of::<OLEINPLACEFRAMEINFO>();
-                ipfo.fMDIApp = ::windows::Win32::Foundation::BOOL::from(false);
-                ipfo.hWndFrame = disp_ref.window();
+                //NOTE: Despite `repr(C)` we can't actually check if we have
+                //space for individual fields because Rust doesn't support
+                //pointer-to-subfields or struct offsets
+                if ipfo.cb >= size_of::<OLEINPLACEFRAMEINFO>() {
+                    ipfo.fMDIApp = ::windows::Win32::Foundation::BOOL::from(false);
+                    ipfo.hWndFrame = disp_ref.window();
 
-                let (haccel, accel_count) = disp_ref.accel();
-                
-                ipfo.hAccel = haccel;
-                ipfo.cAccelEntries = accel_count;
+                    let (haccel, accel_count) = disp_ref.accel();
+
+                    ipfo.hAccel = haccel;
+                    ipfo.cAccelEntries = accel_count;
+                }
             }
 
             S_OK
