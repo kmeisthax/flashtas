@@ -15,7 +15,7 @@ use windows::core::HRESULT;
 use windows::Win32::Foundation::{HWND, RECT, S_OK};
 use windows::Win32::System::Com::{CreateItemMoniker, FORMATETC, STGMEDIUM};
 use windows::Win32::System::Ole::OleMenuGroupWidths;
-use windows::Win32::UI::WindowsAndMessaging::{GetWindowRect, MSG};
+use windows::Win32::UI::WindowsAndMessaging::{GetClientRect, MSG};
 
 com::interfaces! {
     /// COM interface for setting the display window.
@@ -184,7 +184,7 @@ com::class! {
             if !param2.is_null() || !param3.is_null() {
                 let wnd = self.associated_display.lock().unwrap().as_ref().unwrap().window();
                 let mut rect = RECT::default();
-                GetWindowRect(wnd, &mut rect).unwrap();
+                GetClientRect(wnd, &mut rect).unwrap();
 
                 rect.bottom -= rect.top;
                 rect.right -= rect.left;
