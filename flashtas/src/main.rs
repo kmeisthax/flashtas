@@ -1,9 +1,10 @@
 use crate::window_class::Window;
 use clap::Parser;
-use std::fs::canonicalize;
+use std::fs::{canonicalize, File};
 use std::mem::size_of;
 use std::path::{Component, PathBuf, Prefix};
 use std::ptr::null_mut;
+use swf::decompress_swf;
 use windows::Win32::Foundation::HWND;
 use windows::Win32::System::Ole::OleInitialize;
 use windows::Win32::System::Threading::{GetStartupInfoW, STARTUPINFOW};
@@ -47,7 +48,15 @@ fn main() {
         });
     }
 
-    let mainwnd = display::DisplayWindow::create(movie).unwrap();
+    // Getting the stage size from Flash Player is too hard. Let's just parse
+    // the SWF ourselves!
+    let swf_header = decompress_swf(File::open(movie_canon).unwrap()).unwrap();
+    let stage_size = swf_header.header.stage_size();
+    let width = stage_size.x_max.to_pixels();
+    let height = stage_size.y_max.to_pixels();
+    eprintln!("Desired stage dimensions: {}x{}", width, height);
+
+    let mainwnd = display::DisplayWindow::create(movie, width as i32, height as i32).unwrap();
     let mut si = STARTUPINFOW {
         cb: size_of::<STARTUPINFOW>() as u32,
         ..Default::default()

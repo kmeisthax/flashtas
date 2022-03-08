@@ -4,8 +4,7 @@ use crate::tas_client::{ITASClientSite, TASClientSite__CF};
 use crate::window_class::Window;
 use activex_rs::bindings::flash::{IShockwaveFlash, SHOCKWAVE_FLASH_CLSID};
 use activex_rs::bindings::ole32::{
-    IAdviseSink, IOleClientSite, IOleInPlaceActiveObject, IOleInPlaceObject, IOleInPlaceUIWindow,
-    IOleObject,
+    IAdviseSink, IOleClientSite, IOleInPlaceActiveObject, IOleInPlaceObject, IOleObject,
 };
 use com::interfaces::IClassFactory;
 use com::runtime::create_instance;
@@ -23,8 +22,9 @@ use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Ole::OLEIVERB_SHOW;
 use windows::Win32::UI::Input::KeyboardAndMouse::VK_F4;
 use windows::Win32::UI::WindowsAndMessaging::{
-    CreateAcceleratorTableW, CreateWindowExW, RegisterClassW, ACCEL, CW_USEDEFAULT, FALT, HACCEL,
-    HMENU, WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY, WM_SIZE, WNDCLASSW, WS_OVERLAPPEDWINDOW,
+    CreateAcceleratorTableW, CreateWindowExW, GetClientRect, GetWindowRect, RegisterClassW,
+    SetWindowPos, ACCEL, CW_USEDEFAULT, FALT, HACCEL, HMENU, SWP_NOMOVE, SWP_NOZORDER,
+    WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY, WM_SIZE, WNDCLASSW, WS_OVERLAPPEDWINDOW,
 };
 
 /// A Window that holds an ActiveX/OLE control.
@@ -44,7 +44,7 @@ pub struct DisplayWindowData {
 }
 
 impl DisplayWindow {
-    pub fn create(movie: PathBuf) -> Result<Self, WinError> {
+    pub fn create(movie: PathBuf, width: i32, height: i32) -> Result<Self, WinError> {
         let _ = *DISPLAY_WNDCLASS;
 
         let data = Arc::new(Mutex::new(DisplayWindowData {
@@ -65,8 +65,8 @@ impl DisplayWindow {
                 WS_OVERLAPPEDWINDOW,
                 CW_USEDEFAULT,
                 CW_USEDEFAULT,
-                CW_USEDEFAULT,
-                CW_USEDEFAULT,
+                width,
+                height,
                 HWND::default(),
                 HMENU::default(),
                 GetModuleHandleW(PWSTR(null())),
@@ -74,6 +74,33 @@ impl DisplayWindow {
             )
         }
         .ok()?;
+
+        // If we put the window size in `CreateWindowExW` then the non-client
+        // area gets subtracted from it which is wrong. So we have to actually
+        // pull window metrics at this time and add it back.
+        let mut client_rect = RECT::default();
+        unsafe { GetClientRect(window, &mut client_rect).unwrap() };
+
+        let mut nonclient_rect = RECT::default();
+        unsafe { GetWindowRect(window, &mut nonclient_rect).unwrap() };
+
+        let extra_width =
+            (nonclient_rect.right - client_rect.right) + (client_rect.left - nonclient_rect.left);
+        let extra_height =
+            (nonclient_rect.bottom - client_rect.bottom) + (client_rect.top - nonclient_rect.top);
+
+        unsafe {
+            SetWindowPos(
+                window,
+                HWND(0),
+                0,
+                0,
+                width + extra_width,
+                height + extra_height,
+                SWP_NOMOVE | SWP_NOZORDER,
+            )
+            .unwrap()
+        };
 
         // Wrap the HWND back into the data.
         //
