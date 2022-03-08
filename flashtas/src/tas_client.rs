@@ -15,7 +15,7 @@ use windows::core::HRESULT;
 use windows::Win32::Foundation::{HWND, RECT, S_OK};
 use windows::Win32::System::Com::{CreateItemMoniker, FORMATETC, STGMEDIUM};
 use windows::Win32::System::Ole::OleMenuGroupWidths;
-use windows::Win32::UI::WindowsAndMessaging::MSG;
+use windows::Win32::UI::WindowsAndMessaging::{GetWindowRect, MSG};
 
 com::interfaces! {
     /// COM interface for setting the display window.
@@ -181,20 +181,23 @@ com::class! {
                 unsafe_write_com!(param1, ipuiw);
             }
 
-            if !param2.is_null() {
-                let pos_rect = &mut *param2;
-                pos_rect.left = 0;
-                pos_rect.top = 0;
-                pos_rect.bottom = 100;
-                pos_rect.right = 100;
-            }
+            if !param2.is_null() || !param3.is_null() {
+                let wnd = self.associated_display.lock().unwrap().as_ref().unwrap().window();
+                let mut rect = RECT::default();
+                GetWindowRect(wnd, &mut rect).unwrap();
 
-            if !param3.is_null() {
-                let clip_rect = &mut *param3;
-                clip_rect.left = 0;
-                clip_rect.top = 0;
-                clip_rect.bottom = 100;
-                clip_rect.right = 100;
+                rect.bottom -= rect.top;
+                rect.right -= rect.left;
+                rect.top = 0;
+                rect.left = 0;
+
+                if !param2.is_null() {
+                    *param2 = rect;
+                }
+
+                if !param3.is_null() {
+                    *param3 = rect;
+                }
             }
 
             if !param4.is_null() {
