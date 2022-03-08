@@ -1,5 +1,8 @@
 use crate::window_class::Window;
+use clap::Parser;
+use std::fs::canonicalize;
 use std::mem::size_of;
+use std::path::{Component, PathBuf, Prefix};
 use std::ptr::null_mut;
 use windows::Win32::Foundation::HWND;
 use windows::Win32::System::Ole::OleInitialize;
@@ -16,10 +19,35 @@ mod window_class;
 #[macro_use]
 mod glue;
 
+#[derive(Parser)]
+struct Args {
+    movie: String,
+}
+
 fn main() {
     unsafe { OleInitialize(null_mut()) }.expect("Initialized OLE session");
 
-    let mainwnd = display::DisplayWindow::create().unwrap();
+    let args = Args::parse();
+
+    // Flash Player wants canonicalized paths, but chokes on what Rust calls
+    // `VerbatimDisk` (e.g. \\?\C:\test.swf), so we have to *de*canonicalize it
+    // slightly for FP.
+    let movie_canon = canonicalize(args.movie).unwrap();
+    let mut movie = PathBuf::new();
+    for component in movie_canon.components() {
+        movie.push(match component {
+            Component::Prefix(p) => match p.kind() {
+                Prefix::VerbatimDisk(d) => {
+                    movie.push(format!("{}:/", ::std::char::from_u32(d as u32).unwrap()));
+                    continue;
+                }
+                _ => Component::Prefix(p),
+            },
+            c => c,
+        });
+    }
+
+    let mainwnd = display::DisplayWindow::create(movie).unwrap();
     let mut si = STARTUPINFOW {
         cb: size_of::<STARTUPINFOW>() as u32,
         ..Default::default()

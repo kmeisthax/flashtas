@@ -12,6 +12,7 @@ use lazy_static::lazy_static;
 use std::ffi::c_void;
 use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
+use std::path::PathBuf;
 use std::process::exit;
 use std::ptr::{null, null_mut};
 use std::sync::{Arc, Mutex};
@@ -25,12 +26,14 @@ use windows::Win32::UI::WindowsAndMessaging::{
     HMENU, WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY, WNDCLASSW, WS_OVERLAPPEDWINDOW,
 };
 
-/// The window class of our main display window.
+/// A Window that holds an ActiveX/OLE control.
 #[derive(Clone)]
 pub struct DisplayWindow(Arc<Mutex<DisplayWindowData>>);
 
 pub struct DisplayWindowData {
     window: HWND,
+
+    movie: PathBuf,
 
     /// The current Flash instance.
     fp: Option<IShockwaveFlash>,
@@ -40,11 +43,12 @@ pub struct DisplayWindowData {
 }
 
 impl DisplayWindow {
-    pub fn create() -> Result<Self, WinError> {
+    pub fn create(movie: PathBuf) -> Result<Self, WinError> {
         let _ = *DISPLAY_WNDCLASS;
 
         let data = Arc::new(Mutex::new(DisplayWindowData {
             window: HWND(0),
+            movie,
             fp: None,
             accel: HACCEL(0),
         }));
@@ -83,7 +87,7 @@ impl DisplayWindow {
 
     /// Set the active object for this display window.
     pub fn set_active_object(&self, object: IOleInPlaceActiveObject) {
-        let mut child_wnd = 0;
+        let child_wnd = 0;
         unsafe { object.OnFrameWindowActivate(BOOL::from(true).0).unwrap() };
     }
 
@@ -152,6 +156,9 @@ impl Window for DisplayWindow {
                 let client_site = tas_client_site.query_interface::<IOleClientSite>().unwrap();
                 let advise_sink = tas_client_site.query_interface::<IAdviseSink>().unwrap();
 
+                let movie = self.0.lock().unwrap().movie.clone();
+                eprintln!("Loading SWF: {:?}", movie.as_os_str());
+
                 unsafe {
                     fp_ole.SetClientSite(client_site.clone()).unwrap();
                     fp_ole.Advise(advise_sink, null_mut()).unwrap();
@@ -167,7 +174,8 @@ impl Window for DisplayWindow {
                         .unwrap();
                     fp.LoadMovie(
                         0,
-                        OsStr::new("test.swf\0")
+                        movie
+                            .as_os_str()
                             .encode_wide()
                             .collect::<Vec<_>>()
                             .leak()
