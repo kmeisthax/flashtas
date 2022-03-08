@@ -184,7 +184,7 @@ com::interfaces! {
     pub unsafe interface IOleInPlaceObject: IOleWindow {
         pub unsafe fn InPlaceDeactivate(&self) -> HRESULT;
         pub unsafe fn UIDeactivate(&self) -> HRESULT;
-        pub unsafe fn SetObjectRects(&self, param0: i32, param1: i32) -> HRESULT;
+        pub unsafe fn SetObjectRects(&self, param0: *const RECT, param1: *const RECT) -> HRESULT;
         pub unsafe fn ReactivateAndUndo(&self) -> HRESULT;
     }
 

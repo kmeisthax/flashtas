@@ -4,7 +4,8 @@ use crate::tas_client::{ITASClientSite, TASClientSite__CF};
 use crate::window_class::Window;
 use activex_rs::bindings::flash::{IShockwaveFlash, SHOCKWAVE_FLASH_CLSID};
 use activex_rs::bindings::ole32::{
-    IAdviseSink, IOleClientSite, IOleInPlaceActiveObject, IOleObject,
+    IAdviseSink, IOleClientSite, IOleInPlaceActiveObject, IOleInPlaceObject, IOleInPlaceUIWindow,
+    IOleObject,
 };
 use com::interfaces::IClassFactory;
 use com::runtime::create_instance;
@@ -17,13 +18,13 @@ use std::process::exit;
 use std::ptr::{null, null_mut};
 use std::sync::{Arc, Mutex};
 use windows::core::Error as WinError;
-use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, PWSTR, WPARAM};
+use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, PWSTR, RECT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Ole::OLEIVERB_SHOW;
 use windows::Win32::UI::Input::KeyboardAndMouse::VK_F4;
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateAcceleratorTableW, CreateWindowExW, RegisterClassW, ACCEL, CW_USEDEFAULT, FALT, HACCEL,
-    HMENU, WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY, WNDCLASSW, WS_OVERLAPPEDWINDOW,
+    HMENU, WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY, WM_SIZE, WNDCLASSW, WS_OVERLAPPEDWINDOW,
 };
 
 /// A Window that holds an ActiveX/OLE control.
@@ -134,7 +135,7 @@ impl Window for DisplayWindow {
         self.0.lock().unwrap().window = HWND(0);
     }
 
-    fn process_message(&self, msg: u32, _hparam: WPARAM, _lparam: LPARAM) -> Option<LRESULT> {
+    fn process_message(&self, msg: u32, _hparam: WPARAM, lparam: LPARAM) -> Option<LRESULT> {
         match msg {
             WM_CREATE => {
                 let fp = create_instance::<IShockwaveFlash>(&SHOCKWAVE_FLASH_CLSID).expect("Flash");
@@ -189,9 +190,29 @@ impl Window for DisplayWindow {
                 // Don't ask me why, just never call `Release` on an Flash.ocx
                 // class.
                 //
+                // No, it's not because the client site wasn't being retained.
+                //
                 // THIS IS NOT THE CORRECT WAY TO DO THINGS IN RUST.
                 ::std::mem::forget(fp_ole);
                 ::std::mem::forget(fp);
+
+                Some(LRESULT(0))
+            }
+            WM_SIZE => {
+                let fp = self.0.lock().unwrap().fp.clone().unwrap();
+                let fp_ole_inplace = fp.query_interface::<IOleInPlaceObject>().unwrap();
+
+                let new_width = lparam.0 & 0xFFFF;
+                let new_height = (lparam.0 >> 16) & 0xFFFF;
+
+                let rect = RECT {
+                    top: 0,
+                    left: 0,
+                    right: new_width as i32,
+                    bottom: new_height as i32,
+                };
+
+                unsafe { fp_ole_inplace.SetObjectRects(&rect, &rect).unwrap() };
 
                 Some(LRESULT(0))
             }
