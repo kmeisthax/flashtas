@@ -1,6 +1,7 @@
 [workspace]
 
 members = [
+    "flashtas-format",
     "flashtas",
     "comexport-rs",
     "activex-rs",
