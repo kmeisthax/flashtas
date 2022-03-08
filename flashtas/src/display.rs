@@ -39,6 +39,9 @@ pub struct DisplayWindowData {
     /// The current Flash instance.
     fp: Option<IShockwaveFlash>,
 
+    /// The native window that corresponds to this Flash instance.
+    fp_window: HWND,
+
     /// The current keyboard shortcut ("accelerator") table.
     accel: HACCEL,
 }
@@ -51,6 +54,7 @@ impl DisplayWindow {
             window: HWND(0),
             movie,
             fp: None,
+            fp_window: HWND(0),
             accel: HACCEL(0),
         }));
 
@@ -115,8 +119,18 @@ impl DisplayWindow {
 
     /// Set the active object for this display window.
     pub fn set_active_object(&self, object: IOleInPlaceActiveObject) {
-        let child_wnd = 0;
-        unsafe { object.OnFrameWindowActivate(BOOL::from(true).0).unwrap() };
+        let mut child_wnd = 0;
+
+        unsafe { object.GetWindow(&mut child_wnd).unwrap() };
+
+        self.0.lock().unwrap().fp_window = HWND(child_wnd);
+    }
+
+    /// Get the current active object's HWND.
+    ///
+    /// This will be 0 if the current active object
+    pub fn active_object_window(&self) -> HWND {
+        self.0.lock().unwrap().fp_window
     }
 
     pub fn accel(&self) -> (HACCEL, usize) {

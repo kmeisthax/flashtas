@@ -10,7 +10,9 @@ use windows::Win32::System::Ole::OleInitialize;
 use windows::Win32::System::Threading::{GetStartupInfoW, STARTUPINFOW};
 use windows::Win32::UI::WindowsAndMessaging::{
     DispatchMessageW, GetMessageW, ShowWindow, TranslateMessage, MSG, SHOW_WINDOW_CMD, SW_HIDE,
-    SW_SHOWNORMAL,
+    SW_SHOWNORMAL, WM_LBUTTONDBLCLK, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDBLCLK,
+    WM_MBUTTONDOWN, WM_MBUTTONUP, WM_MOUSEHWHEEL, WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_RBUTTONDBLCLK,
+    WM_RBUTTONDOWN, WM_RBUTTONUP, WM_XBUTTONDBLCLK, WM_XBUTTONDOWN, WM_XBUTTONUP,
 };
 
 mod display;
@@ -79,9 +81,19 @@ fn main() {
     let mut msg = MSG::default();
 
     while unsafe { GetMessageW(&mut msg, HWND::default(), 0, 0) }.as_bool() {
-        unsafe {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
+        unsafe { TranslateMessage(&msg) };
+
+        // Filter all queued Flash Player messages, we'll be adding our own.
+        if !msg.hwnd.is_invalid() && msg.hwnd == mainwnd.active_object_window() {
+            match msg.message {
+                WM_LBUTTONDOWN | WM_LBUTTONUP | WM_LBUTTONDBLCLK | WM_MBUTTONDBLCLK
+                | WM_MBUTTONDOWN | WM_MBUTTONUP | WM_MOUSEHWHEEL | WM_MOUSEMOVE | WM_MOUSEWHEEL
+                | WM_RBUTTONDBLCLK | WM_RBUTTONDOWN | WM_RBUTTONUP | WM_XBUTTONDBLCLK
+                | WM_XBUTTONDOWN | WM_XBUTTONUP => continue,
+                _ => {}
+            }
         }
+
+        unsafe { DispatchMessageW(&msg) };
     }
 }
