@@ -210,7 +210,7 @@ com::interfaces! {
     #[uuid("00000117-0000-0000-C000-000000000046")]
     pub unsafe interface IOleInPlaceActiveObject: IUnknown {
         //NOTE: Extracted TLB is wrong, these return HRESULT
-        pub unsafe fn GetWindow(&self, param0: *mut i32) -> HRESULT;
+        pub unsafe fn GetWindow(&self, param0: *mut isize) -> HRESULT;
         pub unsafe fn ContextSensitiveHelp(&self, param0: i32) -> HRESULT;
         pub unsafe fn TranslateAccelerator(&self, param0: i32) -> HRESULT;
         pub unsafe fn OnFrameWindowActivate(&self, param0: i32) -> HRESULT;
