@@ -230,6 +230,13 @@ pub fn print_type_dispatch_as_rust(
             writeln!(ret, "            cNamedArgs: 0")?;
             writeln!(ret, "        }};")?;
 
+            let dispatch_type = match funcdesc.invkind {
+                INVOKE_FUNC => "DISPATCH_METHOD",
+                INVOKE_PROPERTYGET => "DISPATCH_PROPERTYGET",
+                INVOKE_PROPERTYPUT => "DISPATCH_PROPERTYPUT",
+                _ => unimplemented!(),
+            };
+
             if VARENUM(funcdesc.elemdescFunc.tdesc.vt as i32) != VT_VOID {
                 writeln!(ret, "        let mut disp_result = VARIANT::default();")?;
                 writeln!(
@@ -245,13 +252,13 @@ pub fn print_type_dispatch_as_rust(
                 data4: [0; 8]
             }},
             0,
-            DISPATCH_METHOD as u16,
+            {} as u16,
             &mut disp_params,
             &mut disp_result,
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut()
         );",
-                    funcdesc.memid
+                    funcdesc.memid, dispatch_type
                 )?;
                 writeln!(ret, "        if invoke_result.is_err() {{")?;
                 writeln!(ret, "            return Err(invoke_result);")?;
@@ -280,13 +287,13 @@ pub fn print_type_dispatch_as_rust(
                 data4: [0; 8]
             }},
             0,
-            DISPATCH_METHOD as u16,
+            {} as u16,
             &mut disp_params,
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut()
         );",
-                    funcdesc.memid
+                    funcdesc.memid, dispatch_type
                 )?;
                 writeln!(ret, "        if invoke_result.is_err() {{")?;
                 writeln!(ret, "            Err(invoke_result)")?;
