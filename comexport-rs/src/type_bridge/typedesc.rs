@@ -92,7 +92,7 @@ fn bridge_elem_to_rust_type_impl<'a>(
         VT_R8 => (TKIND_RECORD, "f64".into(), num_pointers),
         VT_CY => (TKIND_RECORD, "CY".into(), num_pointers),
         VT_BSTR => (TKIND_RECORD, "BSTR".into(), num_pointers),
-        VT_DISPATCH => (TKIND_INTERFACE, "IDispatch".into(), num_pointers),
+        VT_DISPATCH => (TKIND_INTERFACE, "Option<IDispatch>".into(), num_pointers),
         VT_BOOL => (TKIND_RECORD, "BOOL".into(), num_pointers),
         VT_I1 => (TKIND_RECORD, "i8".into(), num_pointers),
         VT_UI1 => (TKIND_RECORD, "u8".into(), num_pointers),
@@ -104,7 +104,7 @@ fn bridge_elem_to_rust_type_impl<'a>(
         VT_UINT => (TKIND_RECORD, "u32".into(), num_pointers),
         VT_VOID => (TKIND_RECORD, "c_void".into(), num_pointers),
         VT_HRESULT => (TKIND_RECORD, "HRESULT".into(), num_pointers),
-        VT_UNKNOWN => (TKIND_INTERFACE, "IUnknown".into(), num_pointers),
+        VT_UNKNOWN => (TKIND_INTERFACE, "Option<IUnknown>".into(), num_pointers),
         VT_VARIANT => (TKIND_RECORD, "VARIANT".into(), num_pointers),
         VT_PTR => {
             let target_type: &TYPEDESC = unsafe { &*tdesc.Anonymous.lptdesc };
@@ -127,7 +127,12 @@ fn bridge_elem_to_rust_type_impl<'a>(
         }
         VT_USERDEFINED => {
             let href_type = unsafe { tdesc.Anonymous.hreftype };
-            let (com_type, name) = bridged_hreftype(context, typeinfo, href_type)?;
+            let (com_type, mut name) = bridged_hreftype(context, typeinfo, href_type)?;
+
+            // Interface types are considered nullable.
+            if com_type == TKIND_INTERFACE {
+                name = format!("Option<{}>", name).into();
+            }
 
             (com_type, name, num_pointers)
         }
@@ -149,7 +154,8 @@ pub fn bridge_elem_to_rust_type<'a>(
 ) -> Cow<'a, str> {
     match bridge_elem_to_rust_type_impl(context, typeinfo, tdesc, 0) {
         Ok((TKIND_INTERFACE, name, num_pointers)) if num_pointers == 0 => {
-            format!("/* cannot pass {} by value */", name).into()
+            //TODO: This seems wrong?
+            name
         }
         Ok((TKIND_INTERFACE, name, num_pointers)) => {
             format!("{}{}", "*mut ".repeat(num_pointers - 1), name).into()

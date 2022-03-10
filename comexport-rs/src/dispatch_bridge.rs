@@ -114,8 +114,8 @@ fn vt_and_ufield_for_tdesc_ptr<'a>(
                 ("byref", WrapType::CVoidPtr)
             }
         }
-        VT_DISPATCH => ("byref", WrapType::ComPtr("IDispatch".into())),
-        VT_UNKNOWN => ("byref", WrapType::ComPtr("IUnknown".into())),
+        VT_DISPATCH => ("ppdispVal", WrapType::ComPtr("Option<IDispatch>".into())),
+        VT_UNKNOWN => ("ppunkVal", WrapType::ComPtr("Option<IUnknown>".into())),
         VT_LPWSTR | VT_LPSTR => ("byref", WrapType::CVoidPtr),
         VT_VARIANT => ("pvarVal", WrapType::Bare),
         VT_HRESULT => return Err("/* invalid: cannot use VT_HRESULT by ptr */".to_string()),
@@ -149,7 +149,7 @@ fn vt_and_ufield_for_tdesc_value<'a>(
         VT_R8 => ("dblVal", WrapType::Bare),
         VT_CY => ("cyVal", WrapType::Bare),
         VT_BSTR => ("bstrVal", WrapType::Bstr),
-        VT_DISPATCH => ("ppdispVal", WrapType::ManuallyDrop),
+        VT_DISPATCH => ("pdispVal", WrapType::ComPtr("Option<IDispatch>".into())),
         VT_BOOL => ("boolVal", WrapType::Bool),
         VT_I1 => ("cVal", WrapType::Bare),
         VT_UI1 => ("bVal", WrapType::Bare),
@@ -160,7 +160,7 @@ fn vt_and_ufield_for_tdesc_value<'a>(
         VT_INT => ("intVal", WrapType::Bare),
         VT_UINT => ("uintVal", WrapType::Bare),
         VT_VOID => return Err("/* invalid: cannot use VT_VOID by value */".to_string()),
-        VT_UNKNOWN => ("ppunkVal", WrapType::ManuallyDrop),
+        VT_UNKNOWN => ("punkVal", WrapType::ComPtr("Option<IUnknown>".into())),
         VT_PTR => {
             return vt_and_ufield_for_tdesc_ptr(context, typeinfo, unsafe {
                 &*tdesc.Anonymous.lptdesc
@@ -185,9 +185,6 @@ fn vt_and_ufield_for_tdesc_value<'a>(
 enum WrapType<'a> {
     /// The Rust-side type requires no wrapping.
     Bare,
-
-    /// The Rust-side type must be wrapped in ManuallyDrop.
-    ManuallyDrop,
 
     /// The Rust-side type must be unwrapped from a `windows` `BOOL`.
     Bool,
@@ -239,8 +236,7 @@ pub fn generate_param(
 
     let wrapper = match wraptype {
         WrapType::Bare => format!("{}: param{}", ufield, param_i),
-        WrapType::ManuallyDrop => format!("{}: ManuallyDrop::new(param{})", ufield, param_i),
-        WrapType::Bool => format!("{}: param{}.0", ufield, param_i),
+        WrapType::Bool => format!("{}: param{}.0 as i16", ufield, param_i),
         WrapType::Bstr => format!(
             "{}: ManuallyDrop::new(::std::mem::transmute(param{}))",
             ufield, param_i
@@ -249,7 +245,7 @@ pub fn generate_param(
         WrapType::BoolPtr => format!("{}: param{} as *mut i32", ufield, param_i),
         WrapType::CVoidPtr => format!("{}: param{} as *mut c_void", ufield, param_i),
         WrapType::ComPtr(_) => format!(
-            "{}: ::std::mem::transmute(param{}.as_raw())",
+            "{}: ::std::mem::transmute(param{}.map(|m| m.as_raw()))",
             ufield, param_i
         ),
     };
@@ -290,7 +286,6 @@ pub fn generate_return(
 
     let wrapper = match wraptype {
         WrapType::Bare => format!("disp_result.Anonymous.Anonymous.Anonymous.{}", ufield),
-        WrapType::ManuallyDrop => format!("disp_result.Anonymous.Anonymous.Anonymous.{}.0", ufield),
         WrapType::Bool => format!(
             "BOOL(disp_result.Anonymous.Anonymous.Anonymous.{} as i32)",
             ufield
@@ -301,8 +296,12 @@ pub fn generate_return(
         ),
         WrapType::CVoidPtr => format!("disp_result.Anonymous.Anonymous.Anonymous.{}", ufield),
         WrapType::ComPtr(bridged_type) => format!(
-            "let com_ptr: {} = ::std::mem::transmute(disp_result.Anonymous.Anonymous.Anonymous.{});
-            com_ptr.AddRef();
+            "let com_ptr: {} = ::std::mem::transmute_copy(&disp_result.Anonymous.Anonymous.Anonymous.{});
+
+            if let Some(com_ptr) = com_ptr.as_ref() {{
+                com_ptr.AddRef();
+            }}
+
             com_ptr",
             bridged_type, ufield
         ),

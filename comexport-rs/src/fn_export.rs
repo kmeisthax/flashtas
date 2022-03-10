@@ -7,6 +7,7 @@ use std::fmt::Write;
 use windows::Win32::Foundation::BSTR;
 use windows::Win32::System::Com::{
     ITypeInfo, ELEMDESC, FUNCDESC, FUNC_DISPATCH, FUNC_PUREVIRTUAL, FUNC_VIRTUAL, INVOKE_FUNC,
+    INVOKE_PROPERTYGET, INVOKE_PROPERTYPUT, INVOKE_PROPERTYPUTREF,
 };
 use windows::Win32::System::Ole::{VARENUM, VT_VOID};
 
@@ -128,7 +129,7 @@ fn rust_fn_for_com_dispatch_helper(
     context: &'_ mut Context<'_>,
     type_nfo: &ITypeInfo,
     funcdesc: &FUNCDESC,
-    fn_name: BSTR,
+    fn_name: String,
 ) -> Result<String, Error> {
     let mut param_types = vec!["&self".to_string()];
     for i in 0..funcdesc.cParams {
@@ -192,11 +193,18 @@ pub fn print_type_dispatch_as_rust(
 
     //TODO: CALLCONV?
     match funcdesc.funckind {
-        FUNC_DISPATCH if funcdesc.invkind == INVOKE_FUNC => {
+        FUNC_DISPATCH if funcdesc.invkind != INVOKE_PROPERTYPUTREF => {
+            let name = match funcdesc.invkind {
+                INVOKE_FUNC => format!("{}", strname),
+                INVOKE_PROPERTYGET => format!("{}_get", strname),
+                INVOKE_PROPERTYPUT => format!("{}_set", strname),
+                _ => unimplemented!(),
+            };
+
             writeln!(
                 ret,
                 "    {} {{",
-                rust_fn_for_com_dispatch_helper(context, type_nfo, funcdesc, strname)?
+                rust_fn_for_com_dispatch_helper(context, type_nfo, funcdesc, name)?
             )?;
 
             writeln!(ret, "        let mut arg_params = vec![];")?;

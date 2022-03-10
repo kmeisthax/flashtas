@@ -87,18 +87,18 @@ com::interfaces! {
     #[uuid("A6EF9860-C720-11D0-9337-00A0C90DCAA9")]
     pub unsafe interface IDispatchEx: IDispatch {
         pub unsafe fn GetDispID(&self, param0: BSTR, param1: u32, param2: *mut i32) -> HRESULT;
-        pub unsafe fn RemoteInvokeEx(&self, param0: i32, param1: u32, param2: u32, param3: *mut DISPPARAMS, param4: *mut VARIANT, param5: *mut EXCEPINFO, param6: IServiceProvider, param7: u32, param8: *mut u32, param9: *mut VARIANT) -> HRESULT;
+        pub unsafe fn RemoteInvokeEx(&self, param0: i32, param1: u32, param2: u32, param3: *mut DISPPARAMS, param4: *mut VARIANT, param5: *mut EXCEPINFO, param6: Option<IServiceProvider>, param7: u32, param8: *mut u32, param9: *mut VARIANT) -> HRESULT;
         pub unsafe fn DeleteMemberByName(&self, param0: BSTR, param1: u32) -> HRESULT;
         pub unsafe fn DeleteMemberByDispID(&self, param0: i32) -> HRESULT;
         pub unsafe fn GetMemberProperties(&self, param0: i32, param1: u32, param2: *mut u32) -> HRESULT;
         pub unsafe fn GetMemberName(&self, param0: i32, param1: *mut BSTR) -> HRESULT;
         pub unsafe fn GetNextDispID(&self, param0: u32, param1: i32, param2: *mut i32) -> HRESULT;
-        pub unsafe fn GetNameSpaceParent(&self, param0: IUnknown) -> HRESULT;
+        pub unsafe fn GetNameSpaceParent(&self, param0: Option<IUnknown>) -> HRESULT;
     }
 
     #[uuid("6D5140C1-7436-11CE-8034-00AA006009FA")]
     pub unsafe interface IServiceProvider: IUnknown {
-        pub unsafe fn RemoteQueryService(&self, param0: *mut GUID, param1: *mut GUID, param2: IUnknown) -> HRESULT;
+        pub unsafe fn RemoteQueryService(&self, param0: *mut GUID, param1: *mut GUID, param2: Option<IUnknown>) -> HRESULT;
     }
 
     /// IFlashObject Interface
@@ -570,24 +570,780 @@ impl IShockwaveFlash {
         }
     }
 
-    //TODO: IDispatch helper for ReadyState (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for TotalFrames (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for Playing (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for Playing (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for Quality (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for Quality (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for ScaleMode (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for ScaleMode (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for AlignMode (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for AlignMode (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for BackgroundColor (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for BackgroundColor (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for Loop (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for Loop (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for Movie (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for Movie (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for FrameNum (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for FrameNum (invkind INVOKEKIND(4))
+    pub unsafe fn ReadyState_get(&self) -> Result<i32, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xFFFFFDF3,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_I4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.lVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_I4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn TotalFrames_get(&self) -> Result<i32, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x7C,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_I4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.lVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_I4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn Playing_get(&self) -> Result<BOOL, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x7D,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn Playing_set(&self, param0: BOOL) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        boolVal: param0.0 as i16,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x7D,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn Quality_get(&self) -> Result<i32, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x69,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_INT
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.intVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_INT,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn Quality_set(&self, param0: i32) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { intVal: param0 },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x69,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn ScaleMode_get(&self) -> Result<i32, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x78,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_INT
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.intVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_INT,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn ScaleMode_set(&self, param0: i32) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { intVal: param0 },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x78,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn AlignMode_get(&self) -> Result<i32, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x79,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_INT
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.intVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_INT,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn AlignMode_set(&self, param0: i32) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_INT.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { intVal: param0 },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x79,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn BackgroundColor_get(&self) -> Result<i32, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x7B,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_I4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.lVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_I4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn BackgroundColor_set(&self, param0: i32) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x7B,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn Loop_get(&self) -> Result<BOOL, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x6A,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn Loop_set(&self, param0: BOOL) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        boolVal: param0.0 as i16,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x6A,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn Movie_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x66,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn Movie_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x66,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn FrameNum_get(&self) -> Result<i32, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x6B,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_I4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.lVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_I4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn FrameNum_set(&self, param0: i32) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x6B,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
     pub unsafe fn SetZoomRect(
         &self,
         param0: i32,
@@ -1224,24 +1980,789 @@ impl IShockwaveFlash {
         )
     }
 
-    //TODO: IDispatch helper for WMode (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for WMode (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for SAlign (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for SAlign (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for Menu (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for Menu (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for Base (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for Base (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for Scale (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for Scale (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for DeviceFont (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for DeviceFont (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for EmbedMovie (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for EmbedMovie (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for BGColor (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for BGColor (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for Quality2 (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for Quality2 (invkind INVOKEKIND(4))
+    pub unsafe fn WMode_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x85,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn WMode_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x85,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn SAlign_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x86,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn SAlign_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x86,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn Menu_get(&self) -> Result<BOOL, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x87,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn Menu_set(&self, param0: BOOL) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        boolVal: param0.0 as i16,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x87,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn Base_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x88,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn Base_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x88,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn Scale_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x89,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn Scale_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x89,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn DeviceFont_get(&self) -> Result<BOOL, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x8A,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn DeviceFont_set(&self, param0: BOOL) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        boolVal: param0.0 as i16,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x8A,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn EmbedMovie_get(&self) -> Result<BOOL, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x8B,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn EmbedMovie_set(&self, param0: BOOL) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        boolVal: param0.0 as i16,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x8B,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn BGColor_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x8C,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn BGColor_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x8C,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn Quality2_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x8D,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn Quality2_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x8D,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
     pub unsafe fn LoadMovie(&self, param0: i32, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -2137,18 +3658,535 @@ impl IShockwaveFlash {
         )
     }
 
-    //TODO: IDispatch helper for SWRemote (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for SWRemote (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for FlashVars (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for FlashVars (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for AllowScriptAccess (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for AllowScriptAccess (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for MovieData (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for MovieData (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for InlineData (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for InlineData (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for SeamlessTabbing (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for SeamlessTabbing (invkind INVOKEKIND(4))
+    pub unsafe fn SWRemote_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x9F,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn SWRemote_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x9F,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn FlashVars_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xAA,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn FlashVars_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xAA,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn AllowScriptAccess_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xAB,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn AllowScriptAccess_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xAB,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn MovieData_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xBE,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn MovieData_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xBE,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn InlineData_get(&self) -> Result<Option<IUnknown>, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xBF,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_UNKNOWN
+            {
+                let com_ptr: Option<IUnknown> =
+                    ::std::mem::transmute_copy(&disp_result.Anonymous.Anonymous.Anonymous.punkVal);
+
+                if let Some(com_ptr) = com_ptr.as_ref() {
+                    com_ptr.AddRef();
+                }
+
+                com_ptr
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_UNKNOWN,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn InlineData_set(&self, param0: Option<IUnknown>) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_UNKNOWN.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        punkVal: ::std::mem::transmute(param0.map(|m| m.as_raw())),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xBF,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn SeamlessTabbing_get(&self) -> Result<BOOL, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xC0,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn SeamlessTabbing_set(&self, param0: BOOL) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        boolVal: param0.0 as i16,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xC0,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
     pub unsafe fn EnforceLocalSecurity(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -2181,12 +4219,265 @@ impl IShockwaveFlash {
         }
     }
 
-    //TODO: IDispatch helper for Profile (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for Profile (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for ProfileAddress (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for ProfileAddress (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for ProfilePort (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for ProfilePort (invkind INVOKEKIND(4))
+    pub unsafe fn Profile_get(&self) -> Result<BOOL, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xC2,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn Profile_set(&self, param0: BOOL) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        boolVal: param0.0 as i16,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xC2,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn ProfileAddress_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xC3,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn ProfileAddress_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xC3,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn ProfilePort_get(&self) -> Result<i32, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xC4,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_I4
+            {
+                disp_result.Anonymous.Anonymous.Anonymous.lVal
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_I4,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn ProfilePort_set(&self, param0: i32) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_I4.0 as u16,
+                    Anonymous: VARIANT_0_0_0 { lVal: param0 },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xC4,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
     pub unsafe fn CallFunction(&self, param0: BSTR) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -2317,18 +4608,527 @@ impl IShockwaveFlash {
         }
     }
 
-    //TODO: IDispatch helper for AllowNetworking (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for AllowNetworking (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for AllowFullScreen (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for AllowFullScreen (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for AllowFullScreenInteractive (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for AllowFullScreenInteractive (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for IsDependent (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for IsDependent (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for BrowserZoom (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for BrowserZoom (invkind INVOKEKIND(4))
-    //TODO: IDispatch helper for IsTainted (invkind INVOKEKIND(2))
-    //TODO: IDispatch helper for IsTainted (invkind INVOKEKIND(4))
+    pub unsafe fn AllowNetworking_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xC9,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn AllowNetworking_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xC9,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn AllowFullScreen_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xCA,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn AllowFullScreen_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0xCA,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn AllowFullScreenInteractive_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x1F5,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn AllowFullScreenInteractive_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x1F5,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn IsDependent_get(&self) -> Result<BOOL, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x1F6,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn IsDependent_set(&self, param0: BOOL) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        boolVal: param0.0 as i16,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x1F6,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn BrowserZoom_get(&self) -> Result<BSTR, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x1F7,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BSTR
+            {
+                ::std::mem::transmute(&mut (*disp_result.Anonymous.Anonymous).Anonymous.bstrVal)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BSTR,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn BrowserZoom_set(&self, param0: BSTR) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BSTR.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        bstrVal: ManuallyDrop::new(::std::mem::transmute(param0)),
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x1F7,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub unsafe fn IsTainted_get(&self) -> Result<BOOL, HRESULT> {
+        let mut arg_params = vec![];
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let mut disp_result = VARIANT::default();
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x1F8,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            &mut disp_result,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            return Err(invoke_result);
+        }
+        Ok(
+            if VARENUM(disp_result.Anonymous.Anonymous.vt as i32)
+                == ::windows::Win32::System::Ole::VT_BOOL
+            {
+                BOOL(disp_result.Anonymous.Anonymous.Anonymous.boolVal as i32)
+            } else {
+                panic!(
+                    "Expected value of type {:?}, got {}",
+                    ::windows::Win32::System::Ole::VT_BOOL,
+                    disp_result.Anonymous.Anonymous.vt
+                );
+            },
+        )
+    }
+
+    pub unsafe fn IsTainted_set(&self, param0: BOOL) -> Result<(), HRESULT> {
+        let mut arg_params = vec![];
+        arg_params.push(VARIANT {
+            Anonymous: VARIANT_0 {
+                Anonymous: ManuallyDrop::new(VARIANT_0_0 {
+                    vt: ::windows::Win32::System::Ole::VT_BOOL.0 as u16,
+                    Anonymous: VARIANT_0_0_0 {
+                        boolVal: param0.0 as i16,
+                    },
+                    ..Default::default()
+                }),
+            },
+        });
+        let mut disp_params = DISPPARAMS {
+            rgvarg: arg_params.as_mut_ptr(),
+            rgdispidNamedArgs: ::std::ptr::null_mut(),
+            cArgs: arg_params.len() as u32,
+            cNamedArgs: 0,
+        };
+        let invoke_result = IDispatch::Invoke(
+            self,
+            #[allow(overflowing_literals)]
+            0x1F8,
+            &mut GUID {
+                data1: 0,
+                data2: 0,
+                data3: 0,
+                data4: [0; 8],
+            },
+            0,
+            DISPATCH_METHOD as u16,
+            &mut disp_params,
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+            ::std::ptr::null_mut(),
+        );
+        if invoke_result.is_err() {
+            Err(invoke_result)
+        } else {
+            Ok(())
+        }
+    }
 }
 
 impl _IShockwaveFlashEvents {
@@ -3056,7 +5856,7 @@ impl IFlashObject {
         param3: *mut DISPPARAMS,
         param4: *mut VARIANT,
         param5: *mut EXCEPINFO,
-        param6: IServiceProvider,
+        param6: Option<IServiceProvider>,
         param7: u32,
         param8: *mut u32,
         param9: *mut VARIANT,
@@ -3094,7 +5894,7 @@ impl IFlashObject {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_USERDEFINED.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: ::std::mem::transmute(param6.as_raw()),
+                        byref: ::std::mem::transmute(param6.map(|m| m.as_raw())),
                     },
                     ..Default::default()
                 }),
@@ -3461,14 +6261,14 @@ impl IFlashObject {
         }
     }
 
-    pub unsafe fn GetNameSpaceParent(&self, param0: IUnknown) -> Result<(), HRESULT> {
+    pub unsafe fn GetNameSpaceParent(&self, param0: Option<IUnknown>) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
             Anonymous: VARIANT_0 {
                 Anonymous: ManuallyDrop::new(VARIANT_0_0 {
                     vt: ::windows::Win32::System::Ole::VT_UNKNOWN.0 as u16,
                     Anonymous: VARIANT_0_0_0 {
-                        byref: ::std::mem::transmute(param0.as_raw()),
+                        ppunkVal: ::std::mem::transmute(param0.map(|m| m.as_raw())),
                     },
                     ..Default::default()
                 }),
