@@ -24,7 +24,11 @@ mod glue;
 
 #[derive(Parser)]
 struct Args {
+    /// Path to the movie to run.
     movie: String,
+
+    /// Path to the input file to hit.
+    input: String,
 }
 
 fn main() {
@@ -58,7 +62,8 @@ fn main() {
     let height = stage_size.y_max.to_pixels();
     eprintln!("Desired stage dimensions: {}x{}", width, height);
 
-    let mainwnd = display::DisplayWindow::create(movie, width as i32, height as i32).unwrap();
+    let mainwnd =
+        display::DisplayWindow::create(movie, width as i32, height as i32, args.input).unwrap();
     let mut si = STARTUPINFOW {
         cb: size_of::<STARTUPINFOW>() as u32,
         ..Default::default()

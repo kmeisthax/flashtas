@@ -8,23 +8,27 @@ use activex_rs::bindings::ole32::{
 };
 use com::interfaces::IClassFactory;
 use com::runtime::create_instance;
+use flashtas_format::{AutomatedEvent, InputInjector, MouseButton, MouseButtons};
 use lazy_static::lazy_static;
 use std::ffi::c_void;
 use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
+use std::path::Path;
 use std::path::PathBuf;
 use std::process::exit;
 use std::ptr::{null, null_mut};
 use std::sync::{Arc, Mutex};
 use windows::core::Error as WinError;
-use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, PWSTR, RECT, WPARAM};
+use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, POINT, PWSTR, RECT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Ole::OLEIVERB_SHOW;
 use windows::Win32::UI::Input::KeyboardAndMouse::VK_F4;
 use windows::Win32::UI::WindowsAndMessaging::{
-    CreateAcceleratorTableW, CreateWindowExW, GetClientRect, GetWindowRect, RegisterClassW,
-    SetWindowPos, ACCEL, CW_USEDEFAULT, FALT, HACCEL, HMENU, SWP_NOMOVE, SWP_NOZORDER,
-    WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY, WM_SIZE, WNDCLASSW, WS_OVERLAPPEDWINDOW,
+    CreateAcceleratorTableW, CreateWindowExW, DispatchMessageW, GetClientRect, GetWindowRect,
+    RegisterClassW, SetWindowPos, ACCEL, CW_USEDEFAULT, FALT, HACCEL, HMENU, MK_LBUTTON,
+    MK_MBUTTON, MK_RBUTTON, MSG, SWP_NOMOVE, SWP_NOZORDER, WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY,
+    WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_MOUSEMOVE, WM_RBUTTONDOWN,
+    WM_RBUTTONUP, WM_SIZE, WNDCLASSW, WS_OVERLAPPEDWINDOW,
 };
 
 /// A Window that holds an ActiveX/OLE control.
@@ -42,12 +46,26 @@ pub struct DisplayWindowData {
     /// The native window that corresponds to this Flash instance.
     fp_window: HWND,
 
+    /// The movie's desired stage width.
+    stage_width: i32,
+
+    /// The movie's desired stage height.
+    stage_height: i32,
+
+    /// The input injector for this.
+    injector: InputInjector,
+
     /// The current keyboard shortcut ("accelerator") table.
     accel: HACCEL,
 }
 
 impl DisplayWindow {
-    pub fn create(movie: PathBuf, width: i32, height: i32) -> Result<Self, WinError> {
+    pub fn create<P: AsRef<Path>>(
+        movie: PathBuf,
+        width: i32,
+        height: i32,
+        path: P,
+    ) -> Result<Self, WinError> {
         let _ = *DISPLAY_WNDCLASS;
 
         let data = Arc::new(Mutex::new(DisplayWindowData {
@@ -55,6 +73,9 @@ impl DisplayWindow {
             movie,
             fp: None,
             fp_window: HWND(0),
+            stage_width: width,
+            stage_height: height,
+            injector: InputInjector::from_file(path).unwrap(),
             accel: HACCEL(0),
         }));
 
@@ -149,6 +170,79 @@ impl DisplayWindow {
 
         //TODO: Actually get the accel table length
         (me.accel, 1)
+    }
+
+    /// Pump the next frame's worth of synthetic inputs into the player.
+    pub fn pump(&self, msg: &MSG) {
+        let hwnd = self.window();
+
+        let mut client_rect = RECT::default();
+        unsafe { GetClientRect(hwnd, &mut client_rect) }.unwrap();
+
+        let (stage_width, stage_height) = {
+            let me = self.0.lock().unwrap();
+            (me.stage_width, me.stage_height)
+        };
+
+        let stage_aspect_ratio = stage_width as f64 / stage_height as f64;
+        let client_aspect_ratio = client_rect.right as f64 / client_rect.bottom as f64;
+
+        let (offset_x, offset_y, scale) = if client_aspect_ratio > stage_aspect_ratio {
+            let scale = stage_height as f64 / client_rect.bottom as f64;
+            let offset_x = (client_rect.right as f64 - (stage_width as f64 * scale)) / 2.0;
+
+            (offset_x as i16, 0, scale)
+        } else {
+            let scale = stage_width as f64 / client_rect.right as f64;
+            let offset_y = (client_rect.bottom as f64 - (stage_height as f64 * scale)) / 2.0;
+
+            (0, offset_y as i16, scale)
+        };
+
+        self.0.lock().unwrap().injector.next(|evt, buttons| {
+            let mut buttons_wparam = 0;
+            if buttons.contains(MouseButtons::LEFT) {
+                buttons_wparam |= MK_LBUTTON;
+            }
+
+            if buttons.contains(MouseButtons::MIDDLE) {
+                buttons_wparam |= MK_MBUTTON;
+            }
+
+            if buttons.contains(MouseButtons::RIGHT) {
+                buttons_wparam |= MK_RBUTTON;
+            }
+
+            let (pos, message) = match evt {
+                AutomatedEvent::MouseMove { pos } => (pos, WM_MOUSEMOVE),
+                AutomatedEvent::MouseDown { pos, btn } => match btn {
+                    MouseButton::Left => (pos, WM_LBUTTONDOWN),
+                    MouseButton::Middle => (pos, WM_MBUTTONDOWN),
+                    MouseButton::Right => (pos, WM_RBUTTONDOWN),
+                },
+                AutomatedEvent::MouseUp { pos, btn } => match btn {
+                    MouseButton::Left => (pos, WM_LBUTTONUP),
+                    MouseButton::Middle => (pos, WM_MBUTTONUP),
+                    MouseButton::Right => (pos, WM_RBUTTONUP),
+                },
+                AutomatedEvent::Wait => unreachable!(),
+            };
+
+            let client_x = offset_x + (pos.0 as f64 * scale) as i16;
+            let client_y = offset_y + (pos.0 as f64 * scale) as i16;
+            let pos_lparam = (client_x as u16 as u32 | (client_y as u16 as u32) << 16) as isize;
+
+            let msg = MSG {
+                hwnd,
+                message,
+                wParam: WPARAM(buttons_wparam as usize),
+                lParam: LPARAM(pos_lparam),
+                time: 0,              // TODO: timestamping
+                pt: POINT::default(), // TODO: screen coord mapping
+            };
+
+            unsafe { DispatchMessageW(&msg) };
+        });
     }
 }
 
