@@ -4,7 +4,8 @@ use crate::IDispatch;
 use com::interfaces::IUnknown;
 use com::Interface;
 use std::mem::{transmute, transmute_copy, ManuallyDrop};
-use windows::Win32::Foundation::{BOOL, BSTR, CHAR, PSTR};
+use windows::core::HRESULT;
+use windows::Win32::Foundation::{BOOL, BSTR, CHAR, DISP_E_TYPEMISMATCH, PSTR};
 use windows::Win32::System::Com::{CY, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0};
 use windows::Win32::System::Ole::{
     VARENUM, VT_BOOL, VT_BSTR, VT_CY, VT_DISPATCH, VT_I1, VT_I2, VT_I4, VT_I8, VT_INT, VT_R4,
@@ -17,7 +18,7 @@ pub trait DynamicType: Sized {
 
     fn into_variant(self) -> VARIANT;
 
-    fn try_from_variant(param: VARIANT) -> Result<Self, ()>;
+    fn try_from_variant(param: &mut VARIANT) -> Result<Self, HRESULT>;
 }
 
 macro_rules! dynamic_type_wrap {
@@ -113,12 +114,12 @@ macro_rules! dynamic_type_impl {
             }
 
             #[allow(unused_mut)]
-            fn try_from_variant(mut param: VARIANT) -> Result<Self, ()> {
+            fn try_from_variant(mut param: &mut VARIANT) -> Result<Self, HRESULT> {
                 unsafe {
                     if VARENUM(param.Anonymous.Anonymous.vt as i32) == $vt {
                         Ok(dynamic_type_unwrap!($wraptype, param, $varfield, $rs_type))
                     } else {
-                        Err(())
+                        Err(DISP_E_TYPEMISMATCH)
                     }
                 }
             }
