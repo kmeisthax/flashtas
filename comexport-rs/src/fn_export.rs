@@ -3,6 +3,7 @@
 use crate::context::Context;
 use crate::error::Error;
 use crate::{dispatch_bridge, type_bridge};
+use convert_case::{Case, Casing};
 use std::fmt::Write;
 use windows::Win32::Foundation::BSTR;
 use windows::Win32::System::Com::{
@@ -201,6 +202,14 @@ pub fn print_type_dispatch_as_rust(
                 _ => unimplemented!(),
             };
 
+            let const_name = name.to_case(Case::UpperSnake);
+            writeln!(
+                ret,
+                "    pub const {}: u32 = 0x{:X};",
+                const_name, funcdesc.memid
+            )?;
+            writeln!(ret)?;
+
             writeln!(
                 ret,
                 "    {} {{",
@@ -243,8 +252,7 @@ pub fn print_type_dispatch_as_rust(
                     ret,
                     "        let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x{:X},
+            Self::{} as i32,
             &mut GUID {{
                 data1: 0,
                 data2: 0,
@@ -258,7 +266,7 @@ pub fn print_type_dispatch_as_rust(
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut()
         );",
-                    funcdesc.memid, dispatch_type
+                    const_name, dispatch_type
                 )?;
                 writeln!(ret, "        if invoke_result.is_err() {{")?;
                 writeln!(ret, "            return Err(invoke_result);")?;
@@ -278,8 +286,7 @@ pub fn print_type_dispatch_as_rust(
                     ret,
                     "        let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x{:X},
+            Self::{} as i32,
             &mut GUID {{
                 data1: 0,
                 data2: 0,
@@ -293,7 +300,7 @@ pub fn print_type_dispatch_as_rust(
             ::std::ptr::null_mut(),
             ::std::ptr::null_mut()
         );",
-                    funcdesc.memid, dispatch_type
+                    const_name, dispatch_type
                 )?;
                 writeln!(ret, "        if invoke_result.is_err() {{")?;
                 writeln!(ret, "            Err(invoke_result)")?;

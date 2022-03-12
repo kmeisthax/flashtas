@@ -22,15 +22,13 @@ use std::mem::ManuallyDrop;
 use windows::core::HRESULT;
 use windows::Win32::Foundation::BOOL;
 use windows::Win32::System::Com::{
-    DISPPARAMS, EXCEPINFO, SAFEARRAY, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0,
+    DISPPARAMS, EXCEPINFO, VARIANT, VARIANT_0, VARIANT_0_0, VARIANT_0_0_0,
 };
 use windows::Win32::System::Ole::{
     DISPATCH_METHOD, DISPATCH_PROPERTYGET, DISPATCH_PROPERTYPUT, VARENUM,
 };
 
 type BSTR = *const u16;
-type CY = i64;
-type OLE_HANDLE = u32;
 
 /// Shockwave Flash
 ///
@@ -111,6 +109,8 @@ com::interfaces! {
 }
 
 impl IShockwaveFlash {
+    pub const QUERY_INTERFACE: u32 = 0x60000000;
+
     pub unsafe fn QueryInterface(
         &self,
         param0: *mut GUID,
@@ -147,8 +147,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60000000,
+            Self::QUERY_INTERFACE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -169,6 +168,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const ADD_REF: u32 = 0x60000001;
+
     pub unsafe fn AddRef(&self) -> Result<u32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -180,8 +181,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60000001,
+            Self::ADD_REF as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -213,6 +213,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const RELEASE: u32 = 0x60000002;
+
     pub unsafe fn Release(&self) -> Result<u32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -224,8 +226,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60000002,
+            Self::RELEASE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -256,6 +257,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const GET_TYPE_INFO_COUNT: u32 = 0x60010000;
 
     pub unsafe fn GetTypeInfoCount(&self, param0: *mut u32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -276,8 +279,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60010000,
+            Self::GET_TYPE_INFO_COUNT as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -297,6 +299,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const GET_TYPE_INFO: u32 = 0x60010001;
 
     pub unsafe fn GetTypeInfo(
         &self,
@@ -342,8 +346,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60010001,
+            Self::GET_TYPE_INFO as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -363,6 +366,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const GET_I_DS_OF_NAMES: u32 = 0x60010002;
 
     pub unsafe fn GetIDsOfNames(
         &self,
@@ -430,8 +435,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60010002,
+            Self::GET_I_DS_OF_NAMES as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -451,6 +455,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const INVOKE: u32 = 0x60010003;
 
     pub unsafe fn Invoke(
         &self,
@@ -550,8 +556,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60010003,
+            Self::INVOKE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -572,6 +577,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const READY_STATE_GET: u32 = 0xFFFFFDF3;
+
     pub unsafe fn ReadyState_get(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -583,8 +590,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xFFFFFDF3,
+            Self::READY_STATE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -615,6 +621,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const TOTAL_FRAMES_GET: u32 = 0x7C;
 
     pub unsafe fn TotalFrames_get(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
@@ -627,8 +635,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x7C,
+            Self::TOTAL_FRAMES_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -660,6 +667,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const PLAYING_GET: u32 = 0x7D;
+
     pub unsafe fn Playing_get(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -671,8 +680,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x7D,
+            Self::PLAYING_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -703,6 +711,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const PLAYING_SET: u32 = 0x7D;
 
     pub unsafe fn Playing_set(&self, param0: BOOL) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -725,8 +735,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x7D,
+            Self::PLAYING_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -747,6 +756,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const QUALITY_GET: u32 = 0x69;
+
     pub unsafe fn Quality_get(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -758,8 +769,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x69,
+            Self::QUALITY_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -790,6 +800,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const QUALITY_SET: u32 = 0x69;
 
     pub unsafe fn Quality_set(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -810,8 +822,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x69,
+            Self::QUALITY_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -832,6 +843,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const SCALE_MODE_GET: u32 = 0x78;
+
     pub unsafe fn ScaleMode_get(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -843,8 +856,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x78,
+            Self::SCALE_MODE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -875,6 +887,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const SCALE_MODE_SET: u32 = 0x78;
 
     pub unsafe fn ScaleMode_set(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -895,8 +909,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x78,
+            Self::SCALE_MODE_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -917,6 +930,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const ALIGN_MODE_GET: u32 = 0x79;
+
     pub unsafe fn AlignMode_get(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -928,8 +943,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x79,
+            Self::ALIGN_MODE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -961,6 +975,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const ALIGN_MODE_SET: u32 = 0x79;
+
     pub unsafe fn AlignMode_set(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -980,8 +996,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x79,
+            Self::ALIGN_MODE_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1002,6 +1017,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const BACKGROUND_COLOR_GET: u32 = 0x7B;
+
     pub unsafe fn BackgroundColor_get(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1013,8 +1030,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x7B,
+            Self::BACKGROUND_COLOR_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1046,6 +1062,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const BACKGROUND_COLOR_SET: u32 = 0x7B;
+
     pub unsafe fn BackgroundColor_set(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -1065,8 +1083,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x7B,
+            Self::BACKGROUND_COLOR_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1087,6 +1104,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const LOOP_GET: u32 = 0x6A;
+
     pub unsafe fn Loop_get(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1098,8 +1117,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x6A,
+            Self::LOOP_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1131,6 +1149,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const LOOP_SET: u32 = 0x6A;
+
     pub unsafe fn Loop_set(&self, param0: BOOL) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -1152,8 +1172,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x6A,
+            Self::LOOP_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1174,6 +1193,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const MOVIE_GET: u32 = 0x66;
+
     pub unsafe fn Movie_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1185,8 +1206,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x66,
+            Self::MOVIE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1218,6 +1238,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const MOVIE_SET: u32 = 0x66;
+
     pub unsafe fn Movie_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -1239,8 +1261,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x66,
+            Self::MOVIE_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1261,6 +1282,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const FRAME_NUM_GET: u32 = 0x6B;
+
     pub unsafe fn FrameNum_get(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1272,8 +1295,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x6B,
+            Self::FRAME_NUM_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1305,6 +1327,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const FRAME_NUM_SET: u32 = 0x6B;
+
     pub unsafe fn FrameNum_set(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -1324,8 +1348,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x6B,
+            Self::FRAME_NUM_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1345,6 +1368,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const SET_ZOOM_RECT: u32 = 0x6D;
 
     pub unsafe fn SetZoomRect(
         &self,
@@ -1398,8 +1423,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x6D,
+            Self::SET_ZOOM_RECT as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1420,6 +1444,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const ZOOM: u32 = 0x76;
+
     pub unsafe fn Zoom(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -1439,8 +1465,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x76,
+            Self::ZOOM as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1460,6 +1485,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const PAN: u32 = 0x77;
 
     pub unsafe fn Pan(&self, param0: i32, param1: i32, param2: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -1498,8 +1525,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x77,
+            Self::PAN as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1519,6 +1545,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const PLAY: u32 = 0x70;
 
     pub unsafe fn Play(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -1530,8 +1558,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x70,
+            Self::PLAY as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1551,6 +1578,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const STOP: u32 = 0x71;
 
     pub unsafe fn Stop(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -1562,8 +1591,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x71,
+            Self::STOP as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1583,6 +1611,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const BACK: u32 = 0x72;
 
     pub unsafe fn Back(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -1594,8 +1624,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x72,
+            Self::BACK as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1615,6 +1644,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const FORWARD: u32 = 0x73;
 
     pub unsafe fn Forward(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -1626,8 +1657,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x73,
+            Self::FORWARD as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1647,6 +1677,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const REWIND: u32 = 0x74;
 
     pub unsafe fn Rewind(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -1658,8 +1690,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x74,
+            Self::REWIND as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1680,6 +1711,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const STOP_PLAY: u32 = 0x7E;
+
     pub unsafe fn StopPlay(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1690,8 +1723,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x7E,
+            Self::STOP_PLAY as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1711,6 +1743,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const GOTO_FRAME: u32 = 0x7F;
 
     pub unsafe fn GotoFrame(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -1731,8 +1765,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x7F,
+            Self::GOTO_FRAME as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1753,6 +1786,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const CURRENT_FRAME: u32 = 0x80;
+
     pub unsafe fn CurrentFrame(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1764,8 +1799,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x80,
+            Self::CURRENT_FRAME as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1797,6 +1831,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const IS_PLAYING: u32 = 0x81;
+
     pub unsafe fn IsPlaying(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1808,8 +1844,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x81,
+            Self::IS_PLAYING as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1841,6 +1876,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const PERCENT_LOADED: u32 = 0x82;
+
     pub unsafe fn PercentLoaded(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1852,8 +1889,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x82,
+            Self::PERCENT_LOADED as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1884,6 +1920,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const FRAME_LOADED: u32 = 0x83;
 
     pub unsafe fn FrameLoaded(&self, param0: i32) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
@@ -1905,8 +1943,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x83,
+            Self::FRAME_LOADED as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1938,6 +1975,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const FLASH_VERSION: u32 = 0x84;
+
     pub unsafe fn FlashVersion(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1949,8 +1988,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x84,
+            Self::FLASH_VERSION as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -1982,6 +2020,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const W_MODE_GET: u32 = 0x85;
+
     pub unsafe fn WMode_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -1993,8 +2033,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x85,
+            Self::W_MODE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2025,6 +2064,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const W_MODE_SET: u32 = 0x85;
 
     pub unsafe fn WMode_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -2047,8 +2088,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x85,
+            Self::W_MODE_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2069,6 +2109,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const S_ALIGN_GET: u32 = 0x86;
+
     pub unsafe fn SAlign_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -2080,8 +2122,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x86,
+            Self::S_ALIGN_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2112,6 +2153,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const S_ALIGN_SET: u32 = 0x86;
 
     pub unsafe fn SAlign_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -2134,8 +2177,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x86,
+            Self::S_ALIGN_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2156,6 +2198,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const MENU_GET: u32 = 0x87;
+
     pub unsafe fn Menu_get(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -2167,8 +2211,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x87,
+            Self::MENU_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2199,6 +2242,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const MENU_SET: u32 = 0x87;
 
     pub unsafe fn Menu_set(&self, param0: BOOL) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -2221,8 +2266,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x87,
+            Self::MENU_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2243,6 +2287,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const BASE_GET: u32 = 0x88;
+
     pub unsafe fn Base_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -2254,8 +2300,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x88,
+            Self::BASE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2286,6 +2331,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const BASE_SET: u32 = 0x88;
 
     pub unsafe fn Base_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -2308,8 +2355,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x88,
+            Self::BASE_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2330,6 +2376,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const SCALE_GET: u32 = 0x89;
+
     pub unsafe fn Scale_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -2341,8 +2389,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x89,
+            Self::SCALE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2373,6 +2420,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const SCALE_SET: u32 = 0x89;
 
     pub unsafe fn Scale_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -2395,8 +2444,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x89,
+            Self::SCALE_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2417,6 +2465,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const DEVICE_FONT_GET: u32 = 0x8A;
+
     pub unsafe fn DeviceFont_get(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -2428,8 +2478,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x8A,
+            Self::DEVICE_FONT_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2460,6 +2509,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const DEVICE_FONT_SET: u32 = 0x8A;
 
     pub unsafe fn DeviceFont_set(&self, param0: BOOL) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -2482,8 +2533,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x8A,
+            Self::DEVICE_FONT_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2504,6 +2554,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const EMBED_MOVIE_GET: u32 = 0x8B;
+
     pub unsafe fn EmbedMovie_get(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -2515,8 +2567,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x8B,
+            Self::EMBED_MOVIE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2548,6 +2599,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const EMBED_MOVIE_SET: u32 = 0x8B;
+
     pub unsafe fn EmbedMovie_set(&self, param0: BOOL) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -2569,8 +2622,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x8B,
+            Self::EMBED_MOVIE_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2591,6 +2643,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const BG_COLOR_GET: u32 = 0x8C;
+
     pub unsafe fn BGColor_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -2602,8 +2656,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x8C,
+            Self::BG_COLOR_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2634,6 +2687,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const BG_COLOR_SET: u32 = 0x8C;
 
     pub unsafe fn BGColor_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -2656,8 +2711,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x8C,
+            Self::BG_COLOR_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2678,6 +2732,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const QUALITY_2_GET: u32 = 0x8D;
+
     pub unsafe fn Quality2_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -2689,8 +2745,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x8D,
+            Self::QUALITY_2_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2722,6 +2777,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const QUALITY_2_SET: u32 = 0x8D;
+
     pub unsafe fn Quality2_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -2743,8 +2800,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x8D,
+            Self::QUALITY_2_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2764,6 +2820,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const LOAD_MOVIE: u32 = 0x8E;
 
     pub unsafe fn LoadMovie(&self, param0: i32, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -2795,8 +2853,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x8E,
+            Self::LOAD_MOVIE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2816,6 +2873,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const T_GOTO_FRAME: u32 = 0x8F;
 
     pub unsafe fn TGotoFrame(&self, param0: BSTR, param1: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -2847,8 +2906,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x8F,
+            Self::T_GOTO_FRAME as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2868,6 +2926,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const T_GOTO_LABEL: u32 = 0x90;
 
     pub unsafe fn TGotoLabel(&self, param0: BSTR, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -2901,8 +2961,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x90,
+            Self::T_GOTO_LABEL as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2922,6 +2981,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const T_CURRENT_FRAME: u32 = 0x91;
 
     pub unsafe fn TCurrentFrame(&self, param0: BSTR) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
@@ -2945,8 +3006,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x91,
+            Self::T_CURRENT_FRAME as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -2978,6 +3038,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const T_CURRENT_LABEL: u32 = 0x92;
+
     pub unsafe fn TCurrentLabel(&self, param0: BSTR) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -3000,8 +3062,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x92,
+            Self::T_CURRENT_LABEL as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3033,6 +3094,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const T_PLAY: u32 = 0x93;
+
     pub unsafe fn TPlay(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -3054,8 +3117,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x93,
+            Self::T_PLAY as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3075,6 +3137,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const T_STOP_PLAY: u32 = 0x94;
 
     pub unsafe fn TStopPlay(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -3097,8 +3161,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x94,
+            Self::T_STOP_PLAY as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3118,6 +3181,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const SET_VARIABLE: u32 = 0x97;
 
     pub unsafe fn SetVariable(&self, param0: BSTR, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -3151,8 +3216,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x97,
+            Self::SET_VARIABLE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3172,6 +3236,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const GET_VARIABLE: u32 = 0x98;
 
     pub unsafe fn GetVariable(&self, param0: BSTR) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
@@ -3195,8 +3261,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x98,
+            Self::GET_VARIABLE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3227,6 +3292,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const T_SET_PROPERTY: u32 = 0x99;
 
     pub unsafe fn TSetProperty(
         &self,
@@ -3274,8 +3341,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x99,
+            Self::T_SET_PROPERTY as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3295,6 +3361,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const T_GET_PROPERTY: u32 = 0x9A;
 
     pub unsafe fn TGetProperty(&self, param0: BSTR, param1: i32) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
@@ -3327,8 +3395,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x9A,
+            Self::T_GET_PROPERTY as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3360,6 +3427,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const T_CALL_FRAME: u32 = 0x9B;
+
     pub unsafe fn TCallFrame(&self, param0: BSTR, param1: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -3390,8 +3459,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x9B,
+            Self::T_CALL_FRAME as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3411,6 +3479,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const T_CALL_LABEL: u32 = 0x9C;
 
     pub unsafe fn TCallLabel(&self, param0: BSTR, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -3444,8 +3514,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x9C,
+            Self::T_CALL_LABEL as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3465,6 +3534,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const T_SET_PROPERTY_NUM: u32 = 0x9D;
 
     pub unsafe fn TSetPropertyNum(
         &self,
@@ -3510,8 +3581,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x9D,
+            Self::T_SET_PROPERTY_NUM as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3531,6 +3601,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const T_GET_PROPERTY_NUM: u32 = 0x9E;
 
     pub unsafe fn TGetPropertyNum(&self, param0: BSTR, param1: i32) -> Result<f64, HRESULT> {
         let mut arg_params = vec![];
@@ -3563,8 +3635,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x9E,
+            Self::T_GET_PROPERTY_NUM as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3595,6 +3666,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const T_GET_PROPERTY_AS_NUMBER: u32 = 0xAC;
 
     pub unsafe fn TGetPropertyAsNumber(&self, param0: BSTR, param1: i32) -> Result<f64, HRESULT> {
         let mut arg_params = vec![];
@@ -3627,8 +3700,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xAC,
+            Self::T_GET_PROPERTY_AS_NUMBER as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3660,6 +3732,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const SW_REMOTE_GET: u32 = 0x9F;
+
     pub unsafe fn SWRemote_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -3671,8 +3745,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x9F,
+            Self::SW_REMOTE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3703,6 +3776,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const SW_REMOTE_SET: u32 = 0x9F;
 
     pub unsafe fn SWRemote_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -3725,8 +3800,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x9F,
+            Self::SW_REMOTE_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3747,6 +3821,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const FLASH_VARS_GET: u32 = 0xAA;
+
     pub unsafe fn FlashVars_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -3758,8 +3834,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xAA,
+            Self::FLASH_VARS_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3790,6 +3865,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const FLASH_VARS_SET: u32 = 0xAA;
 
     pub unsafe fn FlashVars_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -3812,8 +3889,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xAA,
+            Self::FLASH_VARS_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3834,6 +3910,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const ALLOW_SCRIPT_ACCESS_GET: u32 = 0xAB;
+
     pub unsafe fn AllowScriptAccess_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -3845,8 +3923,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xAB,
+            Self::ALLOW_SCRIPT_ACCESS_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3877,6 +3954,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const ALLOW_SCRIPT_ACCESS_SET: u32 = 0xAB;
 
     pub unsafe fn AllowScriptAccess_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -3899,8 +3978,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xAB,
+            Self::ALLOW_SCRIPT_ACCESS_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3921,6 +3999,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const MOVIE_DATA_GET: u32 = 0xBE;
+
     pub unsafe fn MovieData_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -3932,8 +4012,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xBE,
+            Self::MOVIE_DATA_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -3965,6 +4044,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const MOVIE_DATA_SET: u32 = 0xBE;
+
     pub unsafe fn MovieData_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -3986,8 +4067,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xBE,
+            Self::MOVIE_DATA_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4008,6 +4088,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const INLINE_DATA_GET: u32 = 0xBF;
+
     pub unsafe fn InlineData_get(&self) -> Result<Option<IUnknown>, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4019,8 +4101,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xBF,
+            Self::INLINE_DATA_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4059,6 +4140,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const INLINE_DATA_SET: u32 = 0xBF;
+
     pub unsafe fn InlineData_set(&self, param0: Option<IUnknown>) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -4080,8 +4163,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xBF,
+            Self::INLINE_DATA_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4102,6 +4184,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const SEAMLESS_TABBING_GET: u32 = 0xC0;
+
     pub unsafe fn SeamlessTabbing_get(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4113,8 +4197,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC0,
+            Self::SEAMLESS_TABBING_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4145,6 +4228,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const SEAMLESS_TABBING_SET: u32 = 0xC0;
 
     pub unsafe fn SeamlessTabbing_set(&self, param0: BOOL) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -4167,8 +4252,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC0,
+            Self::SEAMLESS_TABBING_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4189,6 +4273,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const ENFORCE_LOCAL_SECURITY: u32 = 0xC1;
+
     pub unsafe fn EnforceLocalSecurity(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4199,8 +4285,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC1,
+            Self::ENFORCE_LOCAL_SECURITY as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4221,6 +4306,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const PROFILE_GET: u32 = 0xC2;
+
     pub unsafe fn Profile_get(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4232,8 +4319,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC2,
+            Self::PROFILE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4265,6 +4351,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const PROFILE_SET: u32 = 0xC2;
+
     pub unsafe fn Profile_set(&self, param0: BOOL) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -4286,8 +4374,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC2,
+            Self::PROFILE_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4308,6 +4395,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const PROFILE_ADDRESS_GET: u32 = 0xC3;
+
     pub unsafe fn ProfileAddress_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4319,8 +4408,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC3,
+            Self::PROFILE_ADDRESS_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4352,6 +4440,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const PROFILE_ADDRESS_SET: u32 = 0xC3;
+
     pub unsafe fn ProfileAddress_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -4373,8 +4463,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC3,
+            Self::PROFILE_ADDRESS_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4395,6 +4484,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const PROFILE_PORT_GET: u32 = 0xC4;
+
     pub unsafe fn ProfilePort_get(&self) -> Result<i32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4406,8 +4497,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC4,
+            Self::PROFILE_PORT_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4439,6 +4529,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const PROFILE_PORT_SET: u32 = 0xC4;
+
     pub unsafe fn ProfilePort_set(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -4458,8 +4550,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC4,
+            Self::PROFILE_PORT_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4479,6 +4570,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const CALL_FUNCTION: u32 = 0xC6;
 
     pub unsafe fn CallFunction(&self, param0: BSTR) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
@@ -4502,8 +4595,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC6,
+            Self::CALL_FUNCTION as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4534,6 +4626,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const SET_RETURN_VALUE: u32 = 0xC7;
 
     pub unsafe fn SetReturnValue(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -4556,8 +4650,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC7,
+            Self::SET_RETURN_VALUE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4578,6 +4671,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const DISABLE_LOCAL_SECURITY: u32 = 0xC8;
+
     pub unsafe fn DisableLocalSecurity(&self) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4588,8 +4683,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC8,
+            Self::DISABLE_LOCAL_SECURITY as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4609,6 +4703,8 @@ impl IShockwaveFlash {
             Ok(())
         }
     }
+
+    pub const ALLOW_NETWORKING_GET: u32 = 0xC9;
 
     pub unsafe fn AllowNetworking_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
@@ -4621,8 +4717,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC9,
+            Self::ALLOW_NETWORKING_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4653,6 +4748,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const ALLOW_NETWORKING_SET: u32 = 0xC9;
 
     pub unsafe fn AllowNetworking_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -4675,8 +4772,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC9,
+            Self::ALLOW_NETWORKING_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4697,6 +4793,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const ALLOW_FULL_SCREEN_GET: u32 = 0xCA;
+
     pub unsafe fn AllowFullScreen_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4708,8 +4806,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xCA,
+            Self::ALLOW_FULL_SCREEN_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4740,6 +4837,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const ALLOW_FULL_SCREEN_SET: u32 = 0xCA;
 
     pub unsafe fn AllowFullScreen_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -4762,8 +4861,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xCA,
+            Self::ALLOW_FULL_SCREEN_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4784,6 +4882,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const ALLOW_FULL_SCREEN_INTERACTIVE_GET: u32 = 0x1F5;
+
     pub unsafe fn AllowFullScreenInteractive_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4795,8 +4895,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x1F5,
+            Self::ALLOW_FULL_SCREEN_INTERACTIVE_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4827,6 +4926,8 @@ impl IShockwaveFlash {
             },
         )
     }
+
+    pub const ALLOW_FULL_SCREEN_INTERACTIVE_SET: u32 = 0x1F5;
 
     pub unsafe fn AllowFullScreenInteractive_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -4849,8 +4950,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x1F5,
+            Self::ALLOW_FULL_SCREEN_INTERACTIVE_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4871,6 +4971,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const IS_DEPENDENT_GET: u32 = 0x1F6;
+
     pub unsafe fn IsDependent_get(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4882,8 +4984,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x1F6,
+            Self::IS_DEPENDENT_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4915,6 +5016,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const IS_DEPENDENT_SET: u32 = 0x1F6;
+
     pub unsafe fn IsDependent_set(&self, param0: BOOL) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -4936,8 +5039,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x1F6,
+            Self::IS_DEPENDENT_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -4958,6 +5060,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const BROWSER_ZOOM_GET: u32 = 0x1F7;
+
     pub unsafe fn BrowserZoom_get(&self) -> Result<BSTR, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -4969,8 +5073,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x1F7,
+            Self::BROWSER_ZOOM_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5002,6 +5105,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const BROWSER_ZOOM_SET: u32 = 0x1F7;
+
     pub unsafe fn BrowserZoom_set(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -5023,8 +5128,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x1F7,
+            Self::BROWSER_ZOOM_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5045,6 +5149,8 @@ impl IShockwaveFlash {
         }
     }
 
+    pub const IS_TAINTED_GET: u32 = 0x1F8;
+
     pub unsafe fn IsTainted_get(&self) -> Result<BOOL, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -5056,8 +5162,7 @@ impl IShockwaveFlash {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x1F8,
+            Self::IS_TAINTED_GET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5089,6 +5194,8 @@ impl IShockwaveFlash {
         )
     }
 
+    pub const IS_TAINTED_SET: u32 = 0x1F8;
+
     pub unsafe fn IsTainted_set(&self, param0: BOOL) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -5110,8 +5217,7 @@ impl IShockwaveFlash {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x1F8,
+            Self::IS_TAINTED_SET as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5134,6 +5240,8 @@ impl IShockwaveFlash {
 }
 
 impl _IShockwaveFlashEvents {
+    pub const ON_READY_STATE_CHANGE: u32 = 0xFFFFFD9F;
+
     pub unsafe fn OnReadyStateChange(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -5153,8 +5261,7 @@ impl _IShockwaveFlashEvents {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xFFFFFD9F,
+            Self::ON_READY_STATE_CHANGE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5175,6 +5282,8 @@ impl _IShockwaveFlashEvents {
         }
     }
 
+    pub const ON_PROGRESS: u32 = 0x7A6;
+
     pub unsafe fn OnProgress(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -5194,8 +5303,7 @@ impl _IShockwaveFlashEvents {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x7A6,
+            Self::ON_PROGRESS as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5215,6 +5323,8 @@ impl _IShockwaveFlashEvents {
             Ok(())
         }
     }
+
+    pub const FS_COMMAND: u32 = 0x96;
 
     pub unsafe fn FSCommand(&self, param0: BSTR, param1: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -5248,8 +5358,7 @@ impl _IShockwaveFlashEvents {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x96,
+            Self::FS_COMMAND as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5269,6 +5378,8 @@ impl _IShockwaveFlashEvents {
             Ok(())
         }
     }
+
+    pub const FLASH_CALL: u32 = 0xC5;
 
     pub unsafe fn FlashCall(&self, param0: BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -5291,8 +5402,7 @@ impl _IShockwaveFlashEvents {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0xC5,
+            Self::FLASH_CALL as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5323,6 +5433,8 @@ impl IDispatchEx {}
 impl IServiceProvider {}
 
 impl IFlashObject {
+    pub const QUERY_INTERFACE: u32 = 0x60000000;
+
     pub unsafe fn QueryInterface(
         &self,
         param0: *mut GUID,
@@ -5359,8 +5471,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60000000,
+            Self::QUERY_INTERFACE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5381,6 +5492,8 @@ impl IFlashObject {
         }
     }
 
+    pub const ADD_REF: u32 = 0x60000001;
+
     pub unsafe fn AddRef(&self) -> Result<u32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -5392,8 +5505,7 @@ impl IFlashObject {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60000001,
+            Self::ADD_REF as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5425,6 +5537,8 @@ impl IFlashObject {
         )
     }
 
+    pub const RELEASE: u32 = 0x60000002;
+
     pub unsafe fn Release(&self) -> Result<u32, HRESULT> {
         let mut arg_params = vec![];
         let mut disp_params = DISPPARAMS {
@@ -5436,8 +5550,7 @@ impl IFlashObject {
         let mut disp_result = VARIANT::default();
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60000002,
+            Self::RELEASE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5468,6 +5581,8 @@ impl IFlashObject {
             },
         )
     }
+
+    pub const GET_TYPE_INFO_COUNT: u32 = 0x60010000;
 
     pub unsafe fn GetTypeInfoCount(&self, param0: *mut u32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -5488,8 +5603,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60010000,
+            Self::GET_TYPE_INFO_COUNT as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5509,6 +5623,8 @@ impl IFlashObject {
             Ok(())
         }
     }
+
+    pub const GET_TYPE_INFO: u32 = 0x60010001;
 
     pub unsafe fn GetTypeInfo(
         &self,
@@ -5554,8 +5670,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60010001,
+            Self::GET_TYPE_INFO as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5575,6 +5690,8 @@ impl IFlashObject {
             Ok(())
         }
     }
+
+    pub const GET_I_DS_OF_NAMES: u32 = 0x60010002;
 
     pub unsafe fn GetIDsOfNames(
         &self,
@@ -5642,8 +5759,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60010002,
+            Self::GET_I_DS_OF_NAMES as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5663,6 +5779,8 @@ impl IFlashObject {
             Ok(())
         }
     }
+
+    pub const INVOKE: u32 = 0x60010003;
 
     pub unsafe fn Invoke(
         &self,
@@ -5762,8 +5880,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60010003,
+            Self::INVOKE as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5783,6 +5900,8 @@ impl IFlashObject {
             Ok(())
         }
     }
+
+    pub const GET_DISP_ID: u32 = 0x60020000;
 
     pub unsafe fn GetDispID(
         &self,
@@ -5828,8 +5947,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60020000,
+            Self::GET_DISP_ID as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5849,6 +5967,8 @@ impl IFlashObject {
             Ok(())
         }
     }
+
+    pub const REMOTE_INVOKE_EX: u32 = 0x60020001;
 
     pub unsafe fn RemoteInvokeEx(
         &self,
@@ -5968,8 +6088,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60020001,
+            Self::REMOTE_INVOKE_EX as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -5989,6 +6108,8 @@ impl IFlashObject {
             Ok(())
         }
     }
+
+    pub const DELETE_MEMBER_BY_NAME: u32 = 0x60020002;
 
     pub unsafe fn DeleteMemberByName(&self, param0: BSTR, param1: u32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -6020,8 +6141,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60020002,
+            Self::DELETE_MEMBER_BY_NAME as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -6042,6 +6162,8 @@ impl IFlashObject {
         }
     }
 
+    pub const DELETE_MEMBER_BY_DISP_ID: u32 = 0x60020003;
+
     pub unsafe fn DeleteMemberByDispID(&self, param0: i32) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
         arg_params.push(VARIANT {
@@ -6061,8 +6183,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60020003,
+            Self::DELETE_MEMBER_BY_DISP_ID as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -6082,6 +6203,8 @@ impl IFlashObject {
             Ok(())
         }
     }
+
+    pub const GET_MEMBER_PROPERTIES: u32 = 0x60020004;
 
     pub unsafe fn GetMemberProperties(
         &self,
@@ -6125,8 +6248,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60020004,
+            Self::GET_MEMBER_PROPERTIES as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -6146,6 +6268,8 @@ impl IFlashObject {
             Ok(())
         }
     }
+
+    pub const GET_MEMBER_NAME: u32 = 0x60020005;
 
     pub unsafe fn GetMemberName(&self, param0: i32, param1: *mut BSTR) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -6177,8 +6301,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60020005,
+            Self::GET_MEMBER_NAME as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -6198,6 +6321,8 @@ impl IFlashObject {
             Ok(())
         }
     }
+
+    pub const GET_NEXT_DISP_ID: u32 = 0x60020006;
 
     pub unsafe fn GetNextDispID(
         &self,
@@ -6241,8 +6366,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60020006,
+            Self::GET_NEXT_DISP_ID as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
@@ -6262,6 +6386,8 @@ impl IFlashObject {
             Ok(())
         }
     }
+
+    pub const GET_NAME_SPACE_PARENT: u32 = 0x60020007;
 
     pub unsafe fn GetNameSpaceParent(&self, param0: Option<IUnknown>) -> Result<(), HRESULT> {
         let mut arg_params = vec![];
@@ -6284,8 +6410,7 @@ impl IFlashObject {
         };
         let invoke_result = IDispatch::Invoke(
             self,
-            #[allow(overflowing_literals)]
-            0x60020007,
+            Self::GET_NAME_SPACE_PARENT as i32,
             &mut GUID {
                 data1: 0,
                 data2: 0,
