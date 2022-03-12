@@ -1,0 +1,14 @@
+Mouse down on frame 1
+Mouse up on frame 2
+Mouse down on frame 3
+Mouse up on frame 4
+Mouse down on frame 5
+Mouse up on frame 6
+Mouse down on frame 7
+Mouse up on frame 8
+Mouse down on frame 9
+Mouse up on frame 10
+Mouse down on frame 11
+Mouse up on frame 12
+Mouse down on frame 13
+Mouse up on frame 14
