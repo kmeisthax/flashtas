@@ -2,9 +2,12 @@
 
 use crate::tas_client::{ITASClientSite, TASClientSite__CF};
 use crate::window_class::Window;
-use activex_rs::bindings::flash::{IShockwaveFlash, SHOCKWAVE_FLASH_CLSID};
+use activex_rs::bindings::flash::{
+    IShockwaveFlash, IID___ISHOCKWAVE_FLASH_EVENTS, SHOCKWAVE_FLASH_CLSID,
+};
 use activex_rs::bindings::ole32::{
-    IAdviseSink, IOleClientSite, IOleInPlaceActiveObject, IOleInPlaceObject, IOleObject,
+    IAdviseSink, IConnectionPointContainer, IOleClientSite, IOleInPlaceActiveObject,
+    IOleInPlaceObject, IOleObject,
 };
 use com::interfaces::IClassFactory;
 use com::runtime::create_instance;
@@ -12,6 +15,7 @@ use flashtas_format::{AutomatedEvent, InputInjector, MouseButton, MouseButtons};
 use lazy_static::lazy_static;
 use std::ffi::c_void;
 use std::ffi::OsStr;
+use std::mem::MaybeUninit;
 use std::os::windows::ffi::OsStrExt;
 use std::path::Path;
 use std::path::PathBuf;
@@ -295,7 +299,20 @@ impl Window for DisplayWindow {
                 let movie = self.0.lock().unwrap().movie.clone();
                 eprintln!("Loading SWF: {:?}", movie.as_os_str());
 
+                let fp_conn = fp.query_interface::<IConnectionPointContainer>().unwrap();
+
                 unsafe {
+                    let mut fp_conn_pt = MaybeUninit::uninit();
+
+                    fp_conn
+                        .FindConnectionPoint(IID___ISHOCKWAVE_FLASH_EVENTS, fp_conn_pt.as_mut_ptr())
+                        .unwrap();
+
+                    //TODO: How do you check for nullptr in MaybeUninit without UB?
+                    let fp_conn_pt = fp_conn_pt.assume_init();
+                    let mut cookie = 0;
+                    fp_conn_pt.Advise(client_site.clone(), &mut cookie).unwrap();
+
                     fp_ole.SetClientSite(client_site.clone()).unwrap();
                     fp_ole.Advise(advise_sink, null_mut()).unwrap();
                     fp_ole

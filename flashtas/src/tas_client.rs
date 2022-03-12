@@ -1,20 +1,26 @@
 use crate::display::DisplayWindow;
 use crate::unsafe_write_com;
 use crate::window_class::Window;
+use activex_rs::bindings::flash::_IShockwaveFlashEvents;
 use activex_rs::bindings::ole32::{
     IAdviseSink, IOleClientSite, IOleControlSite, IOleInPlaceActiveObject, IOleInPlaceFrame,
     IOleInPlaceSite, IOleInPlaceUIWindow, IOleWindow, BSTR, CY, OLEINPLACEFRAMEINFO,
 };
 use activex_rs::bindings::stdole::{IDispatch, IMoniker, IOleContainer};
+use activex_rs::{DispatchParams, DynamicType};
 use com::interfaces::IUnknown;
 use com::production::ClassAllocation;
+use com::sys::GUID;
 use lazy_static::lazy_static;
+use std::ffi::c_void;
 use std::mem::size_of;
 use std::sync::{Arc, Mutex};
 use windows::core::HRESULT;
 use windows::Win32::Foundation::{HWND, RECT, S_OK};
-use windows::Win32::System::Com::{CreateItemMoniker, FORMATETC, STGMEDIUM};
-use windows::Win32::System::Ole::OleMenuGroupWidths;
+use windows::Win32::System::Com::{
+    CreateItemMoniker, DISPPARAMS, EXCEPINFO, FORMATETC, STGMEDIUM, VARIANT,
+};
+use windows::Win32::System::Ole::{OleMenuGroupWidths, DISPATCH_METHOD};
 use windows::Win32::UI::WindowsAndMessaging::{GetClientRect, MSG};
 
 com::interfaces! {
@@ -30,7 +36,7 @@ com::interfaces! {
 
 com::class! {
     /// OLE client site for FlashTAS client controls
-    pub class TASClientSite: ITASClientSite, IOleClientSite, IAdviseSink, IOleControlSite, IOleInPlaceFrame(IOleInPlaceUIWindow(IOleWindow)), IOleInPlaceSite(IOleWindow) {
+    pub class TASClientSite: ITASClientSite, IOleClientSite, IAdviseSink, IOleControlSite, IOleInPlaceFrame(IOleInPlaceUIWindow(IOleWindow)), IOleInPlaceSite(IOleWindow), _IShockwaveFlashEvents(IDispatch) {
         associated_display: Arc<Mutex<Option<DisplayWindow>>>
     }
 
@@ -271,6 +277,44 @@ com::class! {
         pub unsafe fn TranslateAccelerator(&self, param0: *mut MSG, param1: u16) -> HRESULT {
             unimplemented!();
         }
+    }
+
+    impl IDispatch for TASClientSite {
+        pub unsafe fn GetTypeInfoCount(&self, param0: *mut usize) -> HRESULT {
+            unimplemented!();
+        }
+
+        pub unsafe fn GetTypeInfo(&self, param0: usize, param1: u32, param2: *mut *mut c_void) -> HRESULT {
+            unimplemented!();
+        }
+
+        pub unsafe fn GetIDsOfNames(&self, param0: *mut GUID, param1: *mut *mut i8, param2: usize, param3: u32, param4: *mut i32) -> HRESULT {
+            unimplemented!();
+        }
+
+        #[allow(clippy::too_many_arguments)]
+        pub unsafe fn Invoke(&self, dispid: i32, riid: *mut GUID, lcid: u32, wflags: u16, params: *mut DISPPARAMS, result: *mut VARIANT, param6: *mut EXCEPINFO, param7: *mut usize) -> HRESULT {
+            match (|| {
+                match (dispid as u32, wflags as u32) {
+                    (_IShockwaveFlashEvents::ON_READY_STATE_CHANGE, DISPATCH_METHOD) => {
+                        let params = &*params;
+                        let ready_state : i32 = params.get_param(0)?;
+
+                        eprintln!("Ready state: {}", ready_state);
+
+                        Ok(S_OK)
+                    },
+                    (_, _) => panic!("Unknown method {} (dispkind {})", dispid, wflags)
+                }
+            })() {
+                Ok(r) => r,
+                Err(e) => e
+            }
+        }
+    }
+
+    impl _IShockwaveFlashEvents for TASClientSite {
+
     }
 }
 

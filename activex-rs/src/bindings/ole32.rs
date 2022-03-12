@@ -349,6 +349,35 @@ com::interfaces! {
         //NOTE: Non-extractable type.
         //TODO: Add VTBL methods.
     }
+
+    #[uuid("b196b286-bab4-101a-b69c-00aa00341d07")]
+    pub unsafe interface IConnectionPoint: IUnknown {
+        //NOTE: Non-extractable type.
+        pub unsafe fn GetConnectionInterface(&self, param0: *mut GUID) -> HRESULT;
+        pub unsafe fn GetConnectionPointContainer(&self, param0: *mut IConnectionPointContainer) -> HRESULT;
+        pub unsafe fn Advise(&self, param0: IUnknown, param1: *mut u32) -> HRESULT;
+        pub unsafe fn Unadvise(&self, param0: u32) -> HRESULT;
+        pub unsafe fn EnumConnections(&self, param0: *mut IEnumConnections) -> HRESULT;
+    }
+
+    #[uuid("b196b284-bab4-101a-b69c-00aa00341d07")]
+    pub unsafe interface IConnectionPointContainer: IUnknown {
+        //NOTE: Non-extractable type.
+        pub unsafe fn EnumConnectionPoints(&self, param0: *mut IEnumConnectionPoints) -> HRESULT;
+        pub unsafe fn FindConnectionPoint(&self, param0: GUID, param1: *mut IConnectionPoint) -> HRESULT;
+    }
+
+    #[uuid("b196b285-bab4-101a-b69c-00aa00341d07")]
+    pub unsafe interface IEnumConnectionPoints: IUnknown {
+        //NOTE: Non-extractable type.
+        //TODO: Add VTBL methods.
+    }
+
+    #[uuid("b196b287-bab4-101a-b69c-00aa00341d07")]
+    pub unsafe interface IEnumConnections: IUnknown {
+        //NOTE: Non-extractable type.
+        //TODO: Add VTBL methods.
+    }
 }
 
 impl IOleWindow {}
