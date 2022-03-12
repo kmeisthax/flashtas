@@ -1,13 +1,14 @@
 //! WNDCLASS for our display window.
 
 use crate::tas_client::{ITASClientSite, TASClientSite__CF};
+use crate::timer::Timer;
 use crate::window_class::Window;
 use activex_rs::bindings::flash::{
     IShockwaveFlash, IID___ISHOCKWAVE_FLASH_EVENTS, SHOCKWAVE_FLASH_CLSID,
 };
 use activex_rs::bindings::ole32::{
     IAdviseSink, IConnectionPointContainer, IOleClientSite, IOleInPlaceActiveObject,
-    IOleInPlaceObject, IOleObject,
+    IOleInPlaceObject, IOleObject, IOleWindow,
 };
 use com::interfaces::IClassFactory;
 use com::runtime::create_instance;
@@ -23,7 +24,7 @@ use std::process::exit;
 use std::ptr::{null, null_mut};
 use std::sync::{Arc, Mutex};
 use windows::core::Error as WinError;
-use windows::Win32::Foundation::{BOOL, HWND, LPARAM, LRESULT, POINT, PWSTR, RECT, WPARAM};
+use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, POINT, PWSTR, RECT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Ole::OLEIVERB_SHOW;
 use windows::Win32::UI::Input::KeyboardAndMouse::VK_F4;
@@ -32,8 +33,10 @@ use windows::Win32::UI::WindowsAndMessaging::{
     RegisterClassW, SetWindowPos, ACCEL, CW_USEDEFAULT, FALT, HACCEL, HMENU, MK_LBUTTON,
     MK_MBUTTON, MK_RBUTTON, MSG, SWP_NOMOVE, SWP_NOZORDER, WINDOW_EX_STYLE, WM_CREATE, WM_DESTROY,
     WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_MOUSEMOVE, WM_RBUTTONDOWN,
-    WM_RBUTTONUP, WM_SIZE, WNDCLASSW, WS_OVERLAPPEDWINDOW,
+    WM_RBUTTONUP, WM_SIZE, WM_USER, WNDCLASSW, WS_OVERLAPPEDWINDOW,
 };
+
+pub const DW_TIMER_ELAPSED: u32 = WM_USER;
 
 /// A Window that holds an ActiveX/OLE control.
 #[derive(Clone)]
@@ -61,6 +64,9 @@ pub struct DisplayWindowData {
 
     /// The current keyboard shortcut ("accelerator") table.
     accel: HACCEL,
+
+    /// A timer object.
+    timer: Timer,
 }
 
 impl DisplayWindow {
@@ -68,6 +74,7 @@ impl DisplayWindow {
         movie: PathBuf,
         width: i32,
         height: i32,
+        frame_rate: f64,
         path: P,
     ) -> Result<Self, WinError> {
         let _ = *DISPLAY_WNDCLASS;
@@ -81,6 +88,7 @@ impl DisplayWindow {
             stage_height: height,
             injector: InputInjector::from_file(path).unwrap(),
             accel: HACCEL(0),
+            timer: Timer::new(frame_rate),
         }));
 
         // The HWND itself owns an `Arc<Mutex<Self>>` through the C pointer,
@@ -176,9 +184,36 @@ impl DisplayWindow {
         (me.accel, 1)
     }
 
+    /// Start the synthetic event pump.
+    pub fn start_pump(&self) {
+        let window = self.window();
+
+        // At this point we absolutely should have a Flash Player window, even
+        // if Flash Player hasn't told us about it yet.
+        let fp = self.0.lock().unwrap().fp.clone().unwrap();
+        let fp_ole = fp.query_interface::<IOleWindow>().unwrap();
+        let mut fp_window = 0;
+
+        unsafe { fp_ole.GetWindow(&mut fp_window).unwrap() };
+
+        self.0.lock().unwrap().fp_window = HWND(fp_window);
+
+        unsafe {
+            self.0
+                .lock()
+                .unwrap()
+                .timer
+                .set_message(window, DW_TIMER_ELAPSED);
+        }
+    }
+
     /// Pump the next frame's worth of synthetic inputs into the player.
-    pub fn pump(&self, msg: &MSG) {
-        let hwnd = self.window();
+    pub fn pump(&self) {
+        let hwnd = self.active_object_window();
+        if hwnd.is_invalid() {
+            eprintln!("Active object window not valid yet");
+            return;
+        }
 
         let mut client_rect = RECT::default();
         unsafe { GetClientRect(hwnd, &mut client_rect) }.unwrap();
@@ -202,6 +237,13 @@ impl DisplayWindow {
 
             (0, offset_y as i16, scale)
         };
+
+        let mut window_rect = RECT::default();
+        unsafe { GetWindowRect(hwnd, &mut window_rect) }.unwrap();
+
+        // We cannot send messages to Flash Player while it's parent window is
+        // locked by Rust.
+        let mut events = vec![];
 
         self.0.lock().unwrap().injector.next(|evt, buttons| {
             let mut buttons_wparam = 0;
@@ -236,17 +278,26 @@ impl DisplayWindow {
             let client_y = offset_y + (pos.0 as f64 * scale) as i16;
             let pos_lparam = (client_x as u16 as u32 | (client_y as u16 as u32) << 16) as isize;
 
-            let msg = MSG {
+            //TODO: This assumes the child window has no non-client area.
+            //Is that always true?
+            let pt = POINT {
+                x: window_rect.left + client_x as i32,
+                y: window_rect.top + client_y as i32,
+            };
+
+            events.push(MSG {
                 hwnd,
                 message,
                 wParam: WPARAM(buttons_wparam as usize),
                 lParam: LPARAM(pos_lparam),
-                time: 0,              // TODO: timestamping
-                pt: POINT::default(), // TODO: screen coord mapping
-            };
-
-            unsafe { DispatchMessageW(&msg) };
+                time: 0, // TODO: timestamping
+                pt,
+            });
         });
+
+        for msg in events {
+            unsafe { DispatchMessageW(&msg) };
+        }
     }
 }
 
@@ -369,6 +420,13 @@ impl Window for DisplayWindow {
                 Some(LRESULT(0))
             }
             WM_DESTROY => exit(0),
+            DW_TIMER_ELAPSED => {
+                let timer = self.0.lock().unwrap().timer.clone();
+
+                timer.elapsed(|| self.pump());
+
+                Some(LRESULT(0))
+            }
             _ => None,
         }
     }

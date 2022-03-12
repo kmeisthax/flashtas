@@ -157,6 +157,8 @@ com::class! {
             S_OK
         }
         pub unsafe fn SetActiveObject(&self, param0: IOleInPlaceActiveObject, param1: *mut u16) -> HRESULT {
+            //NOTE: Fun fact: this method only gets called iff Flash Player
+            //gets user events for some reason...?
             self.associated_display.lock().unwrap().as_ref().unwrap().set_active_object(param0);
 
             S_OK
@@ -294,13 +296,18 @@ com::class! {
 
         #[allow(clippy::too_many_arguments)]
         pub unsafe fn Invoke(&self, dispid: i32, riid: *mut GUID, lcid: u32, wflags: u16, params: *mut DISPPARAMS, result: *mut VARIANT, param6: *mut EXCEPINFO, param7: *mut usize) -> HRESULT {
+            let display = self.associated_display.lock().unwrap();
+            let display = display.as_ref().unwrap();
+
             match (|| {
                 match (dispid as u32, wflags as u32) {
                     (_IShockwaveFlashEvents::ON_READY_STATE_CHANGE, DISPATCH_METHOD) => {
                         let params = &*params;
                         let ready_state : i32 = params.get_param(0)?;
 
-                        eprintln!("Ready state: {}", ready_state);
+                        if ready_state == 4 {
+                            display.start_pump();
+                        }
 
                         Ok(S_OK)
                     },

@@ -17,6 +17,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
 
 mod display;
 mod tas_client;
+mod timer;
 mod window_class;
 
 #[macro_use]
@@ -58,12 +59,13 @@ fn main() {
     // the SWF ourselves!
     let swf_header = decompress_swf(File::open(movie_canon).unwrap()).unwrap();
     let stage_size = swf_header.header.stage_size();
-    let width = stage_size.x_max.to_pixels();
-    let height = stage_size.y_max.to_pixels();
+    let width = stage_size.x_max.to_pixels() as i32;
+    let height = stage_size.y_max.to_pixels() as i32;
+    let frame_rate = swf_header.header.frame_rate().to_f64();
     eprintln!("Desired stage dimensions: {}x{}", width, height);
 
     let mainwnd =
-        display::DisplayWindow::create(movie, width as i32, height as i32, args.input).unwrap();
+        display::DisplayWindow::create(movie, width, height, frame_rate, args.input).unwrap();
     let mut si = STARTUPINFOW {
         cb: size_of::<STARTUPINFOW>() as u32,
         ..Default::default()
