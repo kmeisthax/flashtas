@@ -70,9 +70,9 @@ pub trait Window: Sized {
     /// window has been `created`.
     unsafe fn created(hwnd: HWND, lparam: LPARAM) -> Self {
         let create_struct_raw = lparam.0 as *mut CREATESTRUCTW;
-        let dwindow_raw = unsafe { &mut *create_struct_raw }.lpCreateParams;
+        let dwindow_raw = (*create_struct_raw).lpCreateParams;
 
-        unsafe { SetWindowLongPtrW(hwnd, GWLP_USERDATA, dwindow_raw as isize) };
+        SetWindowLongPtrW(hwnd, GWLP_USERDATA, dwindow_raw as isize);
         let wnd = Self::from_handle_unchecked(hwnd);
 
         wnd.set_window_unchecked(hwnd);
