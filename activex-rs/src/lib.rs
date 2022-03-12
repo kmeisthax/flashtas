@@ -1,6 +1,7 @@
 //! ActiveX bindings for Rust
 
 pub mod bindings;
+mod ole_automation;
 mod rrf_com;
 
 pub use bindings::stdole::{IDispatch, IMoniker, IOleContainer};
