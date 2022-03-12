@@ -11,6 +11,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "activex-rs-macros"
+version = "0.1.0"
+dependencies = [
+ "activex-rs-macros-impl",
+ "syn",
+]
+
+[[package]]
+name = "activex-rs-macros-impl"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "syn",
+]
+
+[[package]]
 name = "adler"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"

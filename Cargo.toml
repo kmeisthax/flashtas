@@ -5,4 +5,6 @@ members = [
     "flashtas",
     "comexport-rs",
     "activex-rs",
+    "activex-rs-macros",
+    "activex-rs-macros/impl",
 ]
