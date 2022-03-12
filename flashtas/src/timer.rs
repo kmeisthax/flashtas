@@ -8,8 +8,10 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use windows::Win32::Foundation::{BOOLEAN, HANDLE, HWND, LPARAM, WPARAM};
 use windows::Win32::Media::timeBeginPeriod;
-use windows::Win32::System::Threading::{CreateTimerQueueTimer, WORKER_THREAD_FLAGS};
-use windows::Win32::UI::WindowsAndMessaging::SendMessageW;
+use windows::Win32::System::Threading::{
+    CreateTimerQueueTimer, DeleteTimerQueueTimer, WORKER_THREAD_FLAGS,
+};
+use windows::Win32::UI::WindowsAndMessaging::PostMessageW;
 
 /// A thin wrapper over Windows's timer queues.
 ///
@@ -90,7 +92,7 @@ impl Timer {
                 HANDLE(0),
                 Some(Self::timer_callback),
                 Arc::into_raw(me.clone()) as *mut c_void,
-                period as u32,
+                0,
                 period as u32,
                 WORKER_THREAD_FLAGS(0),
             );
@@ -120,6 +122,25 @@ impl Timer {
         timer_mut.drift = Duration::new(0, 0);
     }
 
+    /// Determine if the timer is running.
+    pub fn is_stopped(&self) -> bool {
+        let timer = self.0.lock().unwrap();
+        timer.timer.is_invalid() || timer.caller_hwnd.is_invalid()
+    }
+
+    /// Manually tick the timer.
+    pub fn tick(&self) {
+        let (hwnd, msg) = {
+            let timer_inner = self.0.lock().unwrap();
+
+            (timer_inner.caller_hwnd, timer_inner.caller_msg)
+        };
+
+        if !hwnd.is_invalid() {
+            unsafe { PostMessageW(hwnd, msg, WPARAM(0), LPARAM(0)) };
+        }
+    }
+
     /// The system timer callback.
     ///
     /// # Safety
@@ -131,18 +152,10 @@ impl Timer {
         // As explained in `window_class` we have to take care not to consume
         // the lp_param; so we clone it and forget the original.
         let timer_orig = Arc::from_raw(lp_param as *const Mutex<TimerData>);
-        let timer = timer_orig.clone();
+        let timer = Self(timer_orig.clone());
         forget(timer_orig);
 
-        let (hwnd, msg) = {
-            let timer_inner = timer.lock().unwrap();
-
-            (timer_inner.caller_hwnd, timer_inner.caller_msg)
-        };
-
-        if !hwnd.is_invalid() {
-            SendMessageW(hwnd, msg, WPARAM(0), LPARAM(0));
-        }
+        timer.tick();
     }
 
     /// Determine if the timer has elapsed.
@@ -175,5 +188,23 @@ impl Timer {
                 timer_mut.drift, timer_mut.target_period
             );
         }
+    }
+
+    /// Stop the timer.
+    pub fn stop(&self) {
+        let timer = self.0.lock().unwrap().timer;
+        if timer.is_invalid() {
+            return;
+        }
+
+        unsafe {
+            DeleteTimerQueueTimer(HANDLE(0), timer, HANDLE(0));
+        }
+
+        let mut timer_mut = self.0.lock().unwrap();
+        timer_mut.caller_hwnd = HWND(0);
+        timer_mut.caller_msg = 0;
+        timer_mut.last = Instant::now();
+        timer_mut.drift = Duration::new(0, 0);
     }
 }

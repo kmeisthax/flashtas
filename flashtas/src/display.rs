@@ -67,6 +67,15 @@ pub struct DisplayWindowData {
 
     /// A timer object.
     timer: Timer,
+
+    /// Number of times Flash Player has sent Readystate 4
+    fp_ready: u8,
+
+    /// Number of times Flash Player has gotten MSG 1025
+    fp_got_message: bool,
+
+    /// The last frame Flash Player reported.
+    fp_lastframe: i32,
 }
 
 impl DisplayWindow {
@@ -89,6 +98,9 @@ impl DisplayWindow {
             injector: InputInjector::from_file(path).unwrap(),
             accel: HACCEL(0),
             timer: Timer::new(frame_rate),
+            fp_ready: 0,
+            fp_got_message: false,
+            fp_lastframe: 0,
         }));
 
         // The HWND itself owns an `Arc<Mutex<Self>>` through the C pointer,
@@ -156,12 +168,17 @@ impl DisplayWindow {
 
         unsafe { object.GetWindow(&mut child_wnd).unwrap() };
 
+        if child_wnd == 0 {
+            eprintln!("Rejected attempt to set invalid child window");
+            return;
+        }
+
         self.0.lock().unwrap().fp_window = HWND(child_wnd);
     }
 
     /// Get the current active object's HWND.
     ///
-    /// This will be 0 if the current active object
+    /// This will be 0 if the current active object has not been set yet.
     pub fn active_object_window(&self) -> HWND {
         self.0.lock().unwrap().fp_window
     }
@@ -184,35 +201,74 @@ impl DisplayWindow {
         (me.accel, 1)
     }
 
-    /// Start the synthetic event pump.
-    pub fn start_pump(&self) {
+    /// Indicates that Flash Player has hit readystate 4.
+    pub fn fp_ready(&self) {
+        let could_start_pump = self.can_start_pump();
+
+        self.0.lock().unwrap().fp_ready += 1;
+
+        if !could_start_pump && self.can_start_pump() {
+            self.start_pump();
+        }
+    }
+
+    /// Indicates that sync messages (MSG 1025) has been sent to Flash Player.
+    ///
+    /// This also takes the HWND of the window that got this message. This
+    /// allows intercepting Flash Player's messages earlier than when it says
+    /// we're allowed to know what it's HWND is. This also relies on message
+    /// 1025 being unique to FP.
+    pub fn fp_got_message(&self, hwnd: HWND) {
+        if !self.0.lock().unwrap().fp_got_message {
+            self.0.lock().unwrap().fp_got_message = true;
+            self.0.lock().unwrap().fp_window = hwnd;
+
+            // For some reason, we *always* need to pump one frame on MSG 1025,
+            // even if it would otherwise mess with our sync, otherwise we can't
+            // hit frame 2.
+            log::debug!(
+                "FP got first message, pumping frame {} IMMEDIATELY",
+                self.frame_ctr()
+            );
+            self.pump();
+        }
+    }
+
+    fn can_start_pump(&self) -> bool {
+        let self_mut = self.0.lock().unwrap();
+
+        self_mut.fp_ready >= 2 || self_mut.fp_got_message
+    }
+
+    /// Start the timer that drives synthetic event pumping.
+    fn start_pump(&self) {
         let window = self.window();
 
-        // At this point we absolutely should have a Flash Player window, even
-        // if Flash Player hasn't told us about it yet.
-        let fp = self.0.lock().unwrap().fp.clone().unwrap();
-        let fp_ole = fp.query_interface::<IOleWindow>().unwrap();
-        let mut fp_window = 0;
-
-        unsafe { fp_ole.GetWindow(&mut fp_window).unwrap() };
-
-        self.0.lock().unwrap().fp_window = HWND(fp_window);
-
+        let self_mut = self.0.lock().unwrap();
         unsafe {
-            self.0
-                .lock()
-                .unwrap()
-                .timer
-                .set_message(window, DW_TIMER_ELAPSED);
+            self_mut.timer.set_message(window, DW_TIMER_ELAPSED);
         }
     }
 
     /// Pump the next frame's worth of synthetic inputs into the player.
     pub fn pump(&self) {
-        let hwnd = self.active_object_window();
+        let mut hwnd = self.active_object_window();
         if hwnd.is_invalid() {
-            eprintln!("Active object window not valid yet");
-            return;
+            // At this point we absolutely should have a Flash Player window, even
+            // if Flash Player hasn't told us about it yet.
+            let fp = self.0.lock().unwrap().fp.clone().unwrap();
+            let fp_ole = fp.query_interface::<IOleWindow>().unwrap();
+            let mut fp_window = 0;
+
+            unsafe { fp_ole.GetWindow(&mut fp_window).unwrap() };
+
+            if fp_window != 0 {
+                self.0.lock().unwrap().fp_window = HWND(fp_window);
+                hwnd = HWND(fp_window);
+            } else {
+                log::error!("Cannot pump events into windowless player");
+                return;
+            }
         }
 
         let mut client_rect = RECT::default();
@@ -299,6 +355,14 @@ impl DisplayWindow {
             unsafe { DispatchMessageW(&msg) };
         }
     }
+
+    /// Get the current Flash Player timeline frame.
+    pub fn frame_ctr(&self) -> i32 {
+        let self_mut = self.0.lock().unwrap();
+        let fp = self_mut.fp.as_ref().unwrap();
+
+        unsafe { fp.CurrentFrame() }.unwrap()
+    }
 }
 
 impl Window for DisplayWindow {
@@ -348,7 +412,7 @@ impl Window for DisplayWindow {
                 let advise_sink = tas_client_site.query_interface::<IAdviseSink>().unwrap();
 
                 let movie = self.0.lock().unwrap().movie.clone();
-                eprintln!("Loading SWF: {:?}", movie.as_os_str());
+                log::info!("Loading SWF: {:?}", movie.as_os_str());
 
                 let fp_conn = fp.query_interface::<IConnectionPointContainer>().unwrap();
 
@@ -421,9 +485,17 @@ impl Window for DisplayWindow {
             }
             WM_DESTROY => exit(0),
             DW_TIMER_ELAPSED => {
-                let timer = self.0.lock().unwrap().timer.clone();
+                let cur_frame = self.frame_ctr();
+                let last_frame = self.0.lock().unwrap().fp_lastframe;
 
-                timer.elapsed(|| self.pump());
+                log::debug!("Timer fired, last frame was {}", last_frame);
+
+                if cur_frame != last_frame {
+                    log::debug!("Frame updated to {}, pumping new frame", cur_frame);
+                    self.pump();
+                }
+
+                self.0.lock().unwrap().fp_lastframe = cur_frame;
 
                 Some(LRESULT(0))
             }

@@ -157,9 +157,7 @@ com::class! {
             S_OK
         }
         pub unsafe fn SetActiveObject(&self, param0: IOleInPlaceActiveObject, param1: *mut u16) -> HRESULT {
-            //NOTE: Fun fact: this method only gets called iff Flash Player
-            //gets user events for some reason...?
-            self.associated_display.lock().unwrap().as_ref().unwrap().set_active_object(param0);
+            self.associated_display.lock().unwrap().clone().unwrap().set_active_object(param0);
 
             S_OK
         }
@@ -306,7 +304,7 @@ com::class! {
                         let ready_state : i32 = params.get_param(0)?;
 
                         if ready_state == 4 {
-                            display.start_pump();
+                            display.fp_ready();
                         }
 
                         Ok(S_OK)

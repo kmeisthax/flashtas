@@ -4,6 +4,7 @@ use std::fs::{canonicalize, File};
 use std::mem::size_of;
 use std::path::{Component, PathBuf, Prefix};
 use std::ptr::null_mut;
+use std::time::Instant;
 use swf::decompress_swf;
 use windows::Win32::Foundation::HWND;
 use windows::Win32::System::Ole::OleInitialize;
@@ -35,6 +36,8 @@ struct Args {
 fn main() {
     unsafe { OleInitialize(null_mut()) }.expect("Initialized OLE session");
 
+    env_logger::init();
+
     let args = Args::parse();
 
     // Flash Player wants canonicalized paths, but chokes on what Rust calls
@@ -62,7 +65,7 @@ fn main() {
     let width = stage_size.x_max.to_pixels() as i32;
     let height = stage_size.y_max.to_pixels() as i32;
     let frame_rate = swf_header.header.frame_rate().to_f64();
-    eprintln!("Desired stage dimensions: {}x{}", width, height);
+    log::info!("Desired stage dimensions: {}x{}", width, height);
 
     let mainwnd =
         display::DisplayWindow::create(movie, width, height, frame_rate, args.input).unwrap();
@@ -87,7 +90,11 @@ fn main() {
 
     let mut msg = MSG::default();
 
+    let mut last;
+
     while unsafe { GetMessageW(&mut msg, HWND::default(), 0, 0) }.as_bool() {
+        last = Instant::now();
+
         unsafe { TranslateMessage(&msg) };
 
         // Filter all queued Flash Player messages, we'll be adding our own.
@@ -99,8 +106,17 @@ fn main() {
                 | WM_XBUTTONDOWN | WM_XBUTTONUP => continue,
                 _ => {}
             }
+        } else if mainwnd.active_object_window().is_invalid() && msg.message == 1025 {
+            //Assume message 1025 ONLY gets sent to FP.
+            mainwnd.fp_got_message(msg.hwnd);
         }
 
+        log::debug!("Message: {} to {:?}", msg.message, msg.hwnd);
+        log::debug!("Flash Player is {:?}", mainwnd.active_object_window());
+
         unsafe { DispatchMessageW(&msg) };
+
+        let next = Instant::now();
+        log::debug!("Process time: {:?}", next - last);
     }
 }
