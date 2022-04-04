@@ -331,7 +331,7 @@ impl DisplayWindow {
             };
 
             let client_x = offset_x + (pos.0 as f64 * scale) as i16;
-            let client_y = offset_y + (pos.0 as f64 * scale) as i16;
+            let client_y = offset_y + (pos.1 as f64 * scale) as i16;
             let pos_lparam = (client_x as u16 as u32 | (client_y as u16 as u32) << 16) as isize;
 
             //TODO: This assumes the child window has no non-client area.
