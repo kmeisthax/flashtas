@@ -27,6 +27,7 @@ use windows::core::Error as WinError;
 use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, POINT, PWSTR, RECT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::System::Ole::OLEIVERB_SHOW;
+use windows::Win32::System::SystemInformation::GetTickCount;
 use windows::Win32::UI::Input::KeyboardAndMouse::VK_F4;
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateAcceleratorTableW, CreateWindowExW, DispatchMessageW, GetClientRect, GetWindowRect,
@@ -346,7 +347,7 @@ impl DisplayWindow {
                 message,
                 wParam: WPARAM(buttons_wparam as usize),
                 lParam: LPARAM(pos_lparam),
-                time: 0, // TODO: timestamping
+                time: unsafe { GetTickCount() },
                 pt,
             });
         });
