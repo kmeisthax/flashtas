@@ -342,6 +342,27 @@ impl DisplayWindow {
                 y: window_rect.top + client_y as i32,
             };
 
+            //Windows always sends a mousemove before a mousedown or mouseup.
+            match evt {
+                AutomatedEvent::MouseDown { btn, .. } | AutomatedEvent::MouseUp { btn, .. } => {
+                    let buttons_wparam_before = match btn {
+                        MouseButton::Left => buttons_wparam ^ MK_LBUTTON,
+                        MouseButton::Middle => buttons_wparam ^ MK_MBUTTON,
+                        MouseButton::Right => buttons_wparam ^ MK_RBUTTON,
+                    };
+
+                    events.push(MSG {
+                        hwnd,
+                        message: WM_MOUSEMOVE,
+                        wParam: WPARAM(buttons_wparam_before as usize),
+                        lParam: LPARAM(pos_lparam),
+                        time: unsafe { GetTickCount() },
+                        pt,
+                    });
+                }
+                _ => {}
+            }
+
             events.push(MSG {
                 hwnd,
                 message,
